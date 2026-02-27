@@ -1,0 +1,407 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<div class="animate__animated animate__fadeIn p-2" id="scholarshipMainContainer">
+    <div class="d-flex align-items-center mb-5 bg-primary bg-gradient p-4 rounded-4 text-white shadow-sm position-relative">
+        <div class="icon-circle bg-white text-primary me-3 shadow" style="width: 55px; height: 55px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-mortarboard-fill fs-3"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h3 class="fw-bold mb-0">គ្រប់គ្រងអាហារូបករណ៍</h3>
+            <p class="mb-0 opacity-75 small">ប្រព័ន្ធតាមដាន និងគ្រប់គ្រងទិន្នន័យហិរញ្ញវត្ថុសិស្ស</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-warning rounded-pill fw-bold shadow-sm px-3 border-white border-2" onclick="addNewScholarship()">
+                <i class="bi bi-person-plus-fill me-1"></i> បញ្ចូលថ្មី
+            </button>
+            <button class="btn btn-light rounded-pill fw-bold shadow-sm px-3" onclick="exportScholarshipToExcel()">
+                <i class="bi bi-file-earmark-excel-fill text-success me-1"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5 justify-content-center">
+        <div class="col-6 col-md-3">
+            <div class="stat-circle-card border-primary shadow-hover">
+                <div class="circle-content">
+                    <h2 class="fw-bold text-primary mb-0" id="totalScholarshipStudents">0</h2>
+                    <span class="text-muted small fw-bold">សិស្សសរុប</span>
+                </div>
+                <svg viewBox="0 0 36 36" class="circular-chart primary">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="stat-circle-card border-success shadow-hover">
+                <div class="circle-content">
+                    <h2 class="fw-bold text-success mb-0" id="scholarshipTypesCount">0</h2>
+                    <span class="text-muted small fw-bold">ប្រភេទ</span>
+                </div>
+                <svg viewBox="0 0 36 36" class="circular-chart success">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="stat-circle-card position-relative shadow-hover" id="depositCardContainer" role="button" onclick="editBaseDeposit()">
+                <div class="circle-content">
+                    <h2 class="fw-bold mb-0" id="displayDeposit">$0</h2>
+                    <span class="text-muted small fw-bold">ទំនុកបម្រុង</span>
+                </div>
+                <div class="edit-badge"><i class="bi bi-pencil-fill"></i></div>
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" id="depositCircle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+            </div>
+            <p class="mt-2 mb-0 small text-secondary fw-bold text-center" id="studentCountLabel">តម្រូវការ: $0</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-list-ul me-2"></i>បញ្ជីសិស្សអាហារូបករណ៍</h5>
+            <div class="input-group style-search shadow-sm">
+                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="searchScholarship" class="form-control border-0" placeholder="ស្វែងរកឈ្មោះសិស្ស..." oninput="loadScholarshipData()">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-uppercase small fw-bold">
+                    <tr>
+                        <th class="ps-4">សិស្ស</th>
+                        <th>ជំនាញ</th>
+                        <th>ប្រភេទ</th>
+                        <th>កម្រិត</th>
+                        <th class="text-end pe-4">សកម្មភាព</th>
+                    </tr>
+                </thead>
+                <tbody id="scholarshipTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Removed .btn-back-blue styles */
+
+    .stat-circle-card {
+        background: white;
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        transition: 0.3s;
+    }
+
+    .shadow-hover:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+
+    .circle-content {
+        position: absolute;
+        z-index: 2;
+        text-align: center;
+        width: 100%;
+    }
+
+    .circular-chart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: #f0f2f5;
+        stroke-width: 2.2;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .deposit-safe .circle {
+        stroke: #198754;
+    }
+
+    .deposit-safe h2 {
+        color: #198754;
+    }
+
+    .deposit-warning .circle {
+        stroke: #fd7e14;
+    }
+
+    .deposit-warning h2 {
+        color: #fd7e14;
+    }
+
+    .deposit-danger .circle {
+        stroke: #dc3545;
+    }
+
+    .deposit-danger h2 {
+        color: #dc3545;
+    }
+
+    .primary .circle {
+        stroke: #0d6efd;
+    }
+
+    .success .circle {
+        stroke: #198754;
+    }
+
+    .edit-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #6c757d;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        z-index: 3;
+        border: 2px solid white;
+    }
+
+    .style-search {
+        width: 280px;
+        border-radius: 50px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        background: #f8f9fa;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.04);
+    }
+
+    .avatar-img {
+        width: 42px;
+        height: 42px;
+        object-fit: cover;
+        border: 2px solid #eee;
+    }
+</style>
+
+<script>
+    (function() {
+        const RATE_PER_STUDENT = 600;
+        let baseDeposit = parseFloat(localStorage.getItem('base_deposit_rate')) || 0;
+
+        function loadScholarshipData() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const searchTerm = (document.getElementById('searchScholarship')?.value || "").toLowerCase();
+
+            const scholarshipList = students.filter(s => {
+                const perc = parseInt(s.scholarship) || 0;
+                return perc > 0 && s.name.toLowerCase().includes(searchTerm);
+            });
+
+            document.getElementById('totalScholarshipStudents').innerText = scholarshipList.length;
+            document.getElementById('scholarshipTypesCount').innerText = [...new Set(scholarshipList.map(s => s.scholarship_type || 'ទូទៅ'))].length;
+
+            updateDepositUI(scholarshipList.length);
+            renderTable(scholarshipList);
+        }
+
+        function renderTable(list) {
+            const tbody = document.getElementById('scholarshipTableBody');
+            if (!tbody) return;
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted small">មិនមានទិន្នន័យសិស្សឡើយ</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(s => `
+                <tr>
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                            <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)+'&background=random'}" class="rounded-circle avatar-img me-3">
+                            <div>
+                                <div class="fw-bold text-dark small">${s.name}</div>
+                                <small class="text-muted" style="font-size:10px;">ID: ${s.id}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="small fw-bold text-secondary">${s.major || 'N/A'}</td>
+                    <td><span class="badge bg-primary bg-opacity-10 text-primary small px-3 rounded-pill border border-primary border-opacity-25">${s.scholarship_type || 'អាហារូបករណ៍'}</span></td>
+                    <td><span class="small fw-bold text-success">${s.scholarship}%</span></td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                            <button class="btn btn-sm btn-light px-3 border-end" title="កែប្រែ" onclick="editScholarship('${s.id}')">
+                                <i class="bi bi-pencil-square text-warning"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light px-3" title="លុប" onclick="deleteScholarship('${s.id}')">
+                                <i class="bi bi-trash3 text-danger"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.addNewScholarship = async function() {
+            const { value: formValues } = await Swal.fire({
+                title: 'បញ្ចូលសិស្សអាហារូបករណ៍ថ្មី',
+                html: `<div class="text-start">
+                        <label class="small fw-bold mb-1">ឈ្មោះសិស្ស</label>
+                        <input id="swal-name" class="form-control mb-3 rounded-3" placeholder="ឧ. សុខ ហេង">
+                        <label class="small fw-bold mb-1">អត្តលេខ (ID)</label>
+                        <input id="swal-id" class="form-control mb-3 rounded-3" placeholder="ឧ. STU-001">
+                        <label class="small fw-bold mb-1">ជំនាញ</label>
+                        <input id="swal-major" class="form-control mb-3 rounded-3" placeholder="ឧ. IT">
+                        <label class="small fw-bold mb-1">កម្រិតអាហារូបករណ៍ (%)</label>
+                        <input id="swal-perc" type="number" class="form-control rounded-3" placeholder="ឧ. 100">
+                    </div>`,
+                focusConfirm: false,
+                confirmButtonText: '<i class="bi bi-save me-1"></i> រក្សាទុក',
+                confirmButtonColor: '#0d6efd',
+                showCancelButton: true,
+                cancelButtonText: 'បោះបង់',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const id = document.getElementById('swal-id').value;
+                    const major = document.getElementById('swal-major').value;
+                    const scholarship = document.getElementById('swal-perc').value;
+                    if (!name || !id || !scholarship) {
+                        Swal.showValidationMessage('សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់');
+                    }
+                    return { name, id, major, scholarship, scholarship_type: 'អាហារូបករណ៍' };
+                }
+            });
+
+            if (formValues) {
+                let students = JSON.parse(localStorage.getItem('students')) || [];
+                students.push(formValues);
+                localStorage.setItem('students', JSON.stringify(students));
+                loadScholarshipData();
+                Swal.fire({ icon: 'success', title: 'ជោគជ័យ', text: 'ទិន្នន័យត្រូវបានរក្សាទុក', timer: 1500, showConfirmButton: false });
+            }
+        };
+
+        window.editScholarship = async function(id) {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            const s = students.find(item => item.id === id);
+            if (!s) return;
+
+            const { value: formValues } = await Swal.fire({
+                title: 'កែប្រែព័ត៌មានសិស្ស',
+                html: `<div class="text-start">
+                        <label class="small fw-bold mb-1">ឈ្មោះសិស្ស</label>
+                        <input id="swal-name" class="form-control mb-3 rounded-3" value="${s.name}">
+                        <label class="small fw-bold mb-1">ជំនាញ</label>
+                        <input id="swal-major" class="form-control mb-3 rounded-3" value="${s.major}">
+                        <label class="small fw-bold mb-1">កម្រិតអាហារូបករណ៍ (%)</label>
+                        <input id="swal-perc" type="number" class="form-control rounded-3" value="${s.scholarship}">
+                    </div>`,
+                confirmButtonText: 'ធ្វើបច្ចុប្បន្នភាព',
+                confirmButtonColor: '#ffc107',
+                showCancelButton: true,
+                preConfirm: () => {
+                    return {
+                        name: document.getElementById('swal-name').value,
+                        major: document.getElementById('swal-major').value,
+                        scholarship: document.getElementById('swal-perc').value
+                    };
+                }
+            });
+
+            if (formValues) {
+                const index = students.findIndex(item => item.id === id);
+                students[index] = { ...students[index], ...formValues };
+                localStorage.setItem('students', JSON.stringify(students));
+                loadScholarshipData();
+                Swal.fire('រួចរាល់!', 'ទិន្នន័យត្រូវបានកែប្រែ', 'success');
+            }
+        };
+
+        window.deleteScholarship = function(id) {
+            Swal.fire({
+                title: 'តើអ្នកប្រាកដទេ?',
+                text: "ទិន្នន័យនឹងត្រូវលុបចេញជារៀងរហូត!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'បាទ/ចាស លុបចេញ',
+                cancelButtonText: 'បោះបង់'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let students = JSON.parse(localStorage.getItem('students')) || [];
+                    students = students.filter(item => item.id !== id);
+                    localStorage.setItem('students', JSON.stringify(students));
+                    loadScholarshipData();
+                    Swal.fire('លុបរួចរាល់!', '', 'success');
+                }
+            });
+        };
+
+        function updateDepositUI(studentCount) {
+            const requiredAmount = studentCount * RATE_PER_STUDENT;
+            const displayEl = document.getElementById('displayDeposit');
+            const container = document.getElementById('depositCardContainer');
+            const labelEl = document.getElementById('studentCountLabel');
+            if(!displayEl || !container) return;
+
+            displayEl.innerText = `$${baseDeposit.toLocaleString()}`;
+            labelEl.innerText = `តម្រូវការ: $${requiredAmount.toLocaleString()} (${studentCount} នាក់)`;
+
+            container.classList.remove('deposit-safe', 'deposit-warning', 'deposit-danger');
+            if (baseDeposit > requiredAmount && requiredAmount > 0) container.classList.add('deposit-safe');
+            else if (baseDeposit === requiredAmount && requiredAmount > 0) container.classList.add('deposit-warning');
+            else container.classList.add('deposit-danger');
+        }
+
+        window.loadScholarshipData = loadScholarshipData;
+        window.editBaseDeposit = async function() {
+            const { value: newRate } = await Swal.fire({
+                title: 'កំណត់ថវិកាទំនុកបម្រុង',
+                input: 'number',
+                inputValue: baseDeposit,
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd'
+            });
+            if (newRate !== undefined) {
+                baseDeposit = parseFloat(newRate) || 0;
+                localStorage.setItem('base_deposit_rate', baseDeposit);
+                loadScholarshipData();
+            }
+        };
+
+        window.exportScholarshipToExcel = function() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const data = students.filter(s => parseInt(s.scholarship) > 0).map(s => ({
+                "ID": s.id, "Name": s.name, "Major": s.major, "Scholarship": s.scholarship + "%"
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Scholarship");
+            XLSX.writeFile(wb, "Scholarship_Report.xlsx");
+        };
+
+        loadScholarshipData();
+    })();
+</script>

@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងការបង់ប្រាក់ - HR University</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* --- 1. Root & Dark Mode Variables --- */
+        :root {
+            --bg-body: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --input-bg: #fbfbfb;
+            --input-border: #ced4da;
+            --table-hover: #f8f9fa;
+            --modal-header: #f8f9fa;
+            --shadow: rgba(0,0,0,0.08);
+            --payment-btn-bg: #ffffff;
+            --payment-btn-border: #f1f3f5;
+        }
+
+        [data-bs-theme="dark"] {
+            --bg-body: #0b0f19;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --table-hover: #334155;
+            --modal-header: #1e293b;
+            --shadow: rgba(0,0,0,0.3);
+            --payment-btn-bg: #1e293b;
+            --payment-btn-border: #334155;
+        }
+
+        body {
+            font-family: 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        /* --- 2. Form Style --- */
+        .payment-form-card {
+            border: none;
+            border-radius: 20px;
+            background: var(--card-bg);
+            box-shadow: 0 10px 30px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .payment-form-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            }
+
+        .form-header-bg {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin: -3rem -3rem 2rem -3rem;
+            padding: 2.5rem 2rem;
+        }
+
+            .form-header-bg h4 {
+                color: #ffffff !important;
+            }
+
+            .form-header-bg p {
+                color: rgba(255, 255, 255, 0.8) !important;
+            }
+
+        .form-label {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            border-radius: 10px;
+            padding: 12px 15px;
+        }
+
+            .form-control:focus, .form-select:focus {
+                background-color: var(--card-bg);
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            }
+
+        /* --- 3. Payment Buttons --- */
+        .btn-payment {
+            background: var(--payment-btn-bg) !important;
+            border: 2px solid var(--payment-btn-border) !important;
+            color: var(--text-main) !important;
+            border-radius: 16px;
+            padding: 15px !important;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+            .btn-payment:hover {
+                transform: translateY(-5px);
+                border-color: #0d6efd !important;
+            }
+
+        .btn-check:checked + .btn-payment {
+            border-color: #0d6efd !important;
+            background: rgba(13, 110, 253, 0.1) !important;
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.15);
+        }
+
+        .bank-logo-box {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+            .bank-logo-box img {
+                max-height: 100%;
+                max-width: 100%;
+                object-fit: contain;
+            }
+
+        /* --- 4. QR Card --- */
+        .qr-card {
+            background: linear-gradient(90deg, #003366, #0d6efd, #00d4ff);
+            color: white;
+            border-radius: 20px;
+            border: none;
+        }
+
+        /* --- 5. Modal & Table --- */
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .modal-header {
+            background-color: var(--modal-header);
+            border-bottom: 1px solid var(--input-border);
+        }
+
+        .table {
+            color: var(--text-main);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--table-hover);
+        }
+
+        .bg-light {
+            background-color: var(--modal-header) !important;
+        }
+
+        media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background-color: white;
+            }
+
+            .qr-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                color: black !important;
+            }
+
+                .qr-card * {
+                    color: black !important;
+                }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid py-4">
+        <div class="row g-4 no-print mb-4">
+            <div class="col-12">
+                <div class="card payment-form-card p-4 p-md-5">
+                    <div class="text-center form-header-bg">
+                        <h4 class="fw-bold mb-2" id="formTitle">
+                            <i class="bi bi-shield-check me-2" style="color: #00d4ff;"></i>បញ្ចូលព័ត៌មានការបង់ប្រាក់
+                        </h4>
+                        <p class="small mb-0">សូមពិនិត្យព័ត៌មាននិស្សិត និងចំនួនទឹកប្រាក់ឱ្យបានត្រឹមត្រូវ</p>
+                    </div>
+
+                    <form id="paymentForm">
+                        <input type="hidden" id="editIndex" value="-1">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-book me-1"></i> ជំនាញ (Major)</label>
+                                <select id="major" class="form-select" onchange="updateStudentList()" required>
+                                    <option value="" disabled selected>-- ជ្រើសរើសជំនាញ --</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Business Administration">Business Administration</option>
+                                    <option value="English Literature">English Literature</option>
+                                    <option value="Law">Law</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-person me-1"></i> ឈ្មោះសិស្ស (ពីក្នុងបញ្ជី)</label>
+                                <select id="studentName" class="form-select" required>
+                                    <option value="" disabled selected>-- ជ្រើសរើសឈ្មោះ --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-calendar-event me-1"></i> ឆ្នាំសិក្សា</label>
+                                <select id="year" class="form-select">
+                                    <option value="1">ឆ្នាំទី ១</option>
+                                    <option value="2">ឆ្នាំទី ២</option>
+                                    <option value="3">ឆ្នាំទី ៣</option>
+                                    <option value="4">ឆ្នាំទី ៤</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-door-open me-1"></i> បន្ទប់</label>
+                                <input type="text" id="room" class="form-control" placeholder="ឧទាហរណ៍: A01" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-clock me-1"></i> បង់សម្រាប់</label>
+                                <select id="semester" class="form-select">
+                                    <option value="ឆមាសទី ១">ឆមាសទី ១</option>
+                                    <option value="ឆមាសទី ២">ឆមាសទី ២</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-currency-dollar me-1"></i> ចំនួនទឹកប្រាក់ ($)</label>
+                                <input type="number" id="payAmount" class="form-control fw-bold text-primary" placeholder="0.00" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h6 class="fw-bold text-center mb-4 text-secondary">ជ្រើសរើសវិធីសាស្ត្របង់ប្រាក់</h6>
+                            <div class="row row-cols-2 row-cols-md-4 g-3 justify-content-center">
+                                <div class="col" style="max-width: 180px;">
+                                    <input type="radio" class="btn-check" name="payMethod" id="aba" value="ABA Bank" data-logo="/images/aba_logo.png" checked>
+                                    <label class="btn btn-payment w-100" for="aba">
+                                        <div class="bank-logo-box"><img src="/images/aba_logo.png" alt="ABA"></div>
+                                        <span class="bank-name-text">ABA Bank</span>
+                                    </label>
+                                </div>
+                                <div class="col" style="max-width: 180px;">
+                                    <input type="radio" class="btn-check" name="payMethod" id="acleda" value="ACLEDA" data-logo="/images/acleda_logo.png">
+                                    <label class="btn btn-payment w-100" for="acleda">
+                                        <div class="bank-logo-box"><img src="/images/acleda_logo.png" alt="ACLEDA"></div>
+                                        <span class="bank-name-text">ACLEDA</span>
+                                    </label>
+                                </div>
+                                <div class="col" style="max-width: 180px;">
+                                    <input type="radio" class="btn-check" name="payMethod" id="wing" value="Wing Bank" data-logo="/images/wing_logo.png">
+                                    <label class="btn btn-payment w-100" for="wing">
+                                        <div class="bank-logo-box"><img src="/images/wing_logo.png" alt="Wing"></div>
+                                        <span class="bank-name-text">Wing Bank</span>
+                                    </label>
+                                </div>
+                                <div class="col" style="max-width: 180px;">
+                                    <input type="radio" class="btn-check" name="payMethod" id="cash" value="Cash">
+                                    <label class="btn btn-payment w-100" for="cash">
+                                        <div class="bank-logo-box">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/10149/10149458.png" alt="Cash" style="filter: invert(31%) sepia(94%) saturate(1450%) hue-rotate(205deg) brightness(97%) contrast(102%);">
+                                        </div>
+                                        <span class="bank-name-text">សាច់ប្រាក់</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+                                    <i class="bi bi-plus-circle me-2"></i>រក្សាទុកការបង់ប្រាក់
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-outline-secondary w-100 py-3 fw-bold rounded-3" data-bs-toggle="modal" data-bs-target="#historyModal" onclick="renderPaymentTable()">
+                                    <i class="bi bi-list-ul me-2"></i>មើលប្រវត្តិបង់ប្រាក់
+                                </button>
+                            </div>
+                            <div class="col-md-2 d-none" id="cancelBtnContainer">
+                                <button type="button" id="cancelBtn" class="btn btn-light w-100 py-3 fw-bold rounded-3" onclick="resetForm()">បោះបង់</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card qr-card overflow-hidden shadow">
+                    <div class="row g-0">
+                        <div class="col-md-8 p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-weight: 900;">KH</div>
+                                <div>
+                                    <h5 class="fw-bold m-0 text-white">ស្កែនដើម្បីបង់ប្រាក់ (Scan to Pay)</h5>
+                                    <p class="small m-0 text-white-50">គាំទ្រគ្រប់ធនាគារទាំងអស់ក្នុងស្រុកតាមរយៈ KHQR</p>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-white text-dark small">
+                                        <span class="text-muted d-block" style="font-size: 10px;">ឈ្មោះគណនី / Account Name</span>
+                                        <b style="font-size: 12px;">VANNALJOHN KEOBUNKUANG</b>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-white text-dark small">
+                                        <span class="text-muted d-block" style="font-size: 10px;">លេខទូរស័ព្ទ / Phone Number</span>
+                                        <b style="font-size: 12px;">009 507 957</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 no-print">
+                                <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-primary"><i class="bi bi-download me-1"></i> រក្សាទុករូបភាព</button>
+                                <button class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="window.print()"><i class="bi bi-printer me-1"></i> បោះពុម្ព</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 bg-white p-3 d-flex align-items-center justify-content-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=VANNALJOHN-KEOBUNKUANG-009507957" class="img-fluid rounded" style="max-height: 160px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade no-print" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content shadow border-0">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>ប្រវត្តិនៃការបង់ប្រាក់ទាំងអស់</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <input type="text" id="tableSearch" class="form-control" placeholder="ស្វែងរកឈ្មោះសិស្ស...">
+                        </div>
+                        <div class="col-md-4">
+                            <select id="filterMajor" class="form-select" onchange="filterByMajor()">
+                                <option value="">-- បង្ហាញគ្រប់ជំនាញ --</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Business Administration">Business Administration</option>
+                                <option value="English Literature">English Literature</option>
+                                <option value="Law">Law</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="paymentTable">
+                            <thead class="bg-light">
+                                <tr class="small text-muted">
+                                    <th>សិស្ស</th>
+                                    <th>ជំនាញ/ឆ្នាំ</th>
+                                    <th>បន្ទប់/ឆមាស</th>
+                                    <th>បង់តាម</th>
+                                    <th>សរុប ($)</th>
+                                    <th>ថ្ងៃទី</th>
+                                    <th class="text-center">សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody" class="small"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- 1. Initial Data ---
+        if(!localStorage.getItem('students')) {
+            localStorage.setItem('students', JSON.stringify([
+                {id: 'ST001', name: 'កែវ មករា', major: 'Information Technology'},
+                {id: 'ST002', name: 'សៅ វិច្ឆិកា', major: 'Business Administration'},
+                {id: 'ST003', name: 'លី ហ៊ួរ', major: 'Law'},
+                {id: 'ST004', name: 'ចាន់ ធារ៉ា', major: 'English Literature'}
+            ]));
+        }
+
+        // --- 2. Update Student List based on Major ---
+        function updateStudentList() {
+            const majorSelect = document.getElementById('major').value;
+            const studentSelect = document.getElementById('studentName');
+            const allStudents = JSON.parse(localStorage.getItem('students')) || [];
+            studentSelect.innerHTML = '<option value="" disabled selected>-- ជ្រើសរើសឈ្មោះ --</option>';
+
+            const filteredStudents = allStudents.filter(s => s.major === majorSelect);
+
+            if (filteredStudents.length > 0) {
+                filteredStudents.forEach(s => {
+                    let opt = document.createElement('option');
+                    opt.value = s.name;
+                    opt.text = `${s.name} (${s.id})`;
+                    studentSelect.add(opt);
+                });
+            } else {
+                studentSelect.innerHTML = '<option disabled>គ្មានទិន្នន័យសិស្ស</option>';
+            }
+        }
+
+        // --- 3. Form Submission (Add/Edit) ---
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            const methodEl = document.querySelector('input[name="payMethod"]:checked');
+            const isCash = methodEl.value === 'Cash';
+
+            const paymentData = {
+                name: document.getElementById('studentName').value,
+                major: document.getElementById('major').value,
+                year: document.getElementById('year').value,
+                room: document.getElementById('room').value,
+                semester: document.getElementById('semester').value,
+                method: methodEl.value,
+                logo: isCash ? '' : methodEl.getAttribute('data-logo'),
+                amount: parseFloat(document.getElementById('payAmount').value),
+                date: new Date().toLocaleDateString('km-KH')
+            };
+
+            let payments = JSON.parse(localStorage.getItem('payment_history')) || [];
+
+            if (editIndex === -1) {
+                payments.unshift(paymentData);
+                Swal.fire({ icon: 'success', title: 'រក្សាទុកជោគជ័យ!', timer: 1500, showConfirmButton: false });
+            } else {
+                payments[editIndex] = paymentData;
+                Swal.fire({ icon: 'success', title: 'កែប្រែជោគជ័យ!', timer: 1500, showConfirmButton: false });
+                const modal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+                if(modal) modal.hide();
+            }
+
+            localStorage.setItem('payment_history', JSON.stringify(payments));
+            resetForm();
+        });
+
+        // --- 4. Render Table ---
+        function renderPaymentTable() {
+            const payments = JSON.parse(localStorage.getItem('payment_history')) || [];
+            const tableBody = document.getElementById('paymentTableBody');
+
+            if(payments.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">មិនទាន់មានប្រវត្តិបង់ប្រាក់នៅឡើយទេ</td></tr>';
+                return;
+            }
+            displayPayments(payments);
+        }
+
+        function displayPayments(data) {
+            const tableBody = document.getElementById('paymentTableBody');
+            tableBody.innerHTML = data.map((p, index) => `
+                <tr data-major="${p.major}">
+                    <td><div class="fw-bold">${p.name}</div></td>
+                    <td>${p.major} (ឆ្នាំទី ${p.year})</td>
+                    <td>${p.room} - ${p.semester}</td>
+                    <td>
+                        ${p.method === 'Cash' ? '<i class="bi bi-cash me-1 text-success"></i> សាច់ប្រាក់' : `<img src="${p.logo}" height="18" class="me-1"> ${p.method}`}
+                    </td>
+                    <td class="text-primary fw-bold">$${p.amount.toFixed(2)}</td>
+                    <td class="text-muted small">${p.date}</td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-light text-primary" onclick="editPayment(${index})"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-light text-danger" onclick="deletePayment(${index})"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- 5. Filtering & Search ---
+        function filterByMajor() {
+            const selectedMajor = document.getElementById('filterMajor').value;
+            const rows = document.querySelectorAll('#paymentTableBody tr');
+            rows.forEach(row => {
+                const major = row.getAttribute('data-major');
+                row.style.display = (selectedMajor === "" || major === selectedMajor) ? "" : "none";
+            });
+        }
+
+        document.getElementById('tableSearch').addEventListener('keyup', function() {
+            let val = this.value.toLowerCase();
+            document.querySelectorAll('#paymentTableBody tr').forEach(tr => {
+                tr.style.display = tr.innerText.toLowerCase().includes(val) ? '' : 'none';
+            });
+        });
+
+        // --- 6. Delete Payment ---
+        function deletePayment(index) {
+            Swal.fire({
+                title: 'តើអ្នកប្រាកដទេ?',
+                text: "អ្នកនឹងមិនអាចត្រឡប់វាវិញបានទេ!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'បាទ លុបវា!',
+                cancelButtonText: 'បោះបង់'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let payments = JSON.parse(localStorage.getItem('payment_history')) || [];
+                    payments.splice(index, 1);
+                    localStorage.setItem('payment_history', JSON.stringify(payments));
+                    renderPaymentTable();
+                }
+            });
+        }
+
+        // --- 7. Edit Payment ---
+        function editPayment(index) {
+            let payments = JSON.parse(localStorage.getItem('payment_history')) || [];
+            let p = payments[index];
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('historyModal'));
+            if(modal) modal.hide();
+
+            document.getElementById('editIndex').value = index;
+            document.getElementById('major').value = p.major;
+            updateStudentList();
+            document.getElementById('studentName').value = p.name;
+            document.getElementById('year').value = p.year;
+            document.getElementById('room').value = p.room;
+            document.getElementById('semester').value = p.semester;
+            document.getElementById('payAmount').value = p.amount;
+
+            const methods = document.querySelectorAll('input[name="payMethod"]');
+            methods.forEach(m => { if(m.value === p.method) m.checked = true; });
+
+            // UI Update for Edit Mode
+            document.getElementById('formTitle').innerHTML = '<i class="bi bi-pencil-square me-2" style="color:#00d4ff"></i>កែប្រែព័ត៌មានការបង់ប្រាក់';
+            document.getElementById('submitBtn').innerHTML = '<i class="bi bi-save me-2"></i>រក្សាទុកការកែប្រែ';
+            document.getElementById('submitBtn').className = "btn btn-success w-100 py-3 fw-bold rounded-3 shadow-sm";
+            document.getElementById('cancelBtnContainer').classList.remove('d-none');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 8. Reset Form ---
+        function resetForm() {
+            document.getElementById('paymentForm').reset();
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('formTitle').innerHTML = '<i class="bi bi-shield-check me-2" style="color:#00d4ff"></i>បញ្ចូលព័ត៌មានការបង់ប្រាក់';
+            document.getElementById('submitBtn').innerHTML = '<i class="bi bi-plus-circle me-2"></i>រក្សាទុកការបង់ប្រាក់';
+            document.getElementById('submitBtn').className = "btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm";
+            document.getElementById('cancelBtnContainer').classList.add('d-none');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+﻿@model IEnumerable<WebApplication2.Models.Student>
+@{
+    ViewData["Title"] = "Home - HR University";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --hru-blue: #1a237e;
+        --hru-red: #d32f2f;
+        --hru-light-blue: #0022cc;
+    }
+
+    /* 1. CAROUSEL BANNER */
+    .welcome-banner-slide {
+        height: 300px;
+        position: relative;
+        background-size: cover !important;
+        background-position: center !important;
+        display: flex;
+        align-items: center;
+        border-radius: 0 0 40px 40px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+
+        .welcome-banner-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(26, 35, 126, 0.7) 0%, rgba(0,0,0,0.1) 100%);
+            z-index: 1;
+        }
+
+    .banner-content-wrapper {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        padding-left: 80px;
+    }
+
+    .main-logo {
+        height: 120px;
+        width: auto;
+        filter: drop-shadow(0px 5px 15px rgba(255,255,255,0.3));
+    }
+
+    .banner-text {
+        color: white;
+        margin-left: 30px;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+
+        .banner-text h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0;
+        }
+
+    /* 2. ACADEMICS & SECTION TITLES */
+    .section-title {
+        text-align: center;
+        margin: 40px 0;
+        font-weight: 800;
+        color: var(--hru-blue);
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--hru-red);
+        }
+
+    .degree-btn {
+        background: var(--hru-light-blue);
+        color: white;
+        border-radius: 20px 5px 20px 5px;
+        padding: 12px;
+        font-weight: 700;
+        border: none;
+        transition: 0.3s;
+        font-size: 0.85rem;
+    }
+
+        .degree-btn:hover {
+            background: #001188;
+            transform: translateY(-2px);
+        }
+
+    /* 3. ABOUT UNIVERSITY SECTION */
+    .about-container {
+        border-radius: 20px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .about-image-fixed {
+        background-image: url('/images/hru-buidling.jpg'); /* ប្រើរូបភាពអាគាររបស់អ្នក */
+        background-size: cover;
+        background-position: center;
+        min-height: 400px;
+        position: relative;
+    }
+
+        .about-image-fixed::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 35, 126, 0.1);
+        }
+
+    /* 4. FACULTY CARDS */
+    .faculty-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        height: 100%;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .faculty-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+    .faculty-img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .faculty-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Responsive */
+    media (max-width: 768px) {
+        .welcome-banner-slide {
+            height: 200px;
+        }
+
+        .banner-content-wrapper {
+            padding-left: 20px;
+        }
+
+        .main-logo {
+            height: 70px;
+        }
+
+        .banner-text h1 {
+            font-size: 1.2rem;
+        }
+
+        .about-image-fixed {
+            min-height: 250px;
+        }
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div id="hruBannerCarousel" class="carousel slide carousel-fade mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="4000">
+                <div class="welcome-banner-slide" style="background-image: url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1260');">
+                    <div class="banner-content-wrapper">
+                        <img src="/images/hru-logo-png.png" alt="HRU Logo" class="main-logo">
+                        <div class="banner-text d-none d-md-block">
+                            <h1 class="fw-bold"></h1>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">ACADEMICS</h2>
+        <div class="row g-3 mb-5 px-lg-5">
+            <div class="col-6 col-lg-3"><button class="degree-btn w-100">PHD'S DEGREES</button></div>
+            <div class="col-6 col-lg-3"><button class="degree-btn w-100">MASTER'S DEGREE</button></div>
+            <div class="col-6 col-lg-3"><button class="degree-btn w-100">BACHELOR'S DEGREES</button></div>
+            <div class="col-6 col-lg-3"><button class="degree-btn w-100">ASSOCIATE DEGREES</button></div>
+        </div>
+
+        <div class="about-container mb-5 shadow-sm">
+            <div class="row g-0">
+                <div class="col-md-6 p-5 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #1a237e 0%, #283593 100%);">
+                    <h3 class="fw-bold mb-3 border-start border-4 border-danger ps-3 text-white">ABOUT UNIVERSITY</h3>
+                    <p style="text-align: justify; line-height: 1.8; opacity: 0.9; color: #ffffff; font-size: 1.05rem;">
+                        The Human Resource University (HRU) was established in 1998. We are deeply committed to providing high-quality academic programs, fostering innovation, and building strong ethical values for the next generation of leaders and professionals in Cambodia.
+                    </p>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-light rounded-pill px-4" style="font-weight: 600;">
+                            Read More <i class="bi bi-info-circle ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 d-none d-md-block about-image-fixed"></div>
+            </div>
+        </div>
+
+        <h2 class="section-title">FACULTIES & PROGRAMS</h2>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="faculty-card">
+                    <img src="https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=600" class="faculty-img" alt="IT">
+                    <div class="faculty-body text-center">
+                        <div>
+                            <h5 class="fw-bold text-dark">Computer Science</h5>
+                            <p class="text-muted small">Elevate your tech skills with our specialized courses in Software Engineering, Networking, and Cyber Security.</p>
+                        </div>
+                        <a href="#" class="text-danger text-decoration-none fw-bold mt-2">Discover More <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="faculty-card">
+                    <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600" class="faculty-img" alt="Business">
+                    <div class="faculty-body text-center">
+                        <div>
+                            <h5 class="fw-bold text-dark">Business Administration</h5>
+                            <p class="text-muted small">Become a future leader. We offer professional training in Management, Accounting, Marketing, and Finance.</p>
+                        </div>
+                        <a href="#" class="text-danger text-decoration-none fw-bold mt-2">Discover More <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="faculty-card">
+                    <img src="https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=600" class="faculty-img" alt="Graduate School">
+                    <div class="faculty-body text-center">
+                        <div>
+                            <h5 class="fw-bold text-dark">Graduate School</h5>
+                            <p class="text-muted small">Advance your professional career with our highly recognized Master's and PhD research programs.</p>
+                        </div>
+                        <a href="#" class="text-danger text-decoration-none fw-bold mt-2">Discover More <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

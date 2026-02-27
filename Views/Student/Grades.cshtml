@@ -1,0 +1,254 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="animate__animated animate__fadeIn">
+    <div class="d-flex align-items-center mb-4 bg-primary bg-gradient p-4 rounded-4 text-white shadow-sm" style="background-color: #0d6efd !important;">
+        <div class="icon-circle bg-white text-primary me-3" style="width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #0d6efd !important;">
+            <i class="bi bi-award fs-3"></i>
+        </div>
+        <div>
+            <h3 class="fw-bold mb-0">គ្រប់គ្រងពិន្ទុ និងលទ្ធផលសិក្សា</h3>
+            <p class="mb-0 opacity-75">បញ្ចូលពិន្ទុ និងពិនិត្យលទ្ធផលតាមវេនសិក្សា ជំនាញ និងបន្ទប់</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4 bg-white p-2 rounded-pill shadow-sm d-inline-flex" id="gradeTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#input-tab" onclick="loadStudentGrades()">បញ្ចូលពិន្ទុ</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#report-tab" onclick="initReportFilters()">មើលលទ្ធផលតាមវេនសិក្សា</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="input-tab">
+            <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <select id="gradeFilterMajor" class="form-select border-0 bg-light rounded-pill" onchange="loadStudentGrades()">
+                            <option value="">គ្រប់ជំនាញទាំងអស់</option>
+                            <option>Information Technology</option>
+                            <option>Business Administration</option>
+                            <option>English Literature</option>
+                            <option>Law</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <input type="text" id="gradeSearchInput" class="form-control bg-light border-0 rounded-pill" placeholder="ស្វែងរកឈ្មោះសិស្ស..." oninput="loadStudentGrades()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-uppercase small">
+                            <tr>
+                                <th class="ps-4">ឈ្មោះសិស្ស & ជំនាញ</th>
+                                <th class="text-center">វត្តមាន (10%)</th>
+                                <th class="text-center">កិច្ចការ (20%)</th>
+                                <th class="text-center text-primary">Mid-Term (30%)</th>
+                                <th class="text-center text-primary">Final (40%)</th>
+                                <th class="text-center">សរុប (100)</th>
+                                <th class="text-end pe-4">សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradeTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="report-tab">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h6 class="fw-bold text-primary mb-3">ជ្រើសរើសលក្ខខណ្ឌ</h6>
+                        <div class="mb-3">
+                            <label class="small fw-bold mb-1">វេនសិក្សា</label>
+                            <select id="reportShift" class="form-select border-0 bg-light" onchange="updateMajorOptions()">
+                                <option value="">-- គ្រប់វេនទាំងអស់ --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold mb-1">ជំនាញ</label>
+                            <select id="reportMajor" class="form-select border-0 bg-light" onchange="updateRoomOptions()">
+                                <option value="">-- គ្រប់ជំនាញទាំងអស់ --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold mb-1">បន្ទប់</label>
+                            <select id="reportRoom" class="form-select border-0 bg-light" onchange="showFilteredReport()">
+                                <option value="">-- គ្រប់បន្ទប់ទាំងអស់ --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-body bg-light border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0 text-dark" id="reportTitle">លទ្ធផលសិក្សាទូទៅ</h5>
+                            <span class="badge bg-primary rounded-pill" id="studentCount">0 នាក់</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="text-uppercase small fw-bold">
+                                    <tr>
+                                        <th class="ps-4">ចំណាត់ថ្នាក់</th>
+                                        <th>ឈ្មោះសិស្ស</th>
+                                        <th class="text-center">មធ្យមភាគ</th>
+                                        <th class="text-center">និទ្ទេស</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="majorReportBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ១. Logic គណនាពិន្ទុ
+    function calculateTotal(s) {
+        return (parseFloat(s.grade_att) || 0) + (parseFloat(s.grade_asg) || 0) +
+               (parseFloat(s.grade_mid) || 0) + (parseFloat(s.grade_final) || 0);
+    }
+
+    function getGrade(total) {
+        if (total >= 90) return { label: 'A', class: 'bg-success' };
+        if (total >= 80) return { label: 'B', class: 'bg-info text-dark' };
+        if (total >= 70) return { label: 'C', class: 'bg-primary' };
+        if (total >= 60) return { label: 'D', class: 'bg-warning text-dark' };
+        if (total >= 50) return { label: 'E', class: 'bg-secondary' };
+        return { label: 'F', class: 'bg-danger' };
+    }
+
+    // ២. Function សំខាន់៖ បង្ហាញ Data ក្នុងតារាងបញ្ចូលពិន្ទុ
+    function loadStudentGrades() {
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+
+        // ចាប់យកតម្លៃពី Filter (បើអត់ទាន់មាន វានឹងស្មើ "" ដែលមានន័យថាបង្ហាញទាំងអស់)
+        const filterMajorElement = document.getElementById('gradeFilterMajor');
+        const searchInputSelection = document.getElementById('gradeSearchInput');
+
+        const major = filterMajorElement ? filterMajorElement.value : "";
+        const query = searchInputSelection ? searchInputSelection.value.toLowerCase() : "";
+
+        const tbody = document.getElementById('gradeTableBody');
+        if (!tbody) return;
+
+        const filtered = students.filter(s =>
+            (s.name || "").toLowerCase().includes(query) && (major === "" || s.major === major)
+        );
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-muted">មិនមានទិន្នន័យសិស្សឡើយ</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(s => {
+            const total = calculateTotal(s);
+            const grade = getGrade(total);
+            return `
+                <tr>
+                    <td class="ps-4">
+                        <div class="fw-bold text-dark">${s.name}</div>
+                        <div class="text-muted small">${s.major}</div>
+                    </td>
+                    <td class="text-center">${s.grade_att || 0}</td>
+                    <td class="text-center">${s.grade_asg || 0}</td>
+                    <td class="text-center text-primary fw-bold">${s.grade_mid || 0}</td>
+                    <td class="text-center text-primary fw-bold">${s.grade_final || 0}</td>
+                    <td class="text-center"><span class="badge ${grade.class} rounded-pill">${total.toFixed(0)} (${grade.label})</span></td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="openGradeModal('${s.id}')">កែពិន្ទុ</button>
+                    </td>
+                </tr>`;
+        }).join('');
+    }
+
+    // ៣. Logic សម្រាប់ Tab ទី២ (ទុកធម្មតា)
+    function initReportFilters() {
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        const shifts = [...new Set(students.map(s => s.shift))].filter(Boolean);
+        const shiftSelect = document.getElementById('reportShift');
+        if(shiftSelect) {
+            shiftSelect.innerHTML = '<option value="">-- គ្រប់វេនទាំងអស់ --</option>' +
+                shifts.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        showFilteredReport();
+    }
+
+    function updateMajorOptions() {
+        const shift = document.getElementById('reportShift').value;
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        let filtered = shift ? students.filter(s => s.shift === shift) : students;
+        const majors = [...new Set(filtered.map(s => s.major))].filter(Boolean);
+        document.getElementById('reportMajor').innerHTML = '<option value="">-- គ្រប់ជំនាញទាំងអស់ --</option>' +
+            majors.map(m => `<option value="${m}">${m}</option>`).join('');
+        showFilteredReport();
+    }
+
+    function updateRoomOptions() {
+        const shift = document.getElementById('reportShift').value;
+        const major = document.getElementById('reportMajor').value;
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        let filtered = students;
+        if (shift) filtered = filtered.filter(s => s.shift === shift);
+        if (major) filtered = filtered.filter(s => s.major === major);
+        const rooms = [...new Set(filtered.map(s => s.room))].filter(Boolean);
+        document.getElementById('reportRoom').innerHTML = '<option value="">-- គ្រប់បន្ទប់ទាំងអស់ --</option>' +
+            rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+        showFilteredReport();
+    }
+
+    function showFilteredReport() {
+        const shift = document.getElementById('reportShift').value;
+        const major = document.getElementById('reportMajor').value;
+        const room = document.getElementById('reportRoom').value;
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        let filtered = students.filter(s => (!shift || s.shift === shift) && (!major || s.major === major) && (!room || s.room === room));
+        filtered = filtered.map(s => ({ ...s, total: calculateTotal(s) })).sort((a, b) => b.total - a.total);
+        document.getElementById('studentCount').innerText = `${filtered.length} នាក់`;
+        const tbody = document.getElementById('majorReportBody');
+        if (!tbody) return;
+        tbody.innerHTML = filtered.map((s, i) => {
+            const grade = getGrade(s.total);
+            return `<tr><td class="ps-4"><span class="badge ${i < 3 ? 'bg-primary' : 'bg-light text-dark'} rounded-circle" style="width:25px; height:25px; display:inline-flex; align-items:center; justify-content:center;">${i+1}</span></td><td><div class="fw-bold">${s.name}</div><small class="text-muted">${s.major} | ${s.room || 'គ្មានបន្ទប់'}</small></td><td class="text-center fw-bold text-primary">${s.total.toFixed(0)}</td><td class="text-center"><span class="badge ${grade.class} rounded-pill px-3">${grade.label}</span></td></tr>`;
+        }).join('');
+    }
+
+    // ៤. Modal កែពិន្ទុ
+    async function openGradeModal(id) {
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        const idx = students.findIndex(s => s.id === id);
+        const s = students[idx];
+        const { value: v } = await Swal.fire({
+            title: `បញ្ចូលពិន្ទុ៖ ${s.name}`,
+            html: `<div class="row g-2 text-start px-2"><div class="col-6"><label class="small fw-bold">វត្តមាន (10)</label><input id="att" type="number" class="form-control" value="${s.grade_att||0}"></div><div class="col-6"><label class="small fw-bold">កិច្ចការ (20)</label><input id="asg" type="number" class="form-control" value="${s.grade_asg||0}"></div><div class="col-6"><label class="small fw-bold text-primary">Mid-Term (30)</label><input id="mid" type="number" class="form-control" value="${s.grade_mid||0}"></div><div class="col-6"><label class="small fw-bold text-primary">Final (40)</label><input id="final" type="number" class="form-control" value="${s.grade_final||0}"></div></div>`,
+            showCancelButton: true, confirmButtonText: 'រក្សាទុក',
+            preConfirm: () => ({ att: parseFloat(document.getElementById('att').value)||0, asg: parseFloat(document.getElementById('asg').value)||0, mid: parseFloat(document.getElementById('mid').value)||0, final: parseFloat(document.getElementById('final').value)||0 })
+        });
+        if (v) {
+            students[idx] = { ...s, grade_att: v.att, grade_asg: v.asg, grade_mid: v.mid, grade_final: v.final };
+            localStorage.setItem('students', JSON.stringify(students));
+            loadStudentGrades();
+            Swal.fire({ icon: 'success', title: 'រក្សាទុកជោគជ័យ', timer: 800, showConfirmButton: false });
+        }
+    }
+
+    // *** ៥. ចំណុចសំខាន់បំផុត៖ បញ្ជាឱ្យរត់ loadStudentGrades ភ្លាមៗពេលបើកទំព័រ ***
+    // ប្រើ setTimeout បន្តិចដើម្បីធានាថា HTML បង្កើតរួចរាល់
+    setTimeout(() => {
+        loadStudentGrades();
+    }, 100);
+
+    // ហៅម្តងទៀតពេល Window Load រួចរាល់
+    window.onload = loadStudentGrades;
+
+</script>

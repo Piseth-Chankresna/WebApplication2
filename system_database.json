@@ -1,0 +1,148 @@
+{
+  "Users": [
+    {
+      "Id": 3,
+      "FullName": "Jonh",
+      "Email": "Jonh@gmailcom",
+      "Role": "Admin",
+      "Password": "12345678",
+      "IsActive": true
+    },
+    {
+      "Id": 6,
+      "FullName": "Hru",
+      "Email": "hru@gmail.com",
+      "Role": "Registrar",
+      "Password": "12345",
+      "IsActive": true
+    }
+  ],
+  "RolePermissions": {
+    "Administrator": [
+      {
+        "ModuleName": "User Management",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Student Records",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Financial Reports",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Inventory",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Settings",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      }
+    ],
+    "Registrar": [
+      {
+        "ModuleName": "User Management",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Student Records",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": true
+      },
+      {
+        "ModuleName": "Financial Reports",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": false,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Inventory",
+        "CanView": true,
+        "CanCreate": false,
+        "CanEdit": false,
+        "CanDelete": false,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Settings",
+        "CanView": true,
+        "CanCreate": false,
+        "CanEdit": true,
+        "CanDelete": false,
+        "CanExport": false
+      }
+    ],
+    "Accounting": [
+      {
+        "ModuleName": "User Management",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Student Records",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Financial Reports",
+        "CanView": true,
+        "CanCreate": true,
+        "CanEdit": true,
+        "CanDelete": true,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Inventory",
+        "CanView": true,
+        "CanCreate": false,
+        "CanEdit": false,
+        "CanDelete": false,
+        "CanExport": false
+      },
+      {
+        "ModuleName": "Settings",
+        "CanView": true,
+        "CanCreate": false,
+        "CanEdit": false,
+        "CanDelete": false,
+        "CanExport": true
+      }
+    ]
+  }
+}

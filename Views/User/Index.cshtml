@@ -1,0 +1,397 @@
+﻿@model IEnumerable<WebApplication2.Models.UserAccount>
+@{
+    // ឆែកមើល Request ដើម្បីសម្រេចចិត្តប្រើ Layout ឬអត់ (ការពារបញ្ហា Refresh បាត់ Sidebar/Topbar)
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    /* --- CSS Variables សម្រាប់ Support ទាំង Light និង Dark Mode --- */
+    :root {
+        --user-bg-card: #ffffff;
+        --user-bg-wrapper: #ffffff;
+        --user-text-main: #1e293b;
+        --user-text-muted: #64748b;
+        --user-border-color: #f1f5f9;
+        --user-input-bg: #f1f5f9;
+        --user-row-hover: #f8fafc;
+        --user-table-border: #f1f5f9;
+        --user-header-sep: #f8fafc;
+    }
+
+    [data-bs-theme='dark'] {
+        --user-bg-card: #1a1d21;
+        --user-bg-wrapper: #1a1d21;
+        --user-text-main: #f3f4f6;
+        --user-text-muted: #9ca3af;
+        --user-border-color: #3f444d;
+        --user-input-bg: #2d3239;
+        --user-row-hover: #24282d;
+        --user-table-border: #3f444d;
+        --user-header-sep: #3f444d;
+    }
+
+    /* --- Main Container --- */
+    .user-list-wrapper {
+        background-color: var(--user-bg-wrapper);
+        padding: 25px 40px;
+        min-height: 100vh;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: all 0.3s ease;
+    }
+
+    /* --- Header Section --- */
+    .user-header-minimal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 25px;
+        border-bottom: 2px solid var(--user-header-sep);
+        margin-bottom: 20px;
+    }
+
+    .header-title-box h3 {
+        color: var(--user-text-main);
+        font-weight: 850;
+        margin-bottom: 5px;
+        font-size: 1.8rem;
+        letter-spacing: -0.8px;
+    }
+
+    .header-title-box p {
+        color: var(--user-text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+
+    /* --- Search Bar Modern --- */
+    .search-group-minimal {
+        position: relative;
+        width: 350px;
+    }
+
+    .search-input-minimal {
+        width: 100%;
+        background-color: var(--user-input-bg) !important;
+        border: 2px solid transparent !important;
+        color: var(--user-text-main) !important;
+        padding: 12px 15px 12px 48px !important;
+        border-radius: 16px !important;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+        .search-input-minimal:focus {
+            background-color: var(--user-bg-card) !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1) !important;
+        }
+
+    .search-icon-minimal {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--user-text-muted);
+        font-size: 1.2rem;
+        z-index: 10;
+    }
+
+    /* --- Table Modern Styling --- */
+    .table-modern {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+        .table-modern thead th {
+            color: var(--user-text-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 10px 20px;
+            border: none;
+        }
+
+        .table-modern tbody tr {
+            background-color: var(--user-bg-card);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .table-modern tbody tr td {
+                padding: 18px 20px;
+                border-top: 1.5px solid var(--user-table-border);
+                border-bottom: 1.5px solid var(--user-table-border);
+                color: var(--user-text-main);
+            }
+
+                .table-modern tbody tr td:first-child {
+                    border-left: 1.5px solid var(--user-table-border);
+                    border-top-left-radius: 18px;
+                    border-bottom-left-radius: 18px;
+                }
+
+                .table-modern tbody tr td:last-child {
+                    border-right: 1.5px solid var(--user-table-border);
+                    border-top-right-radius: 18px;
+                    border-bottom-right-radius: 18px;
+                }
+
+            .table-modern tbody tr:hover td {
+                background-color: var(--user-row-hover);
+                border-color: var(--user-border-color);
+            }
+
+    /* --- Avatar --- */
+    .avatar-squircle {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 2px solid var(--user-bg-card);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* --- Status Badges --- */
+    .badge-role {
+        background: var(--user-input-bg);
+        color: var(--user-text-muted);
+        padding: 7px 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        border: 1px solid var(--user-border-color);
+    }
+
+    /* --- Action Buttons --- */
+    .btn-action {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        border: 1.5px solid var(--user-border-color);
+        background: var(--user-bg-card);
+        color: var(--user-text-muted);
+        transition: 0.3s ease;
+        text-decoration: none;
+    }
+
+        .btn-action:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #eff6ff;
+            transform: rotate(5deg);
+        }
+
+    [data-bs-theme='dark'] .btn-action:hover {
+        background: #2d3239;
+    }
+
+    .btn-create-new {
+        background: #2563eb;
+        color: white;
+        padding: 12px 28px;
+        border-radius: 16px;
+        font-weight: 700;
+        border: none;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+    }
+
+        .btn-create-new:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px);
+            color: white;
+        }
+</style>
+
+<div class="user-list-wrapper animate__animated animate__fadeIn">
+    <div class="user-header-minimal">
+        <div class="header-title-box">
+            <h3>បញ្ជីអ្នកប្រើប្រាស់</h3>
+            <p>គ្រប់គ្រងសិទ្ធិ និងព័ត៌មានគណនីបុគ្គលិកក្នុងស្ថាប័ន</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="search-group-minimal">
+                <i class="bi bi-search search-icon-minimal"></i>
+                <input type="text" id="userInputSearch" class="form-control search-input-minimal shadow-none" placeholder="ស្វែងរកតាមឈ្មោះ ឬអ៊ីមែល...">
+            </div>
+            <a href="javascript:void(0)" class="btn-create-new" onclick="loadUserPage('/User/Create')">
+                <i class="bi bi-person-plus-fill me-2"></i> បង្កើតអ្នកប្រើប្រាស់
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-modern align-middle" id="userTable">
+            <thead>
+                <tr>
+                    <th style="width: 35%;">ព័ត៌មានលម្អិត</th>
+                    <th style="width: 15%;">តួនាទី</th>
+                    <th style="width: 15%;">ស្ថានភាព</th>
+                    <th style="width: 20%;">កាលបរិច្ឆេទ</th>
+                    <th class="text-end" style="width: 15%;">សកម្មភាព</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var user in Model)
+                    {
+                        <tr id="row-@user.Id" class="user-row">
+                            <td class="user-info-cell">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://ui-avatars.com/api/?name=@user.FullName&background=2563eb&color=fff&bold=true&rounded=true"
+                                         class="avatar-squircle me-3 user-avatar" alt="Avatar">
+                                    <div>
+                                        <div class="fw-bold user-name-display" style="font-size: 1.05rem;">@user.FullName</div>
+                                        <div class="small user-email-display" style="color: var(--user-text-muted);">@user.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-role user-role-display">@user.Role</span>
+                            </td>
+                            <td>
+                                @if (user.IsActive)
+                                {
+                                    <span class="status-active">សកម្ម</span>
+                                }
+                                else
+                                {
+                                    <span class="status-inactive">អសកម្ម</span>
+                                }
+                            </td>
+                            <td>
+                                <div style="color: var(--user-text-muted); font-size: 0.85rem;">
+                                    <i class="bi bi-calendar3 me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy")
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn-action" onclick="quickEdit(@user.Id, '@user.FullName', '@user.Email', '@user.Role')" title="កែសម្រួល">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="confirmDelete(@user.Id, '@user.FullName')" title="លុបចោល">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="py-5">
+                                <i class="bi bi-person-x text-muted" style="font-size: 4rem; opacity: 0.2;"></i>
+                                <h5 class="text-muted mt-3 fw-bold">មិនមានទិន្នន័យក្នុងប្រព័ន្ធ</h5>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="py-4 border-top mt-3 d-flex justify-content-between align-items-center" style="border-color: var(--user-header-sep) !important;">
+        <p class="small mb-0" style="color: var(--user-text-muted);">បង្ហាញទិន្នន័យចុងក្រោយបង្អស់</p>
+        <div class="d-flex align-items-center">
+            <span class="small me-2" style="color: var(--user-text-muted);">សរុប៖</span>
+            <span class="badge rounded-pill bg-primary px-3" id="totalCount">@(Model?.Count() ?? 0) នាក់</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // បើ Refresh (F5) ក៏នៅតែរក្សា URL នេះ
+        const currentUrl = "/User/Index";
+        if(window.location.pathname !== currentUrl) {
+            window.history.pushState({ path: currentUrl }, '', currentUrl);
+        }
+
+        // Search Logic
+        $("#userInputSearch").on("keyup", function() {
+            const value = $(this).val().toLowerCase();
+            $("#userTable tbody tr.user-row").each(function() {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.indexOf(value) > -1);
+            });
+        });
+    });
+
+    // មុខងារ Load ទំព័រតាម AJAX ដើម្បីរក្សា Layout
+    function loadUserPage(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                $('#main-content-area').html(data); // ប្តូរទៅតាម ID container ក្នុង _Layout របស់អ្នក
+                window.history.pushState({ path: url }, '', url);
+            }
+        });
+    }
+
+    function quickEdit(id, name, email, role) {
+        Swal.fire({
+            title: 'កែសម្រួលព័ត៌មាន',
+            background: getComputedStyle(document.documentElement).getPropertyValue('--user-bg-card'),
+            color: getComputedStyle(document.documentElement).getPropertyValue('--user-text-main'),
+            html: `
+                <div class="text-start">
+                    <label class="small fw-bold mb-1">ឈ្មោះពេញ</label>
+                    <input id="swal-name" class="form-control mb-3" value="${name}" style="background:var(--user-input-bg); color:var(--user-text-main); border:none;">
+                    <label class="small fw-bold mb-1">អ៊ីមែល</label>
+                    <input id="swal-email" class="form-control mb-3" value="${email}" style="background:var(--user-input-bg); color:var(--user-text-main); border:none;">
+                    <label class="small fw-bold mb-1">តួនាទី</label>
+                    <select id="swal-role" class="form-select" style="background:var(--user-input-bg); color:var(--user-text-main); border:none;">
+                        <option value="Admin" ${role === 'Admin' ? 'selected' : ''}>Admin</option>
+                        <option value="Editor" ${role === 'Editor' ? 'selected' : ''}>Editor</option>
+                        <option value="User" ${role === 'User' ? 'selected' : ''}>User</option>
+                    </select>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'រក្សាទុក',
+            confirmButtonColor: '#2563eb'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // បញ្ជូន AJAX ទៅ Update ទីនេះ...
+            }
+        });
+    }
+
+    function confirmDelete(id, name) {
+        Swal.fire({
+            title: 'លុបទិន្នន័យ?',
+            text: `តើអ្នកចង់លុប ${name} មែនទេ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'បាទ លុបចោល'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/User/Delete/' + id, function(res) {
+                    if (res.success) {
+                        $('#row-' + id).fadeOut();
+                        updateCounter();
+                    }
+                });
+            }
+        });
+    }
+
+    function updateCounter() {
+        const count = $("#userTable tbody tr.user-row:visible").length;
+        $("#totalCount").text(count + " នាក់");
+    }
+</script>

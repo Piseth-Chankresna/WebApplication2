@@ -1,0 +1,370 @@
+﻿@page
+@model WebApplication2.Views.Student.ClassesModel
+@{
+    Layout = null;
+}
+
+<link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css' rel='stylesheet'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    :root {
+        --hru-bg: #f8f9fa;
+        --hru-card-bg: #ffffff;
+        --hru-text: #212529;
+        --hru-text-muted: #6c757d;
+        --hru-border: #dee2e6;
+        --hru-input-bg: #f8f9fa;
+        --hru-table-hover: rgba(0,0,0,0.04);
+    }
+
+    /* Dark Mode Variables */
+    [data-bs-theme="dark"] {
+        --hru-bg: #0f172a;
+        --hru-card-bg: #1e293b;
+        --hru-text: #f1f5f9;
+        --hru-text-muted: #94a3b8;
+        --hru-border: #334155;
+        --hru-input-bg: #0f172a;
+        --hru-table-hover: rgba(255,255,255,0.05);
+    }
+
+    #classMainPage {
+        background-color: var(--hru-bg);
+        color: var(--hru-text);
+        min-height: 100vh;
+        transition: all 0.3s ease;
+    }
+
+    .card {
+        background-color: var(--hru-card-bg) !important;
+        border-color: var(--hru-border) !important;
+        color: var(--hru-text) !important;
+    }
+
+    .table {
+        color: var(--hru-text) !important;
+    }
+
+        .table > :not(caption) > * > * {
+            background-color: var(--hru-card-bg) !important;
+            border-bottom-color: var(--hru-border) !important;
+        }
+
+    .table-hover tbody tr:hover td {
+        background-color: var(--hru-table-hover) !important;
+    }
+
+    .bg-light {
+        background-color: var(--hru-input-bg) !important;
+    }
+
+    .text-dark {
+        color: var(--hru-text) !important;
+    }
+
+    .teacher-img-preview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #0d6efd;
+        padding: 2px;
+        background: white;
+        cursor: pointer;
+    }
+
+    .day-card {
+        background: var(--hru-card-bg);
+        border-radius: 15px;
+        padding: 15px;
+        border: 1px solid var(--hru-border);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+        .day-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #0d6efd;
+        }
+
+    .note-input {
+        border: none;
+        background: var(--hru-input-bg);
+        color: var(--hru-text);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        padding: 10px;
+        min-height: 100px;
+        width: 100%;
+        resize: none;
+        outline: none;
+        transition: 0.2s;
+    }
+
+        .note-input:focus {
+            background: var(--hru-card-bg);
+            box-shadow: inset 0 0 0 2px #0d6efd44;
+        }
+
+    .weekend-card {
+        border-color: rgba(220, 53, 69, 0.3) !important;
+    }
+
+    /* Modal Styling for Dark Mode */
+    .swal2-popup {
+        background-color: var(--hru-card-bg) !important;
+        color: var(--hru-text) !important;
+    }
+
+    .swal2-input, .swal2-textarea {
+        background-color: var(--hru-input-bg) !important;
+        color: var(--hru-text) !important;
+    }
+</style>
+
+<div id="classMainPage" class="animate__animated animate__fadeIn p-3">
+
+    <div class="row g-3 mb-4 align-items-stretch">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center h-100 bg-primary bg-gradient p-4 rounded-4 text-white shadow-sm">
+                <div class="bg-white text-primary me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 55px; height: 55px; border-radius: 12px;">
+                    <i class="bi bi-journal-check fs-3"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold mb-0">គ្រប់គ្រងថ្នាក់រៀន និងកំណត់ចំណាំ</h4>
+                    <p class="mb-0 opacity-75 small text-nowrap">គ្រប់គ្រងបញ្ជីថ្នាក់ និងរៀបចំផែនការកត់ត្រាប្រចាំសប្តាហ៍</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-4 position-relative overflow-hidden rounded-4 h-100 border-start border-primary border-5">
+                <div class="position-relative z-1">
+                    <h6 class="mb-1 text-muted small text-uppercase fw-bold">ថ្នាក់រៀនសរុប</h6>
+                    <h1 class="fw-bold mb-0 display-5 text-primary" id="classCount">0</h1>
+                </div>
+                <i class="bi bi-door-open position-absolute end-0 bottom-0 opacity-10 m-n2" style="font-size: 5rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-transparent py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="bi bi-list-ul me-2 text-primary"></i>បញ្ជីថ្នាក់រៀន</h5>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="showClassModal()">
+                <i class="bi bi-plus-circle me-1"></i> បន្ថែមថ្នាក់ថ្មី
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">កូដថ្នាក់</th>
+                        <th>ឈ្មោះថ្នាក់</th>
+                        <th>គ្រូបង្រៀន</th>
+                        <th>បន្ទប់</th>
+                        <th>ម៉ោងសិក្សា</th>
+                        <th class="text-end pe-4">សកម្មភាព</th>
+                    </tr>
+                </thead>
+                <tbody id="tblClasses"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden border">
+        <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="bi bi-calendar-week me-2 text-primary"></i>កត់ចំណាំប្រចាំសប្តាហ៍ (Weekly Planner)</h5>
+            <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3">រក្សាទុកស្វ័យប្រវត្តិ</span>
+        </div>
+        <div class="p-3 bg-light bg-opacity-25">
+            <div class="row g-3" id="weeklyPlannerContainer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CLASS_STORAGE_KEY = 'HRU_STUDENT_CLASSES_DATA_SECURE';
+    const NOTES_STORAGE_KEY = 'HRU_WEEKLY_NOTES_SECURE';
+
+    let globalClasses = [];
+    let weeklyNotes = {};
+
+    function init() {
+        const storedClasses = localStorage.getItem(CLASS_STORAGE_KEY);
+        globalClasses = storedClasses ? JSON.parse(storedClasses) : [];
+
+        const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY);
+        weeklyNotes = storedNotes ? JSON.parse(storedNotes) : {
+            "Monday": "", "Tuesday": "", "Wednesday": "", "Thursday": "", "Friday": "", "Saturday": "", "Sunday": ""
+        };
+
+        renderClasses();
+        renderPlanner();
+    }
+
+    function renderClasses() {
+        $('#classCount').text(globalClasses.length);
+        let rows = '';
+        globalClasses.forEach(item => {
+            const photo = item.teacherPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.teacherName || 'T')}&background=random`;
+            rows += `
+                <tr class="animate__animated animate__fadeIn">
+                    <td class="ps-4 fw-bold text-primary">${item.classCode}</td>
+                    <td>${item.className}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${photo}" class="rounded-circle me-2" style="width:32px; height:32px; object-fit:cover; border:1px solid var(--hru-border);">
+                            <span class="small fw-bold">${item.teacherName || 'N/A'}</span>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-geo-alt me-1 text-danger"></i>${item.room}</td>
+                    <td><span class="badge bg-light text-dark fw-normal border">${item.time}</span></td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group border rounded-3 overflow-hidden shadow-sm">
+                            <button onclick="showClassModal(${item.id})" class="btn btn-light btn-sm px-3"><i class="bi bi-pencil text-primary"></i></button>
+                            <button onclick="deleteClass(${item.id})" class="btn btn-light btn-sm px-3"><i class="bi bi-trash text-danger"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+        $('#tblClasses').html(rows || '<tr><td colspan="6" class="text-center p-5 text-muted">មិនទាន់មានទិន្នន័យថ្នាក់</td></tr>');
+    }
+
+    function showClassModal(id = null) {
+        const item = globalClasses.find(x => x.id === id);
+        const defaultPhoto = item?.teacherPhoto || 'https://via.placeholder.com/80?text=Photo';
+
+        Swal.fire({
+            title: `<h5 class="fw-bold text-primary">${item ? 'កែប្រែថ្នាក់' : 'បន្ថែមថ្នាក់ថ្មី'}</h5>`,
+            html: `
+                <div class="text-center mb-3">
+                    <img id="teacher-preview" src="${defaultPhoto}" class="teacher-img-preview" onclick="$('#teacher-file').click()">
+                    <input type="file" id="teacher-file" hidden accept="image/*" onchange="previewImg(this)">
+                </div>
+                <div class="text-start p-2">
+                    <label class="small fw-bold mb-1 text-muted">ឈ្មោះគ្រូបង្រៀន</label>
+                    <input id="sw-tname" class="form-control mb-3 rounded-3 shadow-none bg-light border-0" value="${item?.teacherName || ''}" placeholder="...">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 text-muted">កូដថ្នាក់</label>
+                            <input id="sw-code" class="form-control mb-3 rounded-3 shadow-none bg-light border-0" value="${item?.classCode || ''}">
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 text-muted">ឈ្មោះថ្នាក់</label>
+                            <input id="sw-name" class="form-control mb-3 rounded-3 shadow-none bg-light border-0" value="${item?.className || ''}">
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 text-muted">បន្ទប់</label>
+                            <input id="sw-room" class="form-control mb-3 rounded-3 shadow-none bg-light border-0" value="${item?.room || ''}">
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold mb-1 text-muted">ម៉ោងសិក្សា</label>
+                            <input id="sw-time" class="form-control mb-3 rounded-3 shadow-none bg-light border-0" value="${item?.time || ''}">
+                        </div>
+                    </div>
+                </div>`,
+            showCancelButton: true,
+            confirmButtonText: 'រក្សាទុក',
+            buttonsStyling: false,
+            customClass: { confirmButton: 'btn btn-primary px-5 rounded-pill me-2', cancelButton: 'btn btn-light px-4 rounded-pill' },
+            preConfirm: () => {
+                const code = $('#sw-code').val();
+                const name = $('#sw-name').val();
+                if(!code || !name) return Swal.showValidationMessage('សូមបំពេញ កូដ និង ឈ្មោះថ្នាក់!');
+                return {
+                    id: item ? item.id : Date.now(),
+                    classCode: code,
+                    className: name,
+                    teacherName: $('#sw-tname').val(),
+                    teacherPhoto: $('#teacher-preview').attr('src'),
+                    room: $('#sw-room').val(),
+                    time: $('#sw-time').val()
+                };
+            }
+        }).then(res => {
+            if(res.isConfirmed) {
+                if(item) {
+                    const idx = globalClasses.findIndex(x => x.id === item.id);
+                    globalClasses[idx] = res.value;
+                } else {
+                    globalClasses.push(res.value);
+                }
+                localStorage.setItem(CLASS_STORAGE_KEY, JSON.stringify(globalClasses));
+                renderClasses();
+            }
+        });
+    }
+
+    function previewImg(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => $('#teacher-preview').attr('src', e.target.result);
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function deleteClass(id) {
+        Swal.fire({ title: 'លុបថ្នាក់នេះ?', icon: 'warning', showCancelButton: true, confirmButtonText: 'យល់ព្រម' }).then(r => {
+            if(r.isConfirmed) {
+                globalClasses = globalClasses.filter(x => x.id !== id);
+                localStorage.setItem(CLASS_STORAGE_KEY, JSON.stringify(globalClasses));
+                renderClasses();
+            }
+        });
+    }
+
+    function renderPlanner() {
+        const days = [
+            { id: "Monday", label: "ចន្ទ (Mon)", icon: "bi-1-square" },
+            { id: "Tuesday", label: "អង្គារ (Tue)", icon: "bi-2-square" },
+            { id: "Wednesday", label: "ពុធ (Wed)", icon: "bi-3-square" },
+            { id: "Thursday", label: "ព្រហស្បតិ៍ (Thu)", icon: "bi-4-square" },
+            { id: "Friday", label: "សុក្រ (Fri)", icon: "bi-5-square" },
+            { id: "Saturday", label: "សៅរ៍ (Sat)", icon: "bi-6-square", weekend: true },
+            { id: "Sunday", label: "អាទិត្យ (Sun)", icon: "bi-7-square", weekend: true }
+        ];
+
+        let html = '';
+        days.forEach(day => {
+            const content = weeklyNotes[day.id] || "";
+            html += `
+                <div class="col-md-3 col-sm-6 animate__animated animate__zoomIn">
+                    <div class="day-card ${day.weekend ? 'weekend-card border-danger border-opacity-25' : ''}">
+                        <div class="day-label ${day.weekend ? 'text-danger' : 'text-primary'} fw-bold mb-2">
+                            <span><i class="bi ${day.icon} me-2"></i>${day.label}</span>
+                        </div>
+                        <textarea class="note-input"
+                                  placeholder="សរសេរអ្វីមួយនៅទីនេះ..."
+                                  oninput="saveNote('${day.id}', this.value)">${content}</textarea>
+                    </div>
+                </div>`;
+        });
+        $('#weeklyPlannerContainer').html(html);
+    }
+
+    let saveTimeout;
+    function saveNote(dayId, value) {
+        weeklyNotes[dayId] = value;
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(weeklyNotes));
+        }, 500);
+    }
+
+    const classObserver = new MutationObserver(() => {
+        if (document.getElementById('classMainPage')) {
+            classObserver.disconnect();
+            init();
+            setTimeout(() => classObserver.observe(document.body, { childList: true, subtree: true }), 500);
+        }
+    });
+
+    $(document).ready(function() {
+        init();
+        classObserver.observe(document.body, { childList: true, subtree: true });
+    });
+</script>

@@ -1,0 +1,44 @@
+{
+  "Registrar": [
+    {
+      "ModuleName": "User Management",
+      "CanView": true,
+      "CanCreate": true,
+      "CanEdit": false,
+      "CanDelete": false,
+      "CanExport": false
+    },
+    {
+      "ModuleName": "Student Records",
+      "CanView": true,
+      "CanCreate": false,
+      "CanEdit": false,
+      "CanDelete": false,
+      "CanExport": false
+    },
+    {
+      "ModuleName": "Financial Reports",
+      "CanView": true,
+      "CanCreate": false,
+      "CanEdit": false,
+      "CanDelete": false,
+      "CanExport": false
+    },
+    {
+      "ModuleName": "Inventory",
+      "CanView": true,
+      "CanCreate": false,
+      "CanEdit": false,
+      "CanDelete": false,
+      "CanExport": false
+    },
+    {
+      "ModuleName": "Settings",
+      "CanView": true,
+      "CanCreate": false,
+      "CanEdit": false,
+      "CanDelete": false,
+      "CanExport": false
+    }
+  ]
+}

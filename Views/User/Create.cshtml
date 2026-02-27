@@ -1,0 +1,398 @@
+﻿
+@model WebApplication2.Views.User.CreateModel
+@{
+    // ឆែកមើលថាតើ Request ជា AJAX ឬអត់ ដើម្បីសម្រេចចិត្តប្រើ Layout ឬអត់
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+}
+
+
+<style>
+    /* --- Dark Mode & Light Mode Variables --- */
+    :root {
+        --user-bg-container: #ffffff;
+        --user-text-main: #374151;
+        --user-text-muted: #64748b;
+        --user-input-bg: #f8fafc;
+        --user-input-border: #e2e8f0;
+        --user-card-header: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        --user-profile-box: #f1f5f9;
+        --user-border-sep: #e2e8f0;
+    }
+
+    /* Automatically switches if the parent or body has [data-bs-theme='dark'] */
+    [data-bs-theme='dark'] {
+        --user-bg-container: #111827; /* Dark Gray/Black */
+        --user-text-main: #f3f4f6;
+        --user-text-muted: #9ca3af;
+        --user-input-bg: #1f2937;
+        --user-input-border: #374151;
+        --user-profile-box: #1f2937;
+        --user-border-sep: #374151;
+    }
+
+    /* --- Container & Layout --- */
+    .user-content-wrapper {
+        background-color: var(--user-bg-container);
+        padding: 40px;
+        min-height: 100vh;
+        border-radius: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .user-form-container {
+        max-width: 1000px;
+        margin-left: 0;
+    }
+
+    /* --- Header Section --- */
+    .header-card-blue {
+        background: var(--user-card-header);
+        border-radius: 16px;
+        padding: 28px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 35px;
+        color: white;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
+    }
+
+    .header-card-blue .icon-box {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        padding: 14px;
+        border-radius: 12px;
+        margin-right: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* --- Form Styling --- */
+    .form-label-custom {
+        font-weight: 700;
+        color: var(--user-text-main);
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        display: block;
+        letter-spacing: 0.3px;
+    }
+
+    .user-input-direct {
+        background-color: var(--user-input-bg) !important;
+        border: 1.5px solid var(--user-input-border) !important;
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
+        font-size: 0.95rem;
+        color: var(--user-text-main) !important;
+        transition: all 0.2s ease;
+    }
+
+    .user-input-direct:focus {
+        background-color: var(--user-bg-container) !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+    }
+
+    /* --- Profile Picture Section --- */
+    .profile-section-container {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 40px;
+        padding: 25px;
+        background: var(--user-profile-box);
+        border-radius: 20px;
+        border: 2px dashed var(--user-input-border);
+    }
+
+    .profile-upload-wrapper {
+        position: relative;
+        width: 110px;
+        height: 110px;
+    }
+
+    .profile-preview {
+        width: 110px;
+        height: 110px;
+        border-radius: 24px;
+        object-fit: cover;
+        border: 4px solid var(--user-bg-container);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-btn-badge {
+        position: absolute;
+        bottom: -6px;
+        right: -6px;
+        background: #2563eb;
+        color: white;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 3px solid var(--user-bg-container);
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .upload-btn-badge:hover {
+        background: #1e40af;
+        transform: scale(1.15) rotate(5deg);
+    }
+
+    /* --- Buttons --- */
+    .btn-save-user {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-save-user:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-cancel-custom {
+        color: var(--user-text-muted);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: 0.2s;
+        border: none;
+        background: transparent;
+    }
+
+    .btn-cancel-custom:hover {
+        background: var(--user-profile-box);
+        color: var(--user-text-main);
+    }
+
+    .input-group-text-custom {
+        background-color: var(--user-input-bg);
+        border: 1.5px solid var(--user-input-border);
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        color: var(--user-text-muted);
+    }
+
+    .text-danger-custom {
+        color: #ef4444;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-top: 6px;
+        display: none;
+    }
+
+    .border-top-custom {
+        border-top: 1px solid var(--user-border-sep) !important;
+    }
+</style>
+
+<div class="user-content-wrapper">
+    <div class="user-form-container">
+
+        <div class="header-card-blue">
+            <div class="icon-box">
+                <i class="bi bi-person-plus-fill fs-3"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold mb-0 text-white">បង្កើតអ្នកប្រើប្រាស់ (New User)</h4>
+                <p class="mb-0 text-white-50 small">កំណត់ព័ត៌មាន និងសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ</p>
+            </div>
+        </div>
+
+        <form id="userForm" class="needs-validation" novalidate enctype="multipart/form-data">
+
+            <div class="profile-section-container">
+                <div class="profile-upload-wrapper">
+                    <img id="imagePreview" src="https://ui-avatars.com/api/?name=User&background=cbd5e1&color=fff&size=128" class="profile-preview" alt="Profile Preview">
+                    <label for="profileInput" class="upload-btn-badge shadow-sm">
+                        <i class="bi bi-camera-fill"></i>
+                    </label>
+                    <input type="file" id="profileInput" name="ProfileImage" class="d-none" accept="image/*">
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1" style="color: var(--user-text-main);">រូបថតអ្នកប្រើប្រាស់</h6>
+                    <p class="small mb-0" style="color: var(--user-text-muted);">សូមជ្រើសរើសរូបថតផ្លូវការសម្រាប់ Profile (JPG, PNG)</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label class="form-label-custom">ឈ្មោះពេញ (Full Name)</label>
+                    <input type="text" name="FullName" class="form-control user-input-direct shadow-none" placeholder="FullName..." required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label-custom">អ៊ីមែល (Email Address)</label>
+                    <input type="email" name="Email" class="form-control user-input-direct shadow-none" placeholder="Enter Gmail..." required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label-custom">តួនាទី (User Role)</label>
+                    <select name="Role" class="form-select user-input-direct shadow-none" required>
+                        <option value="">-- ជ្រើសរើសតួនាទី --</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Registrar">Registrar</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label-custom">លេខសម្ងាត់ (Password)</label>
+                    <div class="input-group">
+                        <input type="password" id="passwordInput" name="Password" class="form-control user-input-direct shadow-none border-end-0" placeholder="Password..." required style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+                        <span class="input-group-text input-group-text-custom toggle-password" data-target="#passwordInput" style="cursor: pointer;">
+                            <i class="bi bi-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label-custom">ផ្ទៀងផ្ទាត់លេខសម្ងាត់ (Confirm Password)</label>
+                    <div class="input-group">
+                        <input type="password" id="confirmPasswordInput" class="form-control user-input-direct shadow-none border-end-0" placeholder="Confirm Password..." required style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+                        <span class="input-group-text input-group-text-custom toggle-password" data-target="#confirmPasswordInput" style="cursor: pointer;">
+                            <i class="bi bi-eye-slash"></i>
+                        </span>
+                    </div>
+                    <div class="text-danger-custom" id="passMismatch">
+                        <i class="bi bi-exclamation-circle me-1"></i>លេខសម្ងាត់មិនត្រូវគ្នាទេ!
+                    </div>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end pb-2">
+                    <div class="form-check form-switch d-flex align-items-center gap-2">
+                        <input class="form-check-input shadow-none mt-0" type="checkbox" id="isActive" name="IsActive" value="true" checked style="width: 45px; height: 22px; cursor: pointer;">
+                        <label class="form-check-label fw-bold mb-0" for="isActive" style="color: var(--user-text-main);">ស្ថានភាព៖ សកម្ម (Active)</label>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-5 pt-4 border-top-custom">
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn-cancel-custom me-4 ajax-link" data-url="/User/Index">
+                            បោះបង់ (Cancel)
+                        </button>
+                        <button type="submit" id="btnSave" class="btn-save-user">
+                            <span class="spinner-border spinner-border-sm d-none" id="loader"></span>
+                            <span id="btnText">រក្សាទុកព័ត៌មាន</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        
+        /** * FIX REFRESH ISSUE:
+         * To prevent "Null" or 404 when refreshing a page loaded via AJAX,
+         * we push the current URL to the browser history.
+         */
+        const currentPath = "/User/Create"; // Change to your actual route
+        if (window.location.pathname !== currentPath) {
+            window.history.pushState({ path: currentPath }, '', currentPath);
+        }
+
+        // Image Preview Logic
+        $("#profileInput").change(function() {
+            const file = this.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) { $("#imagePreview").attr("src", e.target.result); };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Toggle Password Visibility
+        $(".toggle-password").off("click").on("click", function () {
+            const target = $(this).data("target");
+            const input = $(target);
+            const icon = $(this).find("i");
+            if (input.attr("type") === "password") {
+                input.attr("type", "text");
+                icon.removeClass("bi-eye-slash").addClass("bi-eye");
+            } else {
+                input.attr("type", "password");
+                icon.removeClass("bi-eye").addClass("bi-eye-slash");
+            }
+        });
+
+        // Form Submit
+        $("#userForm").off("submit").on("submit", function (e) {
+            e.preventDefault();
+
+            const password = $("#passwordInput").val();
+            const confirm = $("#confirmPasswordInput").val();
+
+            // Validate Passwords
+            if (password !== confirm) {
+                $("#confirmPasswordInput").css("border-color", "#ef4444");
+                $("#passMismatch").fadeIn();
+                return;
+            } else {
+                $("#passMismatch").hide();
+                $("#confirmPasswordInput").css("border-color", "var(--user-input-border)");
+            }
+
+            // Bootstrap Validation
+            if (this.checkValidity() === false) {
+                e.stopPropagation();
+                $(this).addClass('was-validated');
+                return;
+            }
+
+            // UI Loading State
+            $("#btnSave").prop("disabled", true);
+            $("#loader").removeClass("d-none");
+            $("#btnText").text(" កំពុងរក្សាទុក...");
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/User/Create',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    Swal.fire({
+                        title: 'ជោគជ័យ',
+                        text: 'រក្សាទុកទិន្នន័យរួចរាល់',
+                        icon: 'success',
+                        confirmButtonText: 'យល់ព្រម',
+                        timer: 2000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        // Return to Index
+                        const indexUrl = "/User/Index";
+                        if (typeof loadContent === "function") {
+                             loadContent(indexUrl); 
+                        } else {
+                             window.location.href = indexUrl;
+                        }
+                    });
+                },
+                error: function (err) {
+                    Swal.fire('កំហុស', 'មានបញ្ហាបច្ចេកទេស ឬអ៊ីមែលនេះមានរួចហើយ!', 'error');
+                    resetButton();
+                }
+            });
+        });
+
+        function resetButton() {
+            $("#btnSave").prop("disabled", false);
+            $("#loader").addClass("d-none");
+            $("#btnText").text("រក្សាទុកព័ត៌មាន");
+        }
+    });
+</script>

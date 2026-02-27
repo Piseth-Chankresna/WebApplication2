@@ -1,0 +1,533 @@
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+    :root {
+        --primary-blue: #2563eb;
+        --light-blue: #eff6ff;
+    }
+
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .header-card {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+    }
+
+    .table thead th {
+        background-color: #f1f5f9;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        border: none;
+        padding: 15px;
+    }
+
+    .student-row:hover {
+        background-color: var(--light-blue);
+        cursor: pointer;
+    }
+
+    .profile-upload-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+    }
+
+    .profile-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .edit-photo-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        cursor: pointer;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        text-align: left;
+    }
+
+    .info-item {
+        background: #f8fafc;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .filter-container {
+        display: flex;
+        gap: 10px;
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-search {
+        flex: 2;
+        min-width: 200px;
+    }
+
+    .filter-select {
+        flex: 1;
+        min-width: 130px;
+    }
+</style>
+
+<div id="studentListPage" class="container-fluid p-4 animate__animated animate__fadeIn">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-person-badge-fill me-2 text-primary"></i>Student Center</h3>
+            <p class="text-muted mb-0 small">គ្រប់គ្រង និងពិនិត្យព័ត៌មានលម្អិតសិស្ស</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <button class="btn btn-outline-success rounded-pill px-4 fw-bold me-2 shadow-sm" onclick="exportToExcel()">
+                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Excel
+            </button>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="goToCreate()">
+                <i class="bi bi-plus-lg me-2"></i>បន្ថែមសិស្សថ្មី
+            </button>
+        </div>
+    </div>
+
+    <div class="card header-card p-4 mb-4 rounded-4 position-relative overflow-hidden">
+        <div class="position-relative z-1">
+            <h6 class="text-uppercase opacity-75 fw-bold small mb-2">សិស្សសរុបក្នុងប្រព័ន្ធ</h6>
+            <div class="d-flex align-items-center">
+                <h1 class="display-4 fw-bold mb-0" id="countTotal">0</h1>
+                <span class="ms-3 badge bg-white text-primary rounded-pill px-3">Active</span>
+            </div>
+        </div>
+        <i class="bi bi-people position-absolute end-0 bottom-0 opacity-25 m-n3" style="font-size: 8rem;"></i>
+    </div>
+
+    <div class="filter-container border shadow-sm">
+        <div class="filter-search">
+            <div class="input-group overflow-hidden rounded-3 border">
+                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="searchInput" class="form-control border-0 py-2 shadow-none" placeholder="ស្វែងរកឈ្មោះ ឬ ID..." oninput="filterData()">
+            </div>
+        </div>
+        <div class="filter-select">
+            <select id="filterMajor" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
+                <option value="">គ្រប់ជំនាញ</option>
+                <option value="Information Technology">IT</option>
+                <option value="Business Administration">Business</option>
+                <option value="English Literature">English</option>
+                <option value="Law">Law</option>
+                <option value="Accounting">Accounting</option>
+            </select>
+        </div>
+        <div class="filter-select">
+            <select id="filterShift" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
+                <option value="">គ្រប់វេន</option>
+                <option value="Morning">Morning</option>
+                <option value="Afternoon">Afternoon</option>
+                <option value="Evening">Evening</option>
+                <option value="Weekend">Weekend</option>
+            </select>
+        </div>
+        <div class="filter-select">
+            <select id="filterRoom" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
+                <option value="">គ្រប់បន្ទប់</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">សិស្ស</th>
+                        <th>កម្រិត/ជំនាញ</th>
+                        <th class="text-center">ឆ្នាំសិក្សា</th>
+                        <th class="text-center">វេន/បន្ទប់</th>
+                        <th class="text-center">អាហារូបករណ៍</th>
+                        <th class="text-center">សកម្មភាព</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody"></tbody>
+            </table>
+        </div>
+        <div id="noData" class="text-center py-5 d-none">
+            <i class="bi bi-folder-x display-1 text-muted"></i>
+            <p class="mt-2 text-muted">មិនមានទិន្នន័យឡើយ</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. Core Data Access ---
+    function getStudents() {
+        try {
+            const data = localStorage.getItem('students');
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error("Error reading localStorage:", e);
+            return [];
+        }
+    }
+
+    function saveStudents(data) {
+        localStorage.setItem('students', JSON.stringify(data));
+        refreshUI();
+    }
+
+    // --- 2. UI Refresh Logic ---
+    function refreshUI() {
+        updateRoomDropdown();
+        filterData();
+    }
+
+    function updateRoomDropdown() {
+        const students = getStudents();
+        const roomSelect = document.getElementById('filterRoom');
+        if (!roomSelect) return;
+
+        const rooms = [...new Set(students.map(s => s.room).filter(r => r && r.trim() !== ""))].sort();
+        const currentVal = roomSelect.value;
+
+        roomSelect.innerHTML = '<option value="">គ្រប់បន្ទប់</option>';
+        rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room;
+            option.textContent = room;
+            if (room === currentVal) option.selected = true;
+            roomSelect.appendChild(option);
+        });
+    }
+
+    // --- 3. Display Logic ---
+    function displayStudents(dataList = null) {
+        const allStudents = getStudents();
+        const data = dataList !== null ? dataList : allStudents;
+
+        const countEl = document.getElementById('countTotal');
+        if (countEl) countEl.innerText = allStudents.length;
+
+        const tableBody = document.getElementById('studentTableBody');
+        const noData = document.getElementById('noData');
+
+        if (!tableBody) return;
+
+        if (data.length === 0) {
+            tableBody.innerHTML = '';
+            noData.classList.remove('d-none');
+            return;
+        }
+
+        noData.classList.add('d-none');
+        tableBody.innerHTML = data.map(s => `
+            <tr class="student-row animate__animated animate__fadeIn">
+                <td class="ps-4" onclick="viewDetails('${s.id}')">
+                    <div class="d-flex align-items-center py-1">
+                        <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)+'&background=random'}"
+                             class="rounded-circle border me-3 shadow-sm" width="45" height="45" style="object-fit:cover;">
+                        <div>
+                            <div class="fw-bold text-dark">${s.name}</div>
+                            <small class="text-muted">ID: ${s.id} | ${s.gender || 'N/A'}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="small fw-bold text-dark">${s.major}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">${s.degree || 'Bachelor'}</div>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-light text-dark border fw-normal">${s.year || 'Year 1'}</span>
+                </td>
+                <td class="text-center">
+                    <div class="small text-primary fw-bold">${s.shift || 'N/A'}</div>
+                    <div class="badge bg-info bg-opacity-10 text-info" style="font-size: 0.7rem;">Room: ${s.room || 'N/A'}</div>
+                </td>
+                <td class="text-center">
+                    <span class="badge ${(s.scholarship && s.scholarship !== '0%') ? 'bg-success' : 'bg-secondary'} bg-opacity-10 ${(s.scholarship && s.scholarship !== '0%') ? 'text-success' : 'text-secondary'}">
+                        ${s.scholarship || '0%'}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <div class="btn-group shadow-sm rounded-pill overflow-hidden border bg-white">
+                        <button class="btn btn-white btn-sm px-3 border-end" onclick="viewDetails('${s.id}')" title="មើល"><i class="bi bi-eye text-primary"></i></button>
+                        <button class="btn btn-white btn-sm px-3 border-end" onclick="handleEdit('${s.id}')" title="កែប្រែ"><i class="bi bi-pencil-square text-success"></i></button>
+                        <button class="btn btn-white btn-sm px-3" onclick="deleteStudent('${s.id}')" title="លុប"><i class="bi bi-trash text-danger"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- 4. Search & Filter ---
+    function filterData() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const major = document.getElementById('filterMajor').value;
+        const shift = document.getElementById('filterShift').value;
+        const room = document.getElementById('filterRoom').value;
+        const students = getStudents();
+
+        const filtered = students.filter(s => {
+            const matchSearch = (s.name || "").toLowerCase().includes(query) || (s.id || "").toString().includes(query);
+            const matchMajor = major === "" || s.major === major;
+            const matchShift = shift === "" || s.shift === shift;
+            const matchRoom = room === "" || s.room === room;
+            return matchSearch && matchMajor && matchShift && matchRoom;
+        });
+        displayStudents(filtered);
+    }
+
+    // --- 5. View Details ---
+    function viewDetails(id) {
+        const s = getStudents().find(x => x.id == id);
+        if (!s) return;
+        Swal.fire({
+            width: '500px', confirmButtonText: 'បិទ', confirmButtonColor: '#2563eb',
+            customClass: { popup: 'rounded-4' },
+            html: `
+                <div class="profile-upload-container">
+                    <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)}" class="profile-preview-img">
+                </div>
+                <h4 class="fw-bold mb-1">${s.name}</h4>
+                <p class="text-primary mb-4 fw-medium small">${s.degree || 'Bachelor'} of ${s.major}</p>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">អត្តលេខ</div><div class="info-value">${s.id}</div></div>
+                    <div class="info-item"><div class="info-label">ភេទ</div><div class="info-value">${s.gender || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">ថ្ងៃខែឆ្នាំកំណើត</div><div class="info-value">${s.dob || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">ទីកន្លែងកំណើត</div><div class="info-value">${s.pob || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">ឆ្នាំសិក្សា</div><div class="info-value">${s.year || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">វេនសិក្សា</div><div class="info-value">${s.shift || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">បន្ទប់</div><div class="info-value">${s.room || 'N/A'}</div></div>
+                    <div class="info-item"><div class="info-label">អាហារូបករណ៍</div><div class="info-value">${s.scholarship || '0%'}</div></div>
+                    <div class="info-item" style="grid-column: span 2;"><div class="info-label">លេខទូរស័ព្ទ</div><div class="info-value">${s.phone || 'N/A'}</div></div>
+                </div>`
+        });
+    }
+
+    // --- 6. Edit Model ---
+    async function handleEdit(id) {
+        const students = getStudents();
+        const s = students.find(x => x.id == id);
+        if (!s) return;
+
+        const { value: formValues } = await Swal.fire({
+            title: 'កែប្រែព័ត៌មានសិស្ស',
+            width: '800px',
+            showCancelButton: true,
+            confirmButtonText: 'រក្សាទុកការផ្លាស់ប្តូរ',
+            confirmButtonColor: '#2563eb',
+            cancelButtonText: 'បោះបង់',
+            customClass: { popup: 'rounded-4' },
+            html: `
+                <div class="profile-upload-container">
+                    <img id="prev-img-edit" src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)}" class="profile-preview-img">
+                    <div class="edit-photo-btn" onclick="document.getElementById('edit-file').click()"><i class="bi bi-camera-fill"></i></div>
+                    <input type="file" id="edit-file" class="d-none" accept="image/*" onchange="previewEditImage(this)">
+                </div>
+                <div class="row g-3 text-start">
+                    <div class="col-md-4">
+                        <label class="small fw-bold">ឈ្មោះពេញ (Full Name)</label>
+                        <input id="sw-name" class="form-control" value="${s.name || ''}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">ភេទ (Gender)</label>
+                        <select id="sw-gender" class="form-select">
+                            <option value="Male" ${s.gender=='Male'?'selected':''}>ប្រុស (Male)</option>
+                            <option value="Female" ${s.gender=='Female'?'selected':''}>ស្រី (Female)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">ថ្ងៃខែឆ្នាំកំណើត (DOB)</label>
+                        <input type="date" id="sw-dob" class="form-control" value="${s.dob || ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small fw-bold">ទីកន្លែងកំណើត (Place of Birth)</label>
+                        <input id="sw-pob" class="form-control" value="${s.pob || ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small fw-bold">លេខទូរស័ព្ទ (Phone Number)</label>
+                        <input id="sw-phone" class="form-control" value="${s.phone || ''}">
+                    </div>
+                    <hr class="my-2">
+                    <div class="col-md-4">
+                        <label class="small fw-bold">កម្រិតសិក្សា (Degree)</label>
+                        <select id="sw-degree" class="form-select">
+                            <option value="Associate" ${s.degree=='Associate'?'selected':''}>Associate</option>
+                            <option value="Bachelor" ${s.degree=='Bachelor'||!s.degree?'selected':''}>Bachelor</option>
+                            <option value="Master" ${s.degree=='Master'?'selected':''}>Master</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">ជំនាញ (Major)</label>
+                        <select id="sw-major" class="form-select">
+                            <option value="Information Technology" ${s.major=='Information Technology'?'selected':''}>Information Technology</option>
+                            <option value="Business Administration" ${s.major=='Business Administration'?'selected':''}>Business Administration</option>
+                            <option value="English Literature" ${s.major=='English Literature'?'selected':''}>English Literature</option>
+                            <option value="Law" ${s.major=='Law'?'selected':''}>Law</option>
+                            <option value="Accounting" ${s.major=='Accounting'?'selected':''}>Accounting</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">ឆ្នាំសិក្សា (Year)</label>
+                        <select id="sw-year" class="form-select">
+                            <option value="Year 1" ${s.year=='Year 1'?'selected':''}>Year 1</option>
+                            <option value="Year 2" ${s.year=='Year 2'?'selected':''}>Year 2</option>
+                            <option value="Year 3" ${s.year=='Year 3'?'selected':''}>Year 3</option>
+                            <option value="Year 4" ${s.year=='Year 4'?'selected':''}>Year 4</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">អាហារូបករណ៍ (Scholarship %)</label>
+                        <select id="sw-scholarship" class="form-select">
+                            <option value="0%" ${s.scholarship=='0%'?'selected':''}>0% (បង់ពេញ)</option>
+                            <option value="10%" ${s.scholarship=='10%'?'selected':''}>10% Scholarship</option>
+                            <option value="25%" ${s.scholarship=='25%'?'selected':''}>25% Scholarship</option>
+                            <option value="50%" ${s.scholarship=='50%'?'selected':''}>50% Scholarship</option>
+                            <option value="100%" ${s.scholarship=='100%'?'selected':''}>100% Scholarship</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">បន្ទប់ (Room)</label>
+                        <input id="sw-room" class="form-control" value="${s.room || ''}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold">វេនសិក្សា (Study Shift)</label>
+                        <select id="sw-shift" class="form-select">
+                            <option value="Morning" ${s.shift=='Morning'?'selected':''}>Morning</option>
+                            <option value="Afternoon" ${s.shift=='Afternoon'?'selected':''}>Afternoon</option>
+                            <option value="Evening" ${s.shift=='Evening'?'selected':''}>Evening</option>
+                            <option value="Weekend" ${s.shift=='Weekend'?'selected':''}>Weekend</option>
+                        </select>
+                    </div>
+                </div>`,
+            preConfirm: () => {
+                const name = document.getElementById('sw-name').value;
+                if (!name) { Swal.showValidationMessage('សូមបញ្ចូលឈ្មោះសិស្ស'); return false; }
+                return {
+                    name: name,
+                    gender: document.getElementById('sw-gender').value,
+                    dob: document.getElementById('sw-dob').value,
+                    pob: document.getElementById('sw-pob').value,
+                    phone: document.getElementById('sw-phone').value,
+                    degree: document.getElementById('sw-degree').value,
+                    major: document.getElementById('sw-major').value,
+                    year: document.getElementById('sw-year').value,
+                    scholarship: document.getElementById('sw-scholarship').value,
+                    room: document.getElementById('sw-room').value,
+                    shift: document.getElementById('sw-shift').value,
+                    photo: document.getElementById('prev-img-edit').src
+                }
+            }
+        });
+
+        if (formValues) {
+            const currentStudents = getStudents();
+            const idx = currentStudents.findIndex(x => x.id == id);
+            if (idx !== -1) {
+                currentStudents[idx] = { ...currentStudents[idx], ...formValues };
+                saveStudents(currentStudents);
+                Swal.fire({ icon: 'success', title: 'កែប្រែបានជោគជ័យ', showConfirmButton: false, timer: 1500 });
+            }
+        }
+    }
+
+    // --- 7. Other Functions ---
+    function deleteStudent(id) {
+        Swal.fire({
+            title: 'តើអ្នកចង់លុបទិន្នន័យនេះមែនទេ?',
+            text: "ទិន្នន័យដែលលុបហើយមិនអាចយកមកវិញបានទេ!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'បាទ, លុបវាចោល!',
+            cancelButtonText: 'បោះបង់'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const filtered = getStudents().filter(item => item.id != id);
+                saveStudents(filtered);
+                Swal.fire('លុបរួចរាល់!', 'ទិន្នន័យត្រូវបានលុបចេញពីប្រព័ន្ធ។', 'success');
+            }
+        });
+    }
+
+    window.previewEditImage = function(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => document.getElementById('prev-img-edit').src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function exportToExcel() {
+        const s = getStudents();
+        if(s.length === 0) return Swal.fire('Error', 'មិនមានទិន្នន័យសម្រាប់ Export', 'error');
+        const ws = XLSX.utils.json_to_sheet(s);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Students");
+        XLSX.writeFile(wb, "HRU_Student_List.xlsx");
+    }
+
+    function goToCreate() {
+        // FIXED: Checks if showPage exists in the parent/main script, else logs a fallback
+        if(typeof showPage === 'function') {
+            showPage('create-page');
+        } else {
+            Swal.fire('Navigation', 'សូមបញ្ចូលទិន្នន័យតាមរយៈ Form បន្ថែមសិស្ស', 'info');
+        }
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshUI();
+    });
+
+    // Ensure immediate call if DOM already loaded
+    refreshUI();
+</script>

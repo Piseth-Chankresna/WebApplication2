@@ -1,0 +1,278 @@
+﻿@model dynamic
+@{
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+}
+
+<style>
+    /* --- 1. Root Colors (Compatible with Role Page Style) --- */
+    :root {
+        --sc-bg: #f1f5f9;
+        --sc-card: rgba(255, 255, 255, 0.7);
+        --sc-card-hover: #ffffff;
+        --sc-text-main: #1e293b;
+        --sc-text-muted: #64748b;
+        --sc-border: rgba(255, 255, 255, 0.4);
+        --sc-icon-bg: #ffffff;
+        --sc-glass-panel: rgba(255, 255, 255, 0.9);
+        --sc-shadow: rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] {
+        --sc-bg: #0b0f19;
+        --sc-card: rgba(30, 41, 59, 0.6);
+        --sc-card-hover: #1e293b;
+        --sc-text-main: #f1f5f9;
+        --sc-text-muted: #94a3b8;
+        --sc-border: rgba(255, 255, 255, 0.1);
+        --sc-icon-bg: #1f2937;
+        --sc-glass-panel: #111827;
+        --sc-shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    /* --- 2. Main Layout --- */
+    #student-center-wrapper {
+        min-height: 100vh;
+        background-color: var(--sc-bg);
+        margin: -10px -20px;
+        padding-bottom: 50px;
+        font-family: 'Kantumruy Pro', sans-serif;
+        transition: background-color 0.3s ease;
+    }
+
+    .header-banner-bg {
+        background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #2563eb 100%);
+        padding: 60px 40px 110px 40px;
+        color: white;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+    }
+
+    .content-floating-up {
+        margin-top: -75px;
+        padding: 0 40px;
+        position: relative;
+        z-index: 5;
+    }
+
+    /* --- 3. Card Style (Adjusted Size) --- */
+    .student-card-item {
+        background: var(--sc-card) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--sc-border) !important;
+        border-radius: 24px;
+        padding: 25px;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 190px; /* កម្ពស់តាមសំណូមពររបស់អ្នក */
+        box-shadow: 0 8px 32px var(--sc-shadow);
+        cursor: pointer;
+    }
+
+        .student-card-item:hover {
+            transform: translateY(-12px);
+            background: var(--sc-card-hover) !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 20px 40px var(--sc-shadow);
+        }
+
+    .icon-box-student {
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        background: var(--sc-icon-bg);
+        box-shadow: 0 4px 15px var(--sc-shadow);
+        transition: 0.5s ease;
+    }
+
+    .student-card-item:hover .icon-box-student {
+        transform: scale(1.1) rotateY(180deg);
+    }
+
+    /* Side Borders */
+    .border-blue {
+        border-left: 5px solid #3b82f6 !important;
+    }
+
+    .border-cyan {
+        border-left: 5px solid #06b6d4 !important;
+    }
+
+    .border-orange {
+        border-left: 5px solid #f59e0b !important;
+    }
+
+    .border-purple {
+        border-left: 5px solid #8b5cf6 !important;
+    }
+
+    /* Text Colors */
+    .card-title-text {
+        color: var(--sc-text-main) !important;
+        font-weight: 700;
+    }
+
+    .card-subtitle-text {
+        color: var(--sc-text-muted) !important;
+    }
+
+    /* --- 4. Sub-page View --- */
+    .glass-panel-custom {
+        background: var(--sc-glass-panel) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 30px !important;
+        border: 1px solid var(--sc-border) !important;
+        box-shadow: 0 15px 50px var(--sc-shadow);
+    }
+
+    .btn-back-modern {
+        background: var(--sc-icon-bg);
+        color: var(--sc-text-main);
+        border: 1px solid var(--sc-border);
+        padding: 8px 20px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        transition: 0.3s ease;
+    }
+
+        .btn-back-modern:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateX(-5px);
+        }
+
+    /* AJAX Table/Form Styles for Dark Mode */
+    #ajax-body h1, #ajax-body h2, #ajax-body h3, #ajax-body h4, #ajax-body label, #ajax-body strong {
+        color: var(--sc-text-main) !important;
+    }
+
+    #ajax-body table {
+        color: var(--sc-text-main) !important;
+    }
+
+    #ajax-body thead th {
+        background-color: var(--sc-icon-bg) !important;
+        color: var(--sc-text-main) !important;
+    }
+
+    #ajax-body input, #ajax-body select, #ajax-body textarea {
+        background-color: var(--sc-icon-bg) !important;
+        border: 1px solid var(--sc-border) !important;
+        color: var(--sc-text-main) !important;
+    }
+</style>
+
+<div id="student-center-wrapper">
+    <div class="header-banner-bg">
+        <div class="header-title-box">
+            <h3 class="fw-bold"><i class="bi bi-mortarboard-fill me-2"></i> 1.2. Student Center</h3>
+            <p class="opacity-75">Welcome to HR University Management System</p>
+        </div>
+    </div>
+
+    <div class="content-floating-up" id="main-menu-grid">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="student-card-item border-blue ajax-trigger" data-url="/Student/Scholarship">
+                    <div class="icon-box-student text-primary"><i class="bi bi-award"></i></div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title-text mb-1">អាហារូបករណ៍</h5>
+                        <p class="card-subtitle-text small mb-0">គ្រប់គ្រង និងតាមដានអាហារូបករណ៍សិស្ស</p>
+                    </div>
+                    <i class="bi bi-chevron-right card-subtitle-text"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="student-card-item border-cyan ajax-trigger" data-url="/Student/Index">
+                    <div class="icon-box-student text-info"><i class="bi bi-person-badge"></i></div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title-text mb-1">បញ្ជីឈ្មោះសិស្ស</h5>
+                        <p class="card-subtitle-text small mb-0">ស្វែងរក និងមើលព័ត៌មានលម្អិតរបស់សិស្ស</p>
+                    </div>
+                    <i class="bi bi-chevron-right card-subtitle-text"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="student-card-item border-orange ajax-trigger" data-url="/Student/Classes">
+                    <div class="icon-box-student text-warning"><i class="bi bi-calendar3"></i></div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title-text mb-1">កាលវិភាគ</h5>
+                        <p class="card-subtitle-text small mb-0">គ្រប់គ្រងថ្នាក់រៀន និងម៉ោងសិក្សា</p>
+                    </div>
+                    <i class="bi bi-chevron-right card-subtitle-text"></i>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="student-card-item border-purple ajax-trigger" data-url="/Student/Grades">
+                    <div class="icon-box-student" style="color: #8b5cf6;"><i class="bi bi-bar-chart-line"></i></div>
+                    <div class="flex-grow-1">
+                        <h5 class="card-title-text mb-1">គ្រប់គ្រងពិន្ទុ</h5>
+                        <p class="card-subtitle-text small mb-0">បញ្ចូលពិន្ទុ និងតាមដានលទ្ធផលសិក្សា</p>
+                    </div>
+                    <i class="bi bi-chevron-right card-subtitle-text"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sub-page-content" style="display: none;">
+        <div class="card glass-panel-custom shadow-lg">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn-back-modern" id="back-to-menu">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </button>
+                    <h4 class="mb-0 fw-bold card-title-text" id="sub-page-title"></h4>
+                </div>
+                <div class="card-subtitle-text small d-none d-md-block">
+                    <i class="bi bi-clock-history me-1"></i> Student Center / <span id="breadcrumb-active"></span>
+                </div>
+            </div>
+            <hr class="mx-4 opacity-10">
+            <div class="card-body p-4" id="ajax-body"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.ajax-trigger').on('click', function() {
+            let url = $(this).data('url');
+            let title = $(this).find('h5').text();
+
+            $('#main-menu-grid').fadeOut(200);
+            $('#sub-page-title').text(title);
+            $('#breadcrumb-active').text(title);
+            $('#ajax-body').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-3 card-subtitle-text">កំពុងទាញយកទិន្នន័យ...</p></div>');
+            $('#sub-page-content').delay(200).fadeIn(300);
+
+            $.get(url, function(response) {
+                $('#ajax-body').html(response);
+            }).fail(function() {
+                $('#ajax-body').html('<div class="alert alert-danger rounded-4">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។</div>');
+            });
+        });
+
+        $('#back-to-menu').on('click', function() {
+            $('#sub-page-content').fadeOut(200, function() {
+                $('#main-menu-grid').fadeIn(200);
+            });
+        });
+    });
+</script>
