@@ -1,7 +1,36 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:controllers\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\models\\studentclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:models\\studentclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\models\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:models\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|d:\\asp.net 3rd year\\studentmanagementsystem\\webapplication2\\webapplication2\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C69DDCE5-63FA-A520-F5E2-48BAD5DFA536}|WebApplication2.csproj|solutionrelative:views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +38,96 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAADwvyMAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T11:00:47.136Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Student.cs",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Models\\Student.cs",
+              "RelativeDocumentMoniker": "Models\\Student.cs",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Models\\Student.cs",
+              "RelativeToolTip": "Models\\Student.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:52:44.341Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-03-02T10:49:12.041Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StudentController.cs",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Controllers\\StudentController.cs",
+              "RelativeDocumentMoniker": "Controllers\\StudentController.cs",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Controllers\\StudentController.cs",
+              "RelativeToolTip": "Controllers\\StudentController.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAAABsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:47:41.567Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:47:22.839Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "StudentClass.cs",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Models\\StudentClass.cs",
+              "RelativeDocumentMoniker": "Models\\StudentClass.cs",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Models\\StudentClass.cs",
+              "RelativeToolTip": "Models\\StudentClass.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:45:52.173Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\ASP.NET 3rd year\\StudentManagementSystem\\WebApplication2\\WebApplication2\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAFwBAAAAAAAAAAAAAFsBAABxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-02T04:59:42.568Z"
             }
           ]
         }
