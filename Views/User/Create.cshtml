@@ -1,398 +1,515 @@
-﻿
-@model WebApplication2.Views.User.CreateModel
+﻿@model WebApplication2.Models.UserAccount
 @{
-    // ឆែកមើលថាតើ Request ជា AJAX ឬអត់ ដើម្បីសម្រេចចិត្តប្រើ Layout ឬអត់
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "Create User";
 }
 
-
 <style>
-    /* --- Dark Mode & Light Mode Variables --- */
-    :root {
-        --user-bg-container: #ffffff;
-        --user-text-main: #374151;
-        --user-text-muted: #64748b;
-        --user-input-bg: #f8fafc;
-        --user-input-border: #e2e8f0;
-        --user-card-header: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        --user-profile-box: #f1f5f9;
-        --user-border-sep: #e2e8f0;
+    .create-container {
+        max-width: 700px;
+        margin: 0 auto;
     }
 
-    /* Automatically switches if the parent or body has [data-bs-theme='dark'] */
-    [data-bs-theme='dark'] {
-        --user-bg-container: #111827; /* Dark Gray/Black */
-        --user-text-main: #f3f4f6;
-        --user-text-muted: #9ca3af;
-        --user-input-bg: #1f2937;
-        --user-input-border: #374151;
-        --user-profile-box: #1f2937;
-        --user-border-sep: #374151;
-    }
-
-    /* --- Container & Layout --- */
-    .user-content-wrapper {
-        background-color: var(--user-bg-container);
+    .form-card-modern {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
         padding: 40px;
-        min-height: 100vh;
-        border-radius: 20px;
-        transition: background-color 0.3s ease;
+        animation: cardFloat 0.8s ease;
     }
 
-    .user-form-container {
-        max-width: 1000px;
-        margin-left: 0;
+    @@keyframes cardFloat {
+        from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
-    /* --- Header Section --- */
-    .header-card-blue {
-        background: var(--user-card-header);
-        border-radius: 16px;
-        padding: 28px;
-        display: flex;
-        align-items: center;
+    .form-title {
+        text-align: center;
         margin-bottom: 35px;
+    }
+
+    .form-title i {
+        font-size: 3.5rem;
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+    }
+
+    .form-title h2 {
         color: white;
-        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
-    }
-
-    .header-card-blue .icon-box {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(4px);
-        padding: 14px;
-        border-radius: 12px;
-        margin-right: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* --- Form Styling --- */
-    .form-label-custom {
-        font-weight: 700;
-        color: var(--user-text-main);
-        font-size: 0.85rem;
+        font-weight: 800;
+        font-size: 2rem;
         margin-bottom: 10px;
+    }
+
+    .form-title p {
+        color: rgba(255,255,255,0.7);
+    }
+
+    .input-group-modern {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .input-group-modern label {
         display: block;
-        letter-spacing: 0.3px;
-    }
-
-    .user-input-direct {
-        background-color: var(--user-input-bg) !important;
-        border: 1.5px solid var(--user-input-border) !important;
-        padding: 12px 16px !important;
-        border-radius: 12px !important;
+        color: white;
+        font-weight: 600;
+        margin-bottom: 10px;
         font-size: 0.95rem;
-        color: var(--user-text-main) !important;
-        transition: all 0.2s ease;
+        letter-spacing: 0.5px;
     }
 
-    .user-input-direct:focus {
-        background-color: var(--user-bg-container) !important;
-        border-color: #3b82f6 !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+    .input-group-modern .input-wrapper {
+        position: relative;
     }
 
-    /* --- Profile Picture Section --- */
-    .profile-section-container {
+    .input-group-modern .input-wrapper i.input-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255,255,255,0.6);
+        font-size: 1.2rem;
+        z-index: 1;
+    }
+
+    .input-group-modern input,
+    .input-group-modern select {
+        width: 100%;
+        padding: 16px 20px 16px 50px;
+        background: rgba(255,255,255,0.1);
+        border: 2px solid rgba(255,255,255,0.2);
+        border-radius: 30px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+    }
+
+    .input-group-modern input:focus,
+    .input-group-modern select:focus {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 30px rgba(0,255,255,0.3);
+        background: rgba(255,255,255,0.15);
+    }
+
+    .input-group-modern input::placeholder {
+        color: rgba(255,255,255,0.5);
+    }
+
+    .input-group-modern select {
+        cursor: pointer;
+        appearance: none;
+    }
+
+    .input-group-modern select option {
+        background: #1a1a1a;
+        color: white;
+    }
+
+    .password-strength {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .strength-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        margin: 10px 0;
+        overflow: hidden;
+    }
+
+    .strength-progress {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s;
+        border-radius: 4px;
+    }
+
+    .strength-text {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.85rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .password-match-indicator {
+        margin-top: 10px;
         display: flex;
         align-items: center;
-        gap: 25px;
-        margin-bottom: 40px;
-        padding: 25px;
-        background: var(--user-profile-box);
-        border-radius: 20px;
-        border: 2px dashed var(--user-input-border);
+        gap: 8px;
+        font-size: 0.9rem;
     }
 
-    .profile-upload-wrapper {
-        position: relative;
-        width: 110px;
-        height: 110px;
+    .switch-modern {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255,255,255,0.05);
+        padding: 15px 20px;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .profile-preview {
-        width: 110px;
-        height: 110px;
-        border-radius: 24px;
-        object-fit: cover;
-        border: 4px solid var(--user-bg-container);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .upload-btn-badge {
-        position: absolute;
-        bottom: -6px;
-        right: -6px;
-        background: #2563eb;
+    .switch-modern span {
         color: white;
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .switch-modern .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+
+    .switch-modern .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .switch-modern .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.2);
+        transition: .3s;
+        border-radius: 30px;
+    }
+
+    .switch-modern .slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
+
+    .switch-modern input:checked + .slider {
+        background: var(--gradient-4);
+    }
+
+    .switch-modern input:checked + .slider:before {
+        transform: translateX(30px);
+    }
+
+    .form-actions-modern {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 15px;
+        margin-top: 35px;
+    }
+
+    .btn-modern {
+        padding: 16px;
+        border: none;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        border: 3px solid var(--user-bg-container);
-        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .upload-btn-badge:hover {
-        background: #1e40af;
-        transform: scale(1.15) rotate(5deg);
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
     }
 
-    /* --- Buttons --- */
-    .btn-save-user {
-        background: #2563eb;
+    .btn-modern:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-primary-modern {
+        background: var(--gradient-1);
         color: white;
-        border: none;
-        padding: 14px 40px;
-        border-radius: 12px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 10px 20px rgba(65,88,208,0.3);
     }
 
-    .btn-save-user:hover {
-        background: #1d4ed8;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    .btn-secondary-modern {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(5px);
     }
 
-    .btn-cancel-custom {
-        color: var(--user-text-muted);
-        font-weight: 600;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        transition: 0.2s;
-        border: none;
-        background: transparent;
+    .btn-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 30px rgba(0,0,0,0.3);
     }
 
-    .btn-cancel-custom:hover {
-        background: var(--user-profile-box);
-        color: var(--user-text-main);
-    }
-
-    .input-group-text-custom {
-        background-color: var(--user-input-bg);
-        border: 1.5px solid var(--user-input-border);
-        border-left: none;
-        border-radius: 0 12px 12px 0;
-        color: var(--user-text-muted);
-    }
-
-    .text-danger-custom {
-        color: #ef4444;
-        font-size: 0.8rem;
-        font-weight: 500;
-        margin-top: 6px;
+    .error-message {
+        color: #ff6b6b;
+        font-size: 0.85rem;
+        margin-top: 8px;
         display: none;
+        align-items: center;
+        gap: 5px;
     }
 
-    .border-top-custom {
-        border-top: 1px solid var(--user-border-sep) !important;
+    .error-message.show {
+        display: flex;
     }
 </style>
 
-<div class="user-content-wrapper">
-    <div class="user-form-container">
-
-        <div class="header-card-blue">
-            <div class="icon-box">
-                <i class="bi bi-person-plus-fill fs-3"></i>
-            </div>
-            <div>
-                <h4 class="fw-bold mb-0 text-white">បង្កើតអ្នកប្រើប្រាស់ (New User)</h4>
-                <p class="mb-0 text-white-50 small">កំណត់ព័ត៌មាន និងសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ</p>
-            </div>
+<div class="create-container">
+    <div class="form-card-modern">
+        <div class="form-title">
+            <i class="bi bi-person-plus-fill"></i>
+            <h2>បង្កើតអ្នកប្រើប្រាស់ថ្មី</h2>
+            <p>សូមបំពេញព័ត៌មានខាងក្រោម</p>
         </div>
 
-        <form id="userForm" class="needs-validation" novalidate enctype="multipart/form-data">
+        <form asp-action="Create" method="post" id="createForm">
+            @Html.AntiForgeryToken()
 
-            <div class="profile-section-container">
-                <div class="profile-upload-wrapper">
-                    <img id="imagePreview" src="https://ui-avatars.com/api/?name=User&background=cbd5e1&color=fff&size=128" class="profile-preview" alt="Profile Preview">
-                    <label for="profileInput" class="upload-btn-badge shadow-sm">
-                        <i class="bi bi-camera-fill"></i>
-                    </label>
-                    <input type="file" id="profileInput" name="ProfileImage" class="d-none" accept="image/*">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-person me-2"></i>ឈ្មោះពេញ</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-person input-icon"></i>
+                            <input asp-for="FullName" placeholder="សូមបញ្ចូលឈ្មោះពេញ" required>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h6 class="fw-bold mb-1" style="color: var(--user-text-main);">រូបថតអ្នកប្រើប្រាស់</h6>
-                    <p class="small mb-0" style="color: var(--user-text-muted);">សូមជ្រើសរើសរូបថតផ្លូវការសម្រាប់ Profile (JPG, PNG)</p>
+
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-envelope me-2"></i>អ៊ីមែល</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input asp-for="Email" type="email" placeholder="សូមបញ្ចូលអ៊ីមែល" required>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <label class="form-label-custom">ឈ្មោះពេញ (Full Name)</label>
-                    <input type="text" name="FullName" class="form-control user-input-direct shadow-none" placeholder="FullName..." required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label-custom">អ៊ីមែល (Email Address)</label>
-                    <input type="email" name="Email" class="form-control user-input-direct shadow-none" placeholder="Enter Gmail..." required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label-custom">តួនាទី (User Role)</label>
-                    <select name="Role" class="form-select user-input-direct shadow-none" required>
-                        <option value="">-- ជ្រើសរើសតួនាទី --</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Registrar">Registrar</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label-custom">លេខសម្ងាត់ (Password)</label>
-                    <div class="input-group">
-                        <input type="password" id="passwordInput" name="Password" class="form-control user-input-direct shadow-none border-end-0" placeholder="Password..." required style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important;">
-                        <span class="input-group-text input-group-text-custom toggle-password" data-target="#passwordInput" style="cursor: pointer;">
-                            <i class="bi bi-eye-slash"></i>
-                        </span>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-shield me-2"></i>តួនាទី</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-shield input-icon"></i>
+                            <select asp-for="Role" required>
+                                <option value="">-- ជ្រើសរើសតួនាទី --</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Super Admin">Super Admin</option>
+                                <option value="Registrar">Registrar</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="User">User</option>
+                            </select>
+                            <i class="bi bi-chevron-down" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.6);"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label-custom">ផ្ទៀងផ្ទាត់លេខសម្ងាត់ (Confirm Password)</label>
-                    <div class="input-group">
-                        <input type="password" id="confirmPasswordInput" class="form-control user-input-direct shadow-none border-end-0" placeholder="Confirm Password..." required style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important;">
-                        <span class="input-group-text input-group-text-custom toggle-password" data-target="#confirmPasswordInput" style="cursor: pointer;">
-                            <i class="bi bi-eye-slash"></i>
-                        </span>
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-key me-2"></i>លេខសម្ងាត់</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-key input-icon"></i>
+                            <input asp-for="Password" type="password" id="password" class="password-input" placeholder="បញ្ចូលលេខសម្ងាត់" required>
+                            <i class="bi bi-eye-slash" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.6); cursor: pointer;" onclick="togglePassword('password', this)"></i>
+                        </div>
                     </div>
-                    <div class="text-danger-custom" id="passMismatch">
-                        <i class="bi bi-exclamation-circle me-1"></i>លេខសម្ងាត់មិនត្រូវគ្នាទេ!
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-check-circle me-2"></i>បញ្ជាក់លេខសម្ងាត់</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-check-circle input-icon"></i>
+                            <input type="password" id="confirmPassword" class="password-input" placeholder="បញ្ចូលម្តងទៀត" required>
+                            <i class="bi bi-eye-slash" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.6); cursor: pointer;" onclick="togglePassword('confirmPassword', this)"></i>
+                        </div>
+                        
+                        <!-- Password Strength -->
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar">
+                                <div class="strength-progress" id="strengthBar"></div>
+                            </div>
+                            <div class="strength-text">
+                                <span>កម្រិតសុវត្ថិភាព</span>
+                                <span id="strengthLabel">ខ្សោយ</span>
+                            </div>
+                        </div>
+
+                        <div class="password-match-indicator" id="matchIndicator">
+                            <i class="bi bi-exclamation-circle" style="color: #ff6b6b;"></i>
+                            <span style="color: #ff6b6b;">លេខសម្ងាត់មិនត្រូវគ្នា</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 d-flex align-items-end pb-2">
-                    <div class="form-check form-switch d-flex align-items-center gap-2">
-                        <input class="form-check-input shadow-none mt-0" type="checkbox" id="isActive" name="IsActive" value="true" checked style="width: 45px; height: 22px; cursor: pointer;">
-                        <label class="form-check-label fw-bold mb-0" for="isActive" style="color: var(--user-text-main);">ស្ថានភាព៖ សកម្ម (Active)</label>
+                <div class="col-md-6">
+                    <div class="input-group-modern">
+                        <label><i class="bi bi-toggle-on me-2"></i>ស្ថានភាព</label>
+                        <div class="switch-modern">
+                            <span><i class="bi bi-check-circle me-2"></i>សកម្ម</span>
+                            <label class="switch">
+                                <input asp-for="IsActive" type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-12 mt-5 pt-4 border-top-custom">
-                    <div class="d-flex align-items-center">
-                        <button type="button" class="btn-cancel-custom me-4 ajax-link" data-url="/User/Index">
-                            បោះបង់ (Cancel)
-                        </button>
-                        <button type="submit" id="btnSave" class="btn-save-user">
-                            <span class="spinner-border spinner-border-sm d-none" id="loader"></span>
-                            <span id="btnText">រក្សាទុកព័ត៌មាន</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="form-actions-modern">
+                <a href="/User/Index" class="btn-modern btn-secondary-modern ajax-link" data-url="/User/Index">
+                    <i class="bi bi-arrow-left"></i>
+                    បោះបង់
+                </a>
+                <button type="submit" class="btn-modern btn-primary-modern" id="submitBtn">
+                    <i class="bi bi-save"></i>
+                    រក្សាទុក
+                </button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
+    // Toggle password visibility
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        } else {
+            input.type = "password";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        }
+    }
+
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let strength = 0;
         
-        /** * FIX REFRESH ISSUE:
-         * To prevent "Null" or 404 when refreshing a page loaded via AJAX,
-         * we push the current URL to the browser history.
-         */
-        const currentPath = "/User/Create"; // Change to your actual route
-        if (window.location.pathname !== currentPath) {
-            window.history.pushState({ path: currentPath }, '', currentPath);
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]+/)) strength++;
+        if (password.match(/[A-Z]+/)) strength++;
+        if (password.match(/[0-9]+/)) strength++;
+        if (password.match(/[$#&!]+/)) strength++;
+        
+        return strength;
+    }
+
+    // Update password strength
+    $('#password').on('keyup', function() {
+        const password = $(this).val();
+        const strength = checkPasswordStrength(password);
+        const strengthBar = $('#strengthBar');
+        const strengthLabel = $('#strengthLabel');
+        
+        let color, label;
+        
+        if (strength <= 2) {
+            color = '#ff6b6b';
+            label = 'ខ្សោយ';
+        } else if (strength <= 4) {
+            color = '#ffbe0b';
+            label = 'មធ្យម';
+        } else {
+            color = '#00b09b';
+            label = 'រឹងមាំ';
         }
-
-        // Image Preview Logic
-        $("#profileInput").change(function() {
-            const file = this.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = function(e) { $("#imagePreview").attr("src", e.target.result); };
-                reader.readAsDataURL(file);
-            }
+        
+        strengthBar.css({
+            'width': (strength * 20) + '%',
+            'background': color
         });
+        
+        strengthLabel.text(label).css('color', color);
+    });
 
-        // Toggle Password Visibility
-        $(".toggle-password").off("click").on("click", function () {
-            const target = $(this).data("target");
-            const input = $(target);
-            const icon = $(this).find("i");
-            if (input.attr("type") === "password") {
-                input.attr("type", "text");
-                icon.removeClass("bi-eye-slash").addClass("bi-eye");
+    // Password match checker
+    function checkPasswordMatch() {
+        const password = $('#password').val();
+        const confirm = $('#confirmPassword').val();
+        const indicator = $('#matchIndicator');
+        const submitBtn = $('#submitBtn');
+        
+        if (confirm.length > 0) {
+            if (password === confirm) {
+                indicator.html('<i class="bi bi-check-circle" style="color: #00b09b;"></i><span style="color: #00b09b;">លេខសម្ងាត់ត្រឹមត្រូវ</span>');
+                submitBtn.prop('disabled', false);
             } else {
-                input.attr("type", "password");
-                icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                indicator.html('<i class="bi bi-exclamation-circle" style="color: #ff6b6b;"></i><span style="color: #ff6b6b;">លេខសម្ងាត់មិនត្រូវគ្នា</span>');
+                submitBtn.prop('disabled', true);
             }
-        });
-
-        // Form Submit
-        $("#userForm").off("submit").on("submit", function (e) {
-            e.preventDefault();
-
-            const password = $("#passwordInput").val();
-            const confirm = $("#confirmPasswordInput").val();
-
-            // Validate Passwords
-            if (password !== confirm) {
-                $("#confirmPasswordInput").css("border-color", "#ef4444");
-                $("#passMismatch").fadeIn();
-                return;
-            } else {
-                $("#passMismatch").hide();
-                $("#confirmPasswordInput").css("border-color", "var(--user-input-border)");
-            }
-
-            // Bootstrap Validation
-            if (this.checkValidity() === false) {
-                e.stopPropagation();
-                $(this).addClass('was-validated');
-                return;
-            }
-
-            // UI Loading State
-            $("#btnSave").prop("disabled", true);
-            $("#loader").removeClass("d-none");
-            $("#btnText").text(" កំពុងរក្សាទុក...");
-
-            var formData = new FormData(this);
-
-            $.ajax({
-                url: '/User/Create',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    Swal.fire({
-                        title: 'ជោគជ័យ',
-                        text: 'រក្សាទុកទិន្នន័យរួចរាល់',
-                        icon: 'success',
-                        confirmButtonText: 'យល់ព្រម',
-                        timer: 2000,
-                        timerProgressBar: true
-                    }).then(() => {
-                        // Return to Index
-                        const indexUrl = "/User/Index";
-                        if (typeof loadContent === "function") {
-                             loadContent(indexUrl); 
-                        } else {
-                             window.location.href = indexUrl;
-                        }
-                    });
-                },
-                error: function (err) {
-                    Swal.fire('កំហុស', 'មានបញ្ហាបច្ចេកទេស ឬអ៊ីមែលនេះមានរួចហើយ!', 'error');
-                    resetButton();
-                }
-            });
-        });
-
-        function resetButton() {
-            $("#btnSave").prop("disabled", false);
-            $("#loader").addClass("d-none");
-            $("#btnText").text("រក្សាទុកព័ត៌មាន");
         }
+    }
+
+    $('#password, #confirmPassword').on('keyup', checkPasswordMatch);
+
+    // Form submit animation
+    $('#createForm').on('submit', function(e) {
+        const submitBtn = $('#submitBtn');
+        submitBtn.prop('disabled', true);
+        submitBtn.html('<span class="spinner-border spinner-border-sm me-2"></span>កំពុងរក្សាទុក...');
+    });
+
+    // Animate form on load
+    gsap.from('.form-card-modern', {
+        duration: 0.8,
+        y: 50,
+        opacity: 0,
+        scale: 0.9,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.input-group-modern', {
+        duration: 0.5,
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        delay: 0.3,
+        ease: 'power3.out'
     });
 </script>

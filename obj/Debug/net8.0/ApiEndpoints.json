@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "ContainingType": "WebApplication2.Controllers.DataMigrationController",
+    "Method": "ImportAllData",
+    "RelativePath": "api/DataMigration/import-all",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApplication2.Controllers.DataMigrationController",
+    "Method": "ImportAttendance",
+    "RelativePath": "api/DataMigration/import-attendance",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "attendances",
+        "Type": "System.Collections.Generic.List\u00601[[WebApplication2.Models.Attendance, WebApplication2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebApplication2.Controllers.DataMigrationController",
+    "Method": "ImportGrades",
+    "RelativePath": "api/DataMigration/import-grades",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "grades",
+        "Type": "System.Collections.Generic.List\u00601[[WebApplication2.Models.Grade, WebApplication2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

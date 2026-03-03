@@ -1,6 +1,4 @@
 wwwroot\css\site.css
-wwwroot\data\classes.json
-wwwroot\data\payments.json
 wwwroot\favicon.ico
 wwwroot\images\aba_logo.png
 wwwroot\images\aba_logo.png.png

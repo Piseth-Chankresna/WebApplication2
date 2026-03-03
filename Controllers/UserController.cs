@@ -1,155 +1,232 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication2.Data;
 using WebApplication2.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebApplication2.Controllers
 {
-    public class UserController : Controller
+    public class UserController(ApplicationDbContext context) : Controller
     {
-        // ទីតាំង File សម្រាប់រក្សាទុកទិន្នន័យ (ទាំង Users និង Permissions)
-        private static readonly string _dbPath = Path.Combine(Directory.GetCurrentDirectory(), "system_database.json");
+        private readonly ApplicationDbContext _context = context;
 
-        private static List<UserAccount> _users = new List<UserAccount>();
-        private static Dictionary<string, List<RolePermission>> _rolePermissions = new Dictionary<string, List<RolePermission>>();
-
-        public UserController()
+        // ==================== USER LIST ====================
+        public async Task<IActionResult> Index()
         {
-            LoadData(); // Load ទិន្នន័យរាល់ពេល Controller ហៅប្រើ
+            var users = await _context.UserAccounts.ToListAsync();
+            return View(users);
         }
 
-        // --- មុខងារ Persistence (Save/Load) ---
-        private void LoadData()
+        // ==================== CREATE USER ====================
+        public IActionResult Create()
         {
-            if (System.IO.File.Exists(_dbPath))
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(UserAccount user, string ConfirmPassword)
+        {
+            try
             {
-                var json = System.IO.File.ReadAllText(_dbPath);
-                var data = JsonSerializer.Deserialize<SystemDataWrapper>(json);
-                if (data != null)
+                // Manual validation
+                if (string.IsNullOrEmpty(user.FullName))
                 {
-                    _users = data.Users ?? new List<UserAccount>();
-                    _rolePermissions = data.RolePermissions ?? new Dictionary<string, List<RolePermission>>();
+                    TempData["Error"] = "សូមបញ្ចូលឈ្មោះពេញ";
+                    return View(user);
                 }
-            }
 
-            // បើកដំបូងបំផុត មិនទាន់មានទិន្នន័យ ឱ្យវាបង្កើត Admin មួយទុកសិន
-            if (_users.Count == 0)
+                if (string.IsNullOrEmpty(user.Email))
+                {
+                    TempData["Error"] = "សូមបញ្ចូលអ៊ីមែល";
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.Role))
+                {
+                    TempData["Error"] = "សូមជ្រើសរើសតួនាទី";
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.Password))
+                {
+                    TempData["Error"] = "សូមបញ្ចូលលេខសម្ងាត់";
+                    return View(user);
+                }
+
+                if (user.Password.Length < 6)
+                {
+                    TempData["Error"] = "លេខសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ";
+                    return View(user);
+                }
+
+                // Check if passwords match
+                if (user.Password != ConfirmPassword)
+                {
+                    TempData["Error"] = "លេខសម្ងាត់មិនត្រូវគ្នា";
+                    return View(user);
+                }
+
+                // Check if email exists
+                var existingUser = await _context.UserAccounts
+                    .FirstOrDefaultAsync(u => u.Email == user.Email);
+
+                if (existingUser != null)
+                {
+                    TempData["Error"] = "អ៊ីមែលនេះមានរួចហើយ!";
+                    return View(user);
+                }
+
+                // Hash password
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                user.CreatedAt = DateTime.Now;
+                user.IsActive = true;
+
+                _context.UserAccounts.Add(user);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "បង្កើតអ្នកប្រើប្រាស់ថ្មីបានជោគជ័យ!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
             {
-                _users.Add(new UserAccount { Id = 1, FullName = "Admin User", Email = "admin@hru.edu.kh", Role = "Super Admin", IsActive = true });
-                SaveData();
+                TempData["Error"] = "មានបញ្ហា: " + ex.Message;
+                return View(user);
             }
         }
 
-        private void SaveData()
+        // ==================== EDIT USER ====================
+        public async Task<IActionResult> Edit(int id)
         {
-            var data = new SystemDataWrapper { Users = _users, RolePermissions = _rolePermissions };
-            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
-            System.IO.File.WriteAllText(_dbPath, json);
+            var user = await _context.UserAccounts.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
         }
 
-        // 1. បង្ហាញបញ្ជីឈ្មោះអ្នកប្រើប្រាស់ (Index)
-        public IActionResult Index()
-        {
-            var model = _users.OrderByDescending(u => u.Id).ToList();
-            return PartialView(model);
-        }
-
-        // 2. បើកទំព័របង្កើតអ្នកប្រើប្រាស់ (GET)
-        public IActionResult Create() => PartialView();
-
-        // 3. ទទួលទិន្នន័យពី AJAX Form ហើយរក្សាទុក (POST)
         [HttpPost]
-        public IActionResult Create(UserAccount user)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, UserAccount updatedUser)
         {
-            if (ModelState.IsValid)
+            try
             {
-                user.Id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1;
-                _users.Add(user);
-                SaveData(); // រក្សាទុកចូល File ភ្លាមៗ
-                return Json(new { success = true, message = "រក្សាទុកអ្នកប្រើប្រាស់ថ្មីបានជោគជ័យ!" });
+                var user = await _context.UserAccounts.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.FullName = updatedUser.FullName;
+                user.Email = updatedUser.Email;
+                user.Role = updatedUser.Role;
+                user.IsActive = updatedUser.IsActive;
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "កែប្រែព័ត៌មានដោយជោគជ័យ!";
+                return RedirectToAction("Index");
             }
-            return Json(new { success = false, message = "សូមបំពេញព័ត៌មានឱ្យបានត្រឹមត្រូវ!" });
+            catch (Exception ex)
+            {
+                TempData["Error"] = "មានបញ្ហា: " + ex.Message;
+                return RedirectToAction("Edit", new { id });
+            }
         }
 
-        // 4. បើកទំព័រកែប្រែទិន្នន័យ (GET)
-        public IActionResult Edit(int id)
-        {
-            var user = _users.FirstOrDefault(u => u.Id == id);
-            if (user == null) return NotFound();
-            return PartialView(user);
-        }
-
-        // 5. រក្សាទុកការកែប្រែ (POST)
+        // ==================== DELETE USER ====================
         [HttpPost]
-        public IActionResult Edit(UserAccount updatedUser)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            var existingUser = _users.FirstOrDefault(u => u.Id == updatedUser.Id);
-            if (existingUser != null && ModelState.IsValid)
+            try
             {
-                existingUser.FullName = updatedUser.FullName;
-                existingUser.Email = updatedUser.Email;
-                existingUser.Role = updatedUser.Role;
-                existingUser.IsActive = updatedUser.IsActive;
-                SaveData(); // រក្សាទុកការកែប្រែចូល File
-                return Json(new { success = true, message = "ធ្វើបច្ចុប្បន្នភាពបានជោគជ័យ!" });
+                var user = await _context.UserAccounts.FindAsync(id);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "រកមិនឃើញអ្នកប្រើប្រាស់!" });
+                }
+
+                _context.UserAccounts.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "លុបអ្នកប្រើប្រាស់ដោយជោគជ័យ!" });
             }
-            return Json(new { success = false, message = "មិនអាចកែប្រែទិន្នន័យបានទេ។" });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
-        // 6. លុបអ្នកប្រើប្រាស់ (POST)
+        // ==================== RESET PASSWORD ====================
+        public async Task<IActionResult> ResetPassword(int id)
+        {
+            var user = await _context.UserAccounts.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
+        }
+
         [HttpPost]
-        public IActionResult Delete(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(int id, string newPassword, string confirmPassword)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
-            if (user != null)
+            try
             {
-                _users.Remove(user);
-                SaveData(); // រក្សាទុកការលុបចូល File
-                return Json(new { success = true, message = "លុបបានជោគជ័យ!" });
+                if (string.IsNullOrEmpty(newPassword))
+                {
+                    TempData["Error"] = "សូមបញ្ចូលលេខសម្ងាត់ថ្មី";
+                    return RedirectToAction("ResetPassword", new { id });
+                }
+
+                if (newPassword != confirmPassword)
+                {
+                    TempData["Error"] = "លេខសម្ងាត់មិនត្រូវគ្នា";
+                    return RedirectToAction("ResetPassword", new { id });
+                }
+
+                if (newPassword.Length < 6)
+                {
+                    TempData["Error"] = "លេខសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ";
+                    return RedirectToAction("ResetPassword", new { id });
+                }
+
+                var user = await _context.UserAccounts.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "ប្តូរពាក្យសម្ងាត់ជោគជ័យ!";
+                return RedirectToAction("Index");
             }
-            return Json(new { success = false, message = "រកមិនឃើញទិន្នន័យសម្រាប់លុប!" });
+            catch (Exception ex)
+            {
+                TempData["Error"] = "មានបញ្ហា: " + ex.Message;
+                return RedirectToAction("ResetPassword", new { id });
+            }
         }
 
-        // --- មុខងារសម្រាប់ Role & Permissions ---
-        public IActionResult Roles() => PartialView();
+        // ==================== ROLES & PERMISSIONS ====================
+        public IActionResult Roles()
+        {
+            return View();
+        }
 
         [HttpGet]
-        public IActionResult GetPermissions(string roleName)
+        public async Task<IActionResult> GetPermissions(string roleName)
         {
-            if (string.IsNullOrEmpty(roleName)) return Json(new List<RolePermission>());
-
-            if (!_rolePermissions.ContainsKey(roleName))
-            {
-                var modules = new List<string> { "User Management", "Student Records", "Financial Reports", "Inventory", "Settings" };
-                _rolePermissions[roleName] = modules.Select(m => new RolePermission { ModuleName = m, CanView = true }).ToList();
-                SaveData();
-            }
-            return Json(_rolePermissions[roleName]);
+            var permissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == roleName)
+                .ToListAsync();
+            return Json(permissions);
         }
-
-        [HttpPost]
-        public IActionResult SavePermissions(string roleName, List<RolePermission> permissions)
-        {
-            if (string.IsNullOrEmpty(roleName) || permissions == null) return Json(new { success = false });
-
-            _rolePermissions[roleName] = permissions;
-            SaveData();
-            return Json(new { success = true, message = "រក្សាទុកសិទ្ធិរួចរាល់!" });
-        }
-
-        public IActionResult ResetPassword(int id)
-        {
-            var user = _users.FirstOrDefault(u => u.Id == id);
-            return PartialView(user);
-        }
-    }
-
-    // Helper Class សម្រាប់រៀបចំរចនាសម្ព័ន្ធ JSON
-    public class SystemDataWrapper
-    {
-        public List<UserAccount> Users { get; set; }
-        public Dictionary<string, List<RolePermission>> RolePermissions { get; set; }
     }
 }

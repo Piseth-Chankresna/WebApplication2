@@ -6,11 +6,11 @@ namespace WebApplication2.Models
     {
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }  // Make nullable with ?
 
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string? Password { get; set; }  // Make nullable with ?
 
         public bool RememberMe { get; set; }
     }

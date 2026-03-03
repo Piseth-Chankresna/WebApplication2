@@ -1,293 +1,97 @@
-﻿@model dynamic
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "Role & Permissions";
 }
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
 <style>
-    /* --- Root Colors for Light & Dark Mode --- */
-    :root {
-        --role-bg: #f1f5f9;
-        --role-card: rgba(255, 255, 255, 0.7);
-        --role-text-main: #1e293b;
-        --role-text-muted: #64748b;
-        --role-border: rgba(255, 255, 255, 0.4);
-        --role-icon-bg: #ffffff;
-        --role-matrix-bg: rgba(255, 255, 255, 0.9);
-        --role-table-head: #f8fafc;
-        --role-shadow: rgba(0, 0, 0, 0.05);
+    .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
     }
 
-    [data-bs-theme="dark"] {
-        --role-bg: #0f172a;
-        --role-card: rgba(30, 41, 59, 0.7);
-        --role-text-main: #f1f5f9;
-        --role-text-muted: #94a3b8;
-        --role-border: rgba(255, 255, 255, 0.1);
-        --role-icon-bg: #1e293b;
-        --role-matrix-bg: rgba(30, 41, 59, 0.95);
-        --role-table-head: #1e293b;
-        --role-shadow: rgba(0, 0, 0, 0.3);
+    .role-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 25px;
+        transition: all 0.3s;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
     }
 
-    /* --- 1. Header Banner --- */
-    .header-banner-bg {
-        background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #2563eb 100%);
-        padding: 60px 40px 110px 40px;
-        margin: -10px -40px 0 -40px;
-        color: white;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        border-bottom-left-radius: 60px;
-        border-bottom-right-radius: 60px;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
-    }
-
-    /* --- 2. Card Style --- */
-    .role-content-wrapper {
-        background-color: var(--role-bg);
-        padding: 10px 40px;
-        min-height: 100vh;
-        transition: background-color 0.3s ease;
-    }
-
-    .role-item-box {
-        background: var(--role-card) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--role-border) !important;
-        border-radius: 24px;
-        padding: 30px;
-        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 8px 32px var(--role-shadow);
-    }
-
-        .role-item-box:hover {
-            transform: translateY(-10px);
-            background: var(--role-card) !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 20px 40px var(--role-shadow);
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
         }
 
-    .icon-box-role {
+    .role-icon {
         width: 60px;
         height: 60px;
-        border-radius: 18px;
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 26px;
-        margin-bottom: 25px;
-        background: var(--role-icon-bg);
-        box-shadow: 0 4px 10px var(--role-shadow);
-        color: #3b82f6;
+        margin-bottom: 20px;
+        font-size: 28px;
+        color: white;
     }
 
-    .text-dark {
-        color: var(--role-text-main) !important;
-    }
-
-    .text-muted {
-        color: var(--role-text-muted) !important;
-    }
-
-    /* --- 3. Permissions Matrix --- */
-    .matrix-container {
-        background: var(--role-matrix-bg) !important;
-        backdrop-filter: blur(15px);
-        border-radius: 30px !important;
-        border: 1px solid var(--role-border);
-    }
-
-    .matrix-table-modern thead th {
-        background: var(--role-table-head);
-        color: var(--role-text-muted);
-        padding: 18px 20px;
-    }
-
-    .matrix-table-modern tbody td {
-        border-bottom: 1px solid var(--role-border);
-        color: var(--role-text-main);
-    }
-
-    /* --- 4. Inputs & Search --- */
-    .search-input-role {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        border-radius: 12px;
-    }
-
-        .search-input-role::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+        .role-icon.admin {
+            background: linear-gradient(135deg, #667eea, #764ba2);
         }
 
-    .form-check-input-custom {
-        width: 22px;
-        height: 22px;
-        background-color: var(--role-icon-bg) !important;
-        border: 2px solid #cbd5e1 !important;
-    }
+        .role-icon.registrar {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
 
-    /* --- Custom Scrollbar for Dark Mode --- */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--role-bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #3b82f6;
-        border-radius: 10px;
-    }
+        .role-icon.accounting {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
 </style>
 
-<div class="role-content-wrapper">
-    <div class="header-banner-bg">
-        <div class="role-header-minimal">
-            <div class="header-title-box">
-                <h3><i class="bi bi-shield-lock-fill"></i> Role & Permissions</h3>
-                <p>គ្រប់គ្រងតួនាទី និងសិទ្ធិប្រើប្រាស់ក្នុងប្រព័ន្ធ</p>
-            </div>
-            <div class="d-flex gap-3 align-items-center">
-                <div class="position-relative">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-white opacity-75"></i>
-                    <input type="text" id="roleSearch" class="form-control search-input-role shadow-none ps-5" placeholder="ស្វែងរក Role...">
-                </div>
-                <button class="btn btn-white-custom px-4 rounded-3 fw-bold" style="background: white; color: #2563eb; border:none;" onclick="loadContent('/User/CreateRole', 'Create Role')">
-                    <i class="bi bi-plus-lg me-2"></i> បង្កើតថ្មី
-                </button>
-            </div>
-        </div>
+<h4 class="fw-bold mb-4">គ្រប់គ្រងតួនាទី និងសិទ្ធិ</h4>
+
+<div class="roles-grid">
+    <div class="role-card" onclick="viewPermissions('Admin')">
+        <div class="role-icon admin"><i class="bi bi-shield-check"></i></div>
+        <h5 class="fw-bold">Admin</h5>
+        <p class="text-muted small">អ្នកគ្រប់គ្រងប្រព័ន្ធ</p>
     </div>
 
-    <div class="content-floating-up" style="margin-top: -75px;">
-        <div id="roleMainContainer">
-            <div class="row g-4" id="roleGrid">
-                <div class="col-xl-4 col-md-6 role-card-item">
-                    <div class="role-item-box" style="border-left: 6px solid #2563eb !important;">
-                        <div class="icon-box-role"><i class="bi bi-shield-check"></i></div>
-                        <h5 class="fw-bold text-dark mb-2 role-title">Administrator</h5>
-                        <p class="text-muted small mb-4 flex-grow-1">គ្រប់គ្រងប្រព័ន្ធទាំងមូល និងមានសិទ្ធិចូលប្រើប្រាស់គ្រប់ Module ទាំងអស់។</p>
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--role-border) !important;">
-                            <span class="small text-muted fw-bold"><i class="bi bi-people me-1"></i> 5 Users</span>
-                            <button class="btn btn-sm btn-link text-primary fw-bold text-decoration-none" onclick="showMatrix('Administrator')">
-                                កំណត់សិទ្ធិ <i class="bi bi-chevron-right ms-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <div class="role-card" onclick="viewPermissions('Registrar')">
+        <div class="role-icon registrar"><i class="bi bi-person-badge"></i></div>
+        <h5 class="fw-bold">Registrar</h5>
+        <p class="text-muted small">អ្នកគ្រប់គ្រងការសិក្សា</p>
+    </div>
 
-                <div class="col-xl-4 col-md-6 role-card-item">
-                    <div class="role-item-box" style="border-left: 6px solid #06b6d4 !important;">
-                        <div class="icon-box-role" style="color: #06b6d4;"><i class="bi bi-person-badge"></i></div>
-                        <h5 class="fw-bold text-dark mb-2 role-title">Registrar</h5>
-                        <p class="text-muted small mb-4 flex-grow-1">គ្រប់គ្រងការចុះឈ្មោះសិស្ស ការរៀបចំថ្នាក់រៀន និងរបាយការណ៍សិក្សា។</p>
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--role-border) !important;">
-                            <span class="small text-muted fw-bold"><i class="bi bi-people me-1"></i> 12 Users</span>
-                            <button class="btn btn-sm btn-link text-primary fw-bold text-decoration-none" onclick="showMatrix('Registrar')">
-                                កំណត់សិទ្ធិ <i class="bi bi-chevron-right ms-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-4 col-md-6 role-card-item">
-                    <div class="role-item-box" style="border-left: 6px solid #f59e0b !important;">
-                        <div class="icon-box-role" style="color: #f59e0b;"><i class="bi bi-wallet2"></i></div>
-                        <h5 class="fw-bold text-dark mb-2 role-title">Accounting</h5>
-                        <p class="text-muted small mb-4 flex-grow-1">គ្រប់គ្រងការបង់ប្រាក់ ចំណូល-ចំណាយ និងរបាយការណ៍ហិរញ្ញវត្ថុ។</p>
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--role-border) !important;">
-                            <span class="small text-muted fw-bold"><i class="bi bi-people me-1"></i> 3 Users</span>
-                            <button class="btn btn-sm btn-link text-primary fw-bold text-decoration-none" onclick="showMatrix('Accounting')">
-                                កំណត់សិទ្ធិ <i class="bi bi-chevron-right ms-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="matrixSection" style="display: none;">
-            <div class="p-4 matrix-container shadow-lg">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-light rounded-circle p-2 shadow-sm" onclick="hideMatrix()"><i class="bi bi-arrow-left"></i></button>
-                        <div>
-                            <h4 class="mb-0 text-dark fw-bold">កំណត់សិទ្ធិលម្អិត</h4>
-                            <p class="text-muted small mb-0">Role: <span id="targetRoleName" class="badge bg-primary px-3"></span></p>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary px-4 py-2 rounded-3 shadow" onclick="savePermissions()">
-                        <i class="bi bi-check-circle me-2"></i> រក្សាទុក
-                    </button>
-                </div>
-
-                <div class="table-responsive rounded-4">
-                    <table class="table matrix-table-modern text-center mb-0">
-                        <thead>
-                            <tr>
-                                <th class="text-start ps-4">Modules</th>
-                                <th>View</th>
-                                <th>Create</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
-                                <th>Export</th>
-                            </tr>
-                        </thead>
-                        <tbody id="matrixBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="role-card" onclick="viewPermissions('Accounting')">
+        <div class="role-icon accounting"><i class="bi bi-calculator"></i></div>
+        <h5 class="fw-bold">Accounting</h5>
+        <p class="text-muted small">គណនេយ្យករ</p>
     </div>
 </div>
 
 <script>
-    // Search Function
-    $("#roleSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#roleGrid .role-card-item").filter(function() {
-            $(this).toggle($(this).find('.role-title').text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-
-    function showMatrix(roleName) {
-        $("#targetRoleName").text(roleName);
-        $("#matrixBody").html('<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
-
-        // Fake Data for Demo (Replace with real AJAX)
-        setTimeout(() => {
-            const modules = ["User Management", "Student Records", "Financial Reports", "Class Scheduling"];
-            let html = "";
-            modules.forEach(m => {
-                html += `<tr>
-                    <td class="text-start ps-4 fw-bold text-dark">${m}</td>
-                    <td><input class="form-check-input form-check-input-custom" type="checkbox" checked></td>
-                    <td><input class="form-check-input form-check-input-custom" type="checkbox"></td>
-                    <td><input class="form-check-input form-check-input-custom" type="checkbox" checked></td>
-                    <td><input class="form-check-input form-check-input-custom" type="checkbox"></td>
-                    <td><input class="form-check-input form-check-input-custom" type="checkbox"></td>
-                </tr>`;
+    function viewPermissions(role) {
+        $.get('/User/GetPermissions', { roleName: role }, function(data) {
+            let html = '<div class="text-start">';
+            data.forEach(p => {
+                html += `<div class="border-bottom p-2">
+                    <strong>${p.moduleName}:</strong>
+                    ${p.canView ? '👁️ View ' : ''}
+                    ${p.canCreate ? '➕ Create ' : ''}
+                    ${p.canEdit ? '✏️ Edit ' : ''}
+                </div>`;
             });
-            $("#matrixBody").html(html);
-        }, 500);
+            html += '</div>';
 
-        $("#roleMainContainer").fadeOut(200, function() {
-            $("#matrixSection").fadeIn(200);
-        });
-    }
-
-    function hideMatrix() {
-        $("#matrixSection").fadeOut(200, function() {
-            $("#roleMainContainer").fadeIn(200);
+            Swal.fire({
+                title: role + ' Permissions',
+                html: html,
+                confirmButtonText: 'Close'
+            });
         });
     }
 </script>
