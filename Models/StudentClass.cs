@@ -18,5 +18,6 @@ namespace WebApplication2.Models
         public int StudentCount { get; set; }
         public string? TeacherName { get; set; }
         public string? TeacherPhoto { get; set; }
+
     }
 }

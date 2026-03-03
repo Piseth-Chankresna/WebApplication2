@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
-using WebApplication2.Service;
+using WebApplication2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

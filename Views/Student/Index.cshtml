@@ -1,533 +1,790 @@
-﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+﻿@model IEnumerable<WebApplication2.Models.Student>
+@{
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "បញ្ជីសិស្ស";
+}
 
 <style>
-    :root {
-        --primary-blue: #2563eb;
-        --light-blue: #eff6ff;
+    .page-header {
+        margin-bottom: 30px;
     }
 
-    body {
-        background-color: #f8fafc;
-        font-family: 'Inter', sans-serif;
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
-    .rounded-4 {
-        border-radius: 1rem !important;
-    }
-
-    .header-card {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        color: white;
-        border: none;
-        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
-    }
-
-    .table thead th {
-        background-color: #f1f5f9;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        color: #64748b;
-        border: none;
-        padding: 15px;
-    }
-
-    .student-row:hover {
-        background-color: var(--light-blue);
-        cursor: pointer;
-    }
-
-    .profile-upload-container {
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
         position: relative;
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 20px;
+        overflow: hidden;
     }
 
-    .profile-preview-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 4px solid white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: #334155;
     }
 
-    .edit-photo-btn {
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(16,185,129,0.1);
+        border-color: #10b981;
+    }
+
+    .stat-icon {
         position: absolute;
-        bottom: 5px;
-        right: 5px;
-        background: var(--primary-blue);
+        right: 20px;
+        top: 20px;
+        font-size: 3rem;
+        opacity: 0.1;
+        color: #10b981;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    [data-theme="dark"] .stat-value {
         color: white;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .action-bar {
+        background: white;
+        border-radius: 60px;
+        padding: 6px 6px 6px 24px;
+        margin-bottom: 30px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        border: 2px solid white;
-        cursor: pointer;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        text-align: left;
-    }
-
-    .info-item {
-        background: #f8fafc;
-        padding: 10px;
-        border-radius: 10px;
+        justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         border: 1px solid #e2e8f0;
     }
 
-    .info-label {
-        font-size: 0.7rem;
-        color: #64748b;
-        font-weight: 600;
-        text-transform: uppercase;
+    [data-theme="dark"] .action-bar {
+        background: #1e293b;
+        border-color: #334155;
     }
 
-    .info-value {
-        font-size: 0.9rem;
-        color: #1e293b;
-        font-weight: 600;
-    }
-
-    .filter-container {
-        display: flex;
-        gap: 10px;
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        margin-bottom: 25px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .filter-search {
-        flex: 2;
-        min-width: 200px;
-    }
-
-    .filter-select {
+    .search-wrapper {
         flex: 1;
-        min-width: 130px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .search-wrapper i {
+            color: #94a3b8;
+        }
+
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            width: 100%;
+            outline: none;
+            color: #1e293b;
+        }
+
+    [data-theme="dark"] .search-wrapper input {
+        color: white;
+    }
+
+    .search-wrapper input::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-create, .btn-excel {
+        padding: 12px 28px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .btn-excel {
+        background: #10b981;
+        color: white;
+        margin-right: 10px;
+    }
+
+        .btn-create:hover, .btn-excel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+        }
+
+    .filter-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .filter-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-card h5 {
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    [data-theme="dark"] .filter-card h5 {
+        color: white;
+    }
+
+    .filter-card h5 i {
+        color: #10b981;
+        font-size: 1.3rem;
+    }
+
+    .filter-card .form-label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
+
+    [data-theme="dark"] .filter-card .form-label {
+        color: #cbd5e1;
+    }
+
+    .filter-card .form-select,
+    .filter-card .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px;
+        width: 100%;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .filter-card .form-select,
+    [data-theme="dark"] .filter-card .form-control {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .table-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .student-table th {
+            padding: 16px;
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+    [data-theme="dark"] .student-table th {
+        background: #0f172a;
+        color: #cbd5e1;
+        border-bottom-color: #334155;
+    }
+
+    .student-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .student-table td {
+        color: white;
+        border-bottom-color: #334155;
+    }
+
+    .student-table tbody tr {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+        .student-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+    [data-theme="dark"] .student-table tbody tr:hover {
+        background: #0f172a;
+    }
+
+    .student-avatar {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(16,185,129,0.2);
+    }
+
+        .student-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+            .student-avatar img:hover {
+                transform: scale(1.1);
+            }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-active {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .status-inactive {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    .status-warning {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    [data-theme="dark"] .btn-icon {
+        background: #0f172a;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .btn-icon:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        transform: translateY(-2px);
+        border-color: transparent;
+    }
+
+    .filtered-count {
+        background: #10b981;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    /* Loading animation */
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            border-radius: 20px;
+            padding: 16px;
+        }
+
+        .search-wrapper {
+            width: 100%;
+        }
+
+        .btn-create, .btn-excel {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .d-flex.gap-2 {
+            width: 100%;
+        }
+
+        .btn-excel {
+            margin-right: 0;
+        }
     }
 </style>
 
-<div id="studentListPage" class="container-fluid p-4 animate__animated animate__fadeIn">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-person-badge-fill me-2 text-primary"></i>Student Center</h3>
-            <p class="text-muted mb-0 small">គ្រប់គ្រង និងពិនិត្យព័ត៌មានលម្អិតសិស្ស</p>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <button class="btn btn-outline-success rounded-pill px-4 fw-bold me-2 shadow-sm" onclick="exportToExcel()">
-                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Excel
-            </button>
-            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="goToCreate()">
-                <i class="bi bi-plus-lg me-2"></i>បន្ថែមសិស្សថ្មី
-            </button>
-        </div>
-    </div>
+<!-- Page Header -->
+<div class="page-header">
+    <h2><i class="bi bi-people-fill me-2"></i>បញ្ជីសិស្ស</h2>
+    <p class="text-muted">គ្រប់គ្រងព័ត៌មានសិស្សទាំងអស់ក្នុងប្រព័ន្ធ</p>
+</div>
 
-    <div class="card header-card p-4 mb-4 rounded-4 position-relative overflow-hidden">
-        <div class="position-relative z-1">
-            <h6 class="text-uppercase opacity-75 fw-bold small mb-2">សិស្សសរុបក្នុងប្រព័ន្ធ</h6>
-            <div class="d-flex align-items-center">
-                <h1 class="display-4 fw-bold mb-0" id="countTotal">0</h1>
-                <span class="ms-3 badge bg-white text-primary rounded-pill px-3">Active</span>
-            </div>
-        </div>
-        <i class="bi bi-people position-absolute end-0 bottom-0 opacity-25 m-n3" style="font-size: 8rem;"></i>
+<!-- Stats Cards -->
+<div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+        <i class="bi bi-people-fill stat-icon"></i>
+        <div class="stat-value" id="totalStudents">0</div>
+        <div class="stat-label">សិស្សសរុប</div>
     </div>
+    <div class="stat-card">
+        <i class="bi bi-gender-male stat-icon"></i>
+        <div class="stat-value" id="maleStudents">0</div>
+        <div class="stat-label">ប្រុស</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-gender-female stat-icon"></i>
+        <div class="stat-value" id="femaleStudents">0</div>
+        <div class="stat-label">ស្រី</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-check-circle-fill stat-icon"></i>
+        <div class="stat-value" id="activeStudents">0</div>
+        <div class="stat-label">កំពុងសិក្សា</div>
+    </div>
+</div>
 
-    <div class="filter-container border shadow-sm">
-        <div class="filter-search">
-            <div class="input-group overflow-hidden rounded-3 border">
-                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" id="searchInput" class="form-control border-0 py-2 shadow-none" placeholder="ស្វែងរកឈ្មោះ ឬ ID..." oninput="filterData()">
-            </div>
-        </div>
-        <div class="filter-select">
-            <select id="filterMajor" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
-                <option value="">គ្រប់ជំនាញ</option>
-                <option value="Information Technology">IT</option>
-                <option value="Business Administration">Business</option>
-                <option value="English Literature">English</option>
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="search-wrapper">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="ស្វែងរកតាមឈ្មោះ លេខសម្គាល់...">
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Student/ExportToExcel" class="btn-excel">
+            <i class="bi bi-file-earmark-excel"></i>
+            <span class="d-none d-md-inline">Excel</span>
+        </a>
+        <a href="/Student/Create" class="btn-create ajax-link" data-url="/Student/Create">
+            <i class="bi bi-plus-lg"></i>
+            <span class="d-none d-md-inline">បន្ថែមថ្មី</span>
+        </a>
+    </div>
+</div>
+
+<!-- Advanced Filter -->
+<div class="filter-card">
+    <h5><i class="bi bi-sliders2"></i> តម្រងកម្រិតខ្ពស់</h5>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fw-bold">ជំនាញ</label>
+            <select id="filterMajor" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="English Literature">English Literature</option>
                 <option value="Law">Law</option>
                 <option value="Accounting">Accounting</option>
             </select>
         </div>
-        <div class="filter-select">
-            <select id="filterShift" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
-                <option value="">គ្រប់វេន</option>
-                <option value="Morning">Morning</option>
-                <option value="Afternoon">Afternoon</option>
-                <option value="Evening">Evening</option>
-                <option value="Weekend">Weekend</option>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">ឆ្នាំសិក្សា</label>
+            <select id="filterYear" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="1">ឆ្នាំទី១</option>
+                <option value="2">ឆ្នាំទី២</option>
+                <option value="3">ឆ្នាំទី៣</option>
+                <option value="4">ឆ្នាំទី៤</option>
             </select>
         </div>
-        <div class="filter-select">
-            <select id="filterRoom" class="form-select border rounded-3 py-2 shadow-none" onchange="filterData()">
-                <option value="">គ្រប់បន្ទប់</option>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">វេនសិក្សា</label>
+            <select id="filterShift" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="ព្រឹក">ព្រឹក</option>
+                <option value="រសៀល">រសៀល</option>
+                <option value="យប់">យប់</option>
+                <option value="សៅរ៍-អាទិត្យ">សៅរ៍-អាទិត្យ</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">ស្ថានភាព</label>
+            <select id="filterStatus" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="កំពុងសិក្សា">កំពុងសិក្សា</option>
+                <option value="ឈប់សម្រាក">ឈប់សម្រាក</option>
+                <option value="បញ្ចប់ការសិក្សា">បញ្ចប់ការសិក្សា</option>
             </select>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-        <div class="table-responsive">
-            <table class="table align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">សិស្ស</th>
-                        <th>កម្រិត/ជំនាញ</th>
-                        <th class="text-center">ឆ្នាំសិក្សា</th>
-                        <th class="text-center">វេន/បន្ទប់</th>
-                        <th class="text-center">អាហារូបករណ៍</th>
-                        <th class="text-center">សកម្មភាព</th>
-                    </tr>
-                </thead>
-                <tbody id="studentTableBody"></tbody>
-            </table>
-        </div>
-        <div id="noData" class="text-center py-5 d-none">
-            <i class="bi bi-folder-x display-1 text-muted"></i>
-            <p class="mt-2 text-muted">មិនមានទិន្នន័យឡើយ</p>
-        </div>
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn" style="background: #10b981; color: white; border-radius: 40px; padding: 10px 24px;" onclick="applyFilter()">
+            <i class="bi bi-search me-2"></i>ស្វែងរក
+        </button>
+        <button class="btn btn-outline-secondary" style="border-radius: 40px; padding: 10px 24px;" onclick="resetFilter()">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>កំណត់ឡើងវិញ
+        </button>
+    </div>
+</div>
+
+<!-- Filtered Count -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="filtered-count" id="filteredCount">0 / 0</span>
+</div>
+
+<!-- Student Table -->
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="student-table">
+            <thead>
+                <tr>
+                    <th>សិស្ស</th>
+                    <th>ជំនាញ</th>
+                    <th>ឆ្នាំ</th>
+                    <th>វេន/បន្ទប់</th>
+                    <th>ស្ថានភាព</th>
+                    <th class="text-end">សកម្មភាព</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
-    // --- 1. Core Data Access ---
-    function getStudents() {
-        try {
-            const data = localStorage.getItem('students');
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            console.error("Error reading localStorage:", e);
-            return [];
-        }
-    }
+    let students = [];
+    let isLoading = false;
 
-    function saveStudents(data) {
-        localStorage.setItem('students', JSON.stringify(data));
-        refreshUI();
-    }
+    $(document).ready(function() {
+        loadStudents();
+        loadStats();
+    });
 
-    // --- 2. UI Refresh Logic ---
-    function refreshUI() {
-        updateRoomDropdown();
-        filterData();
-    }
+    function loadStudents() {
+        if (isLoading) return;
+        isLoading = true;
 
-    function updateRoomDropdown() {
-        const students = getStudents();
-        const roomSelect = document.getElementById('filterRoom');
-        if (!roomSelect) return;
+        $('#studentTableBody').html(`
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                </td>
+            </tr>
+        `);
 
-        const rooms = [...new Set(students.map(s => s.room).filter(r => r && r.trim() !== ""))].sort();
-        const currentVal = roomSelect.value;
-
-        roomSelect.innerHTML = '<option value="">គ្រប់បន្ទប់</option>';
-        rooms.forEach(room => {
-            const option = document.createElement('option');
-            option.value = room;
-            option.textContent = room;
-            if (room === currentVal) option.selected = true;
-            roomSelect.appendChild(option);
+        $.ajax({
+            url: '/Student/GetStudents',
+            type: 'GET',
+            cache: true,
+            success: function(data) {
+                console.log("Students loaded:", data);
+                students = data;
+                displayStudents(data);
+                updateFilteredCount(data.length);
+                isLoading = false;
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading students:", error);
+                $('#studentTableBody').html(`
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
+                            <button class="btn btn-primary mt-3" onclick="loadStudents()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាមម្តងទៀត
+                            </button>
+                        </td>
+                    </tr>
+                `);
+                isLoading = false;
+            }
         });
     }
 
-    // --- 3. Display Logic ---
-    function displayStudents(dataList = null) {
-        const allStudents = getStudents();
-        const data = dataList !== null ? dataList : allStudents;
-
-        const countEl = document.getElementById('countTotal');
-        if (countEl) countEl.innerText = allStudents.length;
-
-        const tableBody = document.getElementById('studentTableBody');
-        const noData = document.getElementById('noData');
-
-        if (!tableBody) return;
+    function displayStudents(data) {
+        var tbody = $('#studentTableBody');
+        tbody.empty();
 
         if (data.length === 0) {
-            tableBody.innerHTML = '';
-            noData.classList.remove('d-none');
+            tbody.html(`
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <i class="bi bi-people" style="font-size: 4rem; color: #cbd5e1;"></i>
+                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យសិស្សនៅឡើយទេ</h5>
+                        <a href="/Student/Create" class="btn btn-success mt-3 ajax-link" data-url="/Student/Create">
+                            <i class="bi bi-plus-lg me-2"></i>បន្ថែមសិស្សដំបូង
+                        </a>
+                    </td>
+                </tr>
+            `);
             return;
         }
 
-        noData.classList.add('d-none');
-        tableBody.innerHTML = data.map(s => `
-            <tr class="student-row animate__animated animate__fadeIn">
-                <td class="ps-4" onclick="viewDetails('${s.id}')">
-                    <div class="d-flex align-items-center py-1">
-                        <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)+'&background=random'}"
-                             class="rounded-circle border me-3 shadow-sm" width="45" height="45" style="object-fit:cover;">
-                        <div>
-                            <div class="fw-bold text-dark">${s.name}</div>
-                            <small class="text-muted">ID: ${s.id} | ${s.gender || 'N/A'}</small>
+        data.forEach(s => {
+            var statusClass = s.status === 'កំពុងសិក្សា' ? 'status-active' :
+                             s.status === 'ឈប់សម្រាក' ? 'status-warning' : 'status-inactive';
+
+            // Create avatar HTML with image if available
+            var avatarHtml = '';
+            if (s.photo) {
+                avatarHtml = `<img src="${s.photo}" alt="${s.name || ''}">`;
+            } else {
+                avatarHtml = s.name ? s.name.charAt(0).toUpperCase() : '?';
+            }
+
+            var row = `
+                <tr onclick="viewStudent('${s.id}')">
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="student-avatar">
+                                ${avatarHtml}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${s.name || 'មិនមានឈ្មោះ'}</div>
+                                <small class="text-muted">ID: ${s.id}</small>
+                            </div>
                         </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="small fw-bold text-dark">${s.major}</div>
-                    <div class="text-muted" style="font-size: 0.75rem;">${s.degree || 'Bachelor'}</div>
-                </td>
-                <td class="text-center">
-                    <span class="badge bg-light text-dark border fw-normal">${s.year || 'Year 1'}</span>
-                </td>
-                <td class="text-center">
-                    <div class="small text-primary fw-bold">${s.shift || 'N/A'}</div>
-                    <div class="badge bg-info bg-opacity-10 text-info" style="font-size: 0.7rem;">Room: ${s.room || 'N/A'}</div>
-                </td>
-                <td class="text-center">
-                    <span class="badge ${(s.scholarship && s.scholarship !== '0%') ? 'bg-success' : 'bg-secondary'} bg-opacity-10 ${(s.scholarship && s.scholarship !== '0%') ? 'text-success' : 'text-secondary'}">
-                        ${s.scholarship || '0%'}
-                    </span>
-                </td>
-                <td class="text-center">
-                    <div class="btn-group shadow-sm rounded-pill overflow-hidden border bg-white">
-                        <button class="btn btn-white btn-sm px-3 border-end" onclick="viewDetails('${s.id}')" title="មើល"><i class="bi bi-eye text-primary"></i></button>
-                        <button class="btn btn-white btn-sm px-3 border-end" onclick="handleEdit('${s.id}')" title="កែប្រែ"><i class="bi bi-pencil-square text-success"></i></button>
-                        <button class="btn btn-white btn-sm px-3" onclick="deleteStudent('${s.id}')" title="លុប"><i class="bi bi-trash text-danger"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+                    </td>
+                    <td>${s.major || 'មិនមាន'}</td>
+                    <td>ឆ្នាំទី${s.year || '?'}</td>
+                    <td>
+                        <div>${s.shift || 'មិនមាន'}</div>
+                        <small class="text-muted">${s.room || ''}</small>
+                    </td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${s.status || 'កំពុងសិក្សា'}</span>
+                    </td>
+                    <td class="text-end">
+                        <div class="action-group" onclick="event.stopPropagation()">
+                            <a href="/Student/Details/${s.id}" class="btn-icon ajax-link" data-url="/Student/Details/${s.id}" title="មើលលម្អិត">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/Student/Edit/${s.id}" class="btn-icon ajax-link" data-url="/Student/Edit/${s.id}" title="កែប្រែ">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="/Student/Attendance?studentId=${s.id}" class="btn-icon ajax-link" data-url="/Student/Attendance?studentId=${s.id}" title="វត្តមាន">
+                                <i class="bi bi-calendar-check"></i>
+                            </a>
+                            <button class="btn-icon" onclick="deleteStudent('${s.id}', '${s.name}')" title="លុប">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
     }
 
-    // --- 4. Search & Filter ---
-    function filterData() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const major = document.getElementById('filterMajor').value;
-        const shift = document.getElementById('filterShift').value;
-        const room = document.getElementById('filterRoom').value;
-        const students = getStudents();
-
-        const filtered = students.filter(s => {
-            const matchSearch = (s.name || "").toLowerCase().includes(query) || (s.id || "").toString().includes(query);
-            const matchMajor = major === "" || s.major === major;
-            const matchShift = shift === "" || s.shift === shift;
-            const matchRoom = room === "" || s.room === room;
-            return matchSearch && matchMajor && matchShift && matchRoom;
+    function loadStats() {
+        $.ajax({
+            url: '/Student/GetStudentStats',
+            type: 'GET',
+            cache: true,
+            success: function(stats) {
+                $('#totalStudents').text(stats.total);
+                $('#maleStudents').text(stats.male);
+                $('#femaleStudents').text(stats.female);
+                $('#activeStudents').text(stats.active);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading stats:", error);
+            }
         });
+    }
+
+    function applyFilter() {
+        var searchText = $('#searchInput').val().toLowerCase();
+        var major = $('#filterMajor').val();
+        var year = $('#filterYear').val();
+        var shift = $('#filterShift').val();
+        var status = $('#filterStatus').val();
+
+        var filtered = students.filter(s => {
+            var matchSearch = !searchText ||
+                (s.name && s.name.toLowerCase().includes(searchText)) ||
+                (s.id && s.id.toLowerCase().includes(searchText));
+            var matchMajor = !major || s.major === major;
+            var matchYear = !year || s.year === year;
+            var matchShift = !shift || s.shift === shift;
+            var matchStatus = !status || s.status === status;
+
+            return matchSearch && matchMajor && matchYear && matchShift && matchStatus;
+        });
+
         displayStudents(filtered);
+        updateFilteredCount(filtered.length);
     }
 
-    // --- 5. View Details ---
-    function viewDetails(id) {
-        const s = getStudents().find(x => x.id == id);
-        if (!s) return;
+    function resetFilter() {
+        $('#searchInput').val('');
+        $('#filterMajor').val('');
+        $('#filterYear').val('');
+        $('#filterShift').val('');
+        $('#filterStatus').val('');
+        displayStudents(students);
+        updateFilteredCount(students.length);
+    }
+
+    function updateFilteredCount(count) {
+        $('#filteredCount').text(count + ' / ' + students.length);
+    }
+
+    function viewStudent(id) {
+        window.location.href = '/Student/Details/' + id;
+    }
+
+    function deleteStudent(id, name) {
         Swal.fire({
-            width: '500px', confirmButtonText: 'បិទ', confirmButtonColor: '#2563eb',
-            customClass: { popup: 'rounded-4' },
-            html: `
-                <div class="profile-upload-container">
-                    <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)}" class="profile-preview-img">
-                </div>
-                <h4 class="fw-bold mb-1">${s.name}</h4>
-                <p class="text-primary mb-4 fw-medium small">${s.degree || 'Bachelor'} of ${s.major}</p>
-                <div class="info-grid">
-                    <div class="info-item"><div class="info-label">អត្តលេខ</div><div class="info-value">${s.id}</div></div>
-                    <div class="info-item"><div class="info-label">ភេទ</div><div class="info-value">${s.gender || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">ថ្ងៃខែឆ្នាំកំណើត</div><div class="info-value">${s.dob || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">ទីកន្លែងកំណើត</div><div class="info-value">${s.pob || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">ឆ្នាំសិក្សា</div><div class="info-value">${s.year || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">វេនសិក្សា</div><div class="info-value">${s.shift || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">បន្ទប់</div><div class="info-value">${s.room || 'N/A'}</div></div>
-                    <div class="info-item"><div class="info-label">អាហារូបករណ៍</div><div class="info-value">${s.scholarship || '0%'}</div></div>
-                    <div class="info-item" style="grid-column: span 2;"><div class="info-label">លេខទូរស័ព្ទ</div><div class="info-value">${s.phone || 'N/A'}</div></div>
-                </div>`
-        });
-    }
-
-    // --- 6. Edit Model ---
-    async function handleEdit(id) {
-        const students = getStudents();
-        const s = students.find(x => x.id == id);
-        if (!s) return;
-
-        const { value: formValues } = await Swal.fire({
-            title: 'កែប្រែព័ត៌មានសិស្ស',
-            width: '800px',
-            showCancelButton: true,
-            confirmButtonText: 'រក្សាទុកការផ្លាស់ប្តូរ',
-            confirmButtonColor: '#2563eb',
-            cancelButtonText: 'បោះបង់',
-            customClass: { popup: 'rounded-4' },
-            html: `
-                <div class="profile-upload-container">
-                    <img id="prev-img-edit" src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)}" class="profile-preview-img">
-                    <div class="edit-photo-btn" onclick="document.getElementById('edit-file').click()"><i class="bi bi-camera-fill"></i></div>
-                    <input type="file" id="edit-file" class="d-none" accept="image/*" onchange="previewEditImage(this)">
-                </div>
-                <div class="row g-3 text-start">
-                    <div class="col-md-4">
-                        <label class="small fw-bold">ឈ្មោះពេញ (Full Name)</label>
-                        <input id="sw-name" class="form-control" value="${s.name || ''}">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">ភេទ (Gender)</label>
-                        <select id="sw-gender" class="form-select">
-                            <option value="Male" ${s.gender=='Male'?'selected':''}>ប្រុស (Male)</option>
-                            <option value="Female" ${s.gender=='Female'?'selected':''}>ស្រី (Female)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">ថ្ងៃខែឆ្នាំកំណើត (DOB)</label>
-                        <input type="date" id="sw-dob" class="form-control" value="${s.dob || ''}">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="small fw-bold">ទីកន្លែងកំណើត (Place of Birth)</label>
-                        <input id="sw-pob" class="form-control" value="${s.pob || ''}">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="small fw-bold">លេខទូរស័ព្ទ (Phone Number)</label>
-                        <input id="sw-phone" class="form-control" value="${s.phone || ''}">
-                    </div>
-                    <hr class="my-2">
-                    <div class="col-md-4">
-                        <label class="small fw-bold">កម្រិតសិក្សា (Degree)</label>
-                        <select id="sw-degree" class="form-select">
-                            <option value="Associate" ${s.degree=='Associate'?'selected':''}>Associate</option>
-                            <option value="Bachelor" ${s.degree=='Bachelor'||!s.degree?'selected':''}>Bachelor</option>
-                            <option value="Master" ${s.degree=='Master'?'selected':''}>Master</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">ជំនាញ (Major)</label>
-                        <select id="sw-major" class="form-select">
-                            <option value="Information Technology" ${s.major=='Information Technology'?'selected':''}>Information Technology</option>
-                            <option value="Business Administration" ${s.major=='Business Administration'?'selected':''}>Business Administration</option>
-                            <option value="English Literature" ${s.major=='English Literature'?'selected':''}>English Literature</option>
-                            <option value="Law" ${s.major=='Law'?'selected':''}>Law</option>
-                            <option value="Accounting" ${s.major=='Accounting'?'selected':''}>Accounting</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">ឆ្នាំសិក្សា (Year)</label>
-                        <select id="sw-year" class="form-select">
-                            <option value="Year 1" ${s.year=='Year 1'?'selected':''}>Year 1</option>
-                            <option value="Year 2" ${s.year=='Year 2'?'selected':''}>Year 2</option>
-                            <option value="Year 3" ${s.year=='Year 3'?'selected':''}>Year 3</option>
-                            <option value="Year 4" ${s.year=='Year 4'?'selected':''}>Year 4</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">អាហារូបករណ៍ (Scholarship %)</label>
-                        <select id="sw-scholarship" class="form-select">
-                            <option value="0%" ${s.scholarship=='0%'?'selected':''}>0% (បង់ពេញ)</option>
-                            <option value="10%" ${s.scholarship=='10%'?'selected':''}>10% Scholarship</option>
-                            <option value="25%" ${s.scholarship=='25%'?'selected':''}>25% Scholarship</option>
-                            <option value="50%" ${s.scholarship=='50%'?'selected':''}>50% Scholarship</option>
-                            <option value="100%" ${s.scholarship=='100%'?'selected':''}>100% Scholarship</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">បន្ទប់ (Room)</label>
-                        <input id="sw-room" class="form-control" value="${s.room || ''}">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="small fw-bold">វេនសិក្សា (Study Shift)</label>
-                        <select id="sw-shift" class="form-select">
-                            <option value="Morning" ${s.shift=='Morning'?'selected':''}>Morning</option>
-                            <option value="Afternoon" ${s.shift=='Afternoon'?'selected':''}>Afternoon</option>
-                            <option value="Evening" ${s.shift=='Evening'?'selected':''}>Evening</option>
-                            <option value="Weekend" ${s.shift=='Weekend'?'selected':''}>Weekend</option>
-                        </select>
-                    </div>
-                </div>`,
-            preConfirm: () => {
-                const name = document.getElementById('sw-name').value;
-                if (!name) { Swal.showValidationMessage('សូមបញ្ចូលឈ្មោះសិស្ស'); return false; }
-                return {
-                    name: name,
-                    gender: document.getElementById('sw-gender').value,
-                    dob: document.getElementById('sw-dob').value,
-                    pob: document.getElementById('sw-pob').value,
-                    phone: document.getElementById('sw-phone').value,
-                    degree: document.getElementById('sw-degree').value,
-                    major: document.getElementById('sw-major').value,
-                    year: document.getElementById('sw-year').value,
-                    scholarship: document.getElementById('sw-scholarship').value,
-                    room: document.getElementById('sw-room').value,
-                    shift: document.getElementById('sw-shift').value,
-                    photo: document.getElementById('prev-img-edit').src
-                }
-            }
-        });
-
-        if (formValues) {
-            const currentStudents = getStudents();
-            const idx = currentStudents.findIndex(x => x.id == id);
-            if (idx !== -1) {
-                currentStudents[idx] = { ...currentStudents[idx], ...formValues };
-                saveStudents(currentStudents);
-                Swal.fire({ icon: 'success', title: 'កែប្រែបានជោគជ័យ', showConfirmButton: false, timer: 1500 });
-            }
-        }
-    }
-
-    // --- 7. Other Functions ---
-    function deleteStudent(id) {
-        Swal.fire({
-            title: 'តើអ្នកចង់លុបទិន្នន័យនេះមែនទេ?',
-            text: "ទិន្នន័យដែលលុបហើយមិនអាចយកមកវិញបានទេ!",
+            title: 'លុបសិស្ស?',
+            text: `តើអ្នកពិតជាចង់លុប ${name} មែនទេ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'បាទ, លុបវាចោល!',
+            confirmButtonText: 'បាទ/ចាស លុប',
             cancelButtonText: 'បោះបង់'
         }).then((result) => {
             if (result.isConfirmed) {
-                const filtered = getStudents().filter(item => item.id != id);
-                saveStudents(filtered);
-                Swal.fire('លុបរួចរាល់!', 'ទិន្នន័យត្រូវបានលុបចេញពីប្រព័ន្ធ។', 'success');
+                $.ajax({
+                    url: '/Student/Delete',
+                    type: 'POST',
+                    data: { id: id },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ជោគជ័យ!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                loadStudents();
+                                loadStats();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'កំហុស',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'កំហុស',
+                            text: 'មានបញ្ហាបច្ចេកទេស'
+                        });
+                    }
+                });
             }
         });
     }
 
-    window.previewEditImage = function(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => document.getElementById('prev-img-edit').src = e.target.result;
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function exportToExcel() {
-        const s = getStudents();
-        if(s.length === 0) return Swal.fire('Error', 'មិនមានទិន្នន័យសម្រាប់ Export', 'error');
-        const ws = XLSX.utils.json_to_sheet(s);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Students");
-        XLSX.writeFile(wb, "HRU_Student_List.xlsx");
-    }
-
-    function goToCreate() {
-        // FIXED: Checks if showPage exists in the parent/main script, else logs a fallback
-        if(typeof showPage === 'function') {
-            showPage('create-page');
-        } else {
-            Swal.fire('Navigation', 'សូមបញ្ចូលទិន្នន័យតាមរយៈ Form បន្ថែមសិស្ស', 'info');
-        }
-    }
-
-    // --- INITIALIZATION ---
-    document.addEventListener('DOMContentLoaded', () => {
-        refreshUI();
+    // Search on keyup
+    $('#searchInput').on('keyup', function() {
+        applyFilter();
     });
-
-    // Ensure immediate call if DOM already loaded
-    refreshUI();
 </script>

@@ -1,407 +1,982 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+﻿@model IEnumerable<WebApplication2.Models.Student>
+@{
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "អាហារូបករណ៍";
+}
 
-<div class="animate__animated animate__fadeIn p-2" id="scholarshipMainContainer">
-    <div class="d-flex align-items-center mb-5 bg-primary bg-gradient p-4 rounded-4 text-white shadow-sm position-relative">
-        <div class="icon-circle bg-white text-primary me-3 shadow" style="width: 55px; height: 55px; border-radius: 15px; display: flex; align-items: center; justify-content: center;">
-            <i class="bi bi-mortarboard-fill fs-3"></i>
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 3rem;
+        opacity: 0.1;
+        color: #f97316;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    [data-theme="dark"] .stat-value {
+        color: white;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .filter-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .filter-item label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+    [data-theme="dark"] .filter-item label {
+        color: #cbd5e1;
+    }
+
+    .filter-item select,
+    .filter-item input {
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .filter-item select,
+    [data-theme="dark"] .filter-item input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249,115,22,0.3);
+        }
+
+    .scholarship-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+        margin-top: 30px;
+    }
+
+    .scholarship-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .scholarship-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .scholarship-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(249,115,22,0.1);
+        border-color: #f97316;
+    }
+
+    .scholarship-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #f97316, #ea580c);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .student-avatar-large {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 1.8rem;
+        box-shadow: 0 10px 20px rgba(249,115,22,0.2);
+    }
+
+    .student-info h4 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+        font-size: 1.2rem;
+    }
+
+    [data-theme="dark"] .student-info h4 {
+        color: white;
+    }
+
+    .student-info p {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .scholarship-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .badge-100 {
+        background: #fef3c7;
+        color: #f97316;
+    }
+
+    .badge-75 {
+        background: #ffedd5;
+        color: #ea580c;
+    }
+
+    .badge-50 {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .badge-25 {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .badge-0 {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .info-row {
+        border-bottom-color: #334155;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .info-value {
+        color: white;
+    }
+
+    .amount-due {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    .amount-paid {
+        color: #10b981;
+        font-weight: 700;
+    }
+
+    .progress-section {
+        margin: 20px 0;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f97316, #ea580c);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #475569;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    [data-theme="dark"] .btn-action {
+        background: #0f172a;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .btn-action:hover {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+    }
+
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+    .summary-section {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-top: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .summary-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .summary-title {
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    [data-theme="dark"] .summary-title {
+        color: white;
+    }
+
+    .summary-title i {
+        color: #f97316;
+        font-size: 1.5rem;
+    }
+
+    .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .summary-item {
+        text-align: center;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 16px;
+    }
+
+    [data-theme="dark"] .summary-item {
+        background: #0f172a;
+    }
+
+    .summary-item .value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #f97316;
+        margin-bottom: 5px;
+    }
+
+    .summary-item .label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .modal-content {
+        background: #1e293b;
+        color: white;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        padding: 20px 24px;
+        border: none;
+    }
+
+    .scholarship-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .scholarship-option {
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .scholarship-option:hover {
+            border-color: #f97316;
+            background: #fff7ed;
+        }
+
+    [data-theme="dark"] .scholarship-option:hover {
+        background: #1e293b;
+    }
+
+    .scholarship-option.selected {
+        border-color: #f97316;
+        background: #fff7ed;
+    }
+
+    [data-theme="dark"] .scholarship-option.selected {
+        background: #1e293b;
+    }
+
+    .scholarship-option .percentage {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #f97316;
+        margin-bottom: 8px;
+    }
+
+    .scholarship-option .label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .summary-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h2><i class="bi bi-gift-fill me-2"></i>អាហារូបករណ៍</h2>
+    <p class="text-muted">គ្រប់គ្រងអាហារូបករណ៍របស់សិស្ស</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <i class="bi bi-people-fill stat-icon"></i>
+        <div class="stat-value" id="totalStudents">0</div>
+        <div class="stat-label">សិស្សសរុប</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-gift-fill stat-icon"></i>
+        <div class="stat-value" id="totalScholarship">0</div>
+        <div class="stat-label">មានអាហារូបករណ៍</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-star-fill stat-icon"></i>
+        <div class="stat-value" id="avgScholarship">0%</div>
+        <div class="stat-label">អាហារូបករណ៍មធ្យម</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-cash-stack stat-icon"></i>
+        <div class="stat-value" id="totalAmount">$0</div>
+        <div class="stat-label">ទឹកប្រាក់សរុប</div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-grid">
+        <div class="filter-item">
+            <label>ជំនាញ</label>
+            <select id="filterMajor">
+                <option value="">ទាំងអស់</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="English Literature">English Literature</option>
+                <option value="Law">Law</option>
+                <option value="Accounting">Accounting</option>
+            </select>
         </div>
-        <div class="flex-grow-1">
-            <h3 class="fw-bold mb-0">គ្រប់គ្រងអាហារូបករណ៍</h3>
-            <p class="mb-0 opacity-75 small">ប្រព័ន្ធតាមដាន និងគ្រប់គ្រងទិន្នន័យហិរញ្ញវត្ថុសិស្ស</p>
+
+        <div class="filter-item">
+            <label>ឆ្នាំសិក្សា</label>
+            <select id="filterYear">
+                <option value="">ទាំងអស់</option>
+                <option value="1">ឆ្នាំទី១</option>
+                <option value="2">ឆ្នាំទី២</option>
+                <option value="3">ឆ្នាំទី៣</option>
+                <option value="4">ឆ្នាំទី៤</option>
+            </select>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-warning rounded-pill fw-bold shadow-sm px-3 border-white border-2" onclick="addNewScholarship()">
-                <i class="bi bi-person-plus-fill me-1"></i> បញ្ចូលថ្មី
-            </button>
-            <button class="btn btn-light rounded-pill fw-bold shadow-sm px-3" onclick="exportScholarshipToExcel()">
-                <i class="bi bi-file-earmark-excel-fill text-success me-1"></i> Export
-            </button>
+
+        <div class="filter-item">
+            <label>កម្រិតអាហារូបករណ៍</label>
+            <select id="filterScholarship">
+                <option value="">ទាំងអស់</option>
+                <option value="100%">100%</option>
+                <option value="75%">75%</option>
+                <option value="50%">50%</option>
+                <option value="25%">25%</option>
+                <option value="0%">0% (គ្មាន)</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label>ស្វែងរក</label>
+            <input type="text" id="searchInput" placeholder="ឈ្មោះ ឬលេខសម្គាល់...">
         </div>
     </div>
 
-    <div class="row g-4 mb-5 justify-content-center">
-        <div class="col-6 col-md-3">
-            <div class="stat-circle-card border-primary shadow-hover">
-                <div class="circle-content">
-                    <h2 class="fw-bold text-primary mb-0" id="totalScholarshipStudents">0</h2>
-                    <span class="text-muted small fw-bold">សិស្សសរុប</span>
-                </div>
-                <svg viewBox="0 0 36 36" class="circular-chart primary">
-                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-            </div>
-        </div>
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn-filter" onclick="applyFilter()">
+            <i class="bi bi-search"></i>
+            អនុវត្តតម្រង
+        </button>
+        <button class="btn-filter" onclick="resetFilter()" style="background: #64748b;">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            កំណត់ឡើងវិញ
+        </button>
+    </div>
+</div>
 
-        <div class="col-6 col-md-3">
-            <div class="stat-circle-card border-success shadow-hover">
-                <div class="circle-content">
-                    <h2 class="fw-bold text-success mb-0" id="scholarshipTypesCount">0</h2>
-                    <span class="text-muted small fw-bold">ប្រភេទ</span>
-                </div>
-                <svg viewBox="0 0 36 36" class="circular-chart success">
-                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="circle" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-            </div>
-        </div>
+<!-- Scholarship Cards Grid -->
+<div class="scholarship-grid" id="scholarshipGrid">
+    <!-- Cards will be loaded here -->
+</div>
 
-        <div class="col-6 col-md-3">
-            <div class="stat-circle-card position-relative shadow-hover" id="depositCardContainer" role="button" onclick="editBaseDeposit()">
-                <div class="circle-content">
-                    <h2 class="fw-bold mb-0" id="displayDeposit">$0</h2>
-                    <span class="text-muted small fw-bold">ទំនុកបម្រុង</span>
-                </div>
-                <div class="edit-badge"><i class="bi bi-pencil-fill"></i></div>
-                <svg viewBox="0 0 36 36" class="circular-chart">
-                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="circle" id="depositCircle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-            </div>
-            <p class="mt-2 mb-0 small text-secondary fw-bold text-center" id="studentCountLabel">តម្រូវការ: $0</p>
-        </div>
+<!-- Summary Section -->
+<div class="summary-section">
+    <div class="summary-title">
+        <i class="bi bi-pie-chart-fill"></i>
+        <span>សង្ខេបតាមកម្រិតអាហារូបករណ៍</span>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-list-ul me-2"></i>បញ្ជីសិស្សអាហារូបករណ៍</h5>
-            <div class="input-group style-search shadow-sm">
-                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" id="searchScholarship" class="form-control border-0" placeholder="ស្វែងរកឈ្មោះសិស្ស..." oninput="loadScholarshipData()">
+    <div class="summary-stats" id="scholarshipSummary">
+        <!-- Summary stats will be loaded here -->
+    </div>
+</div>
+
+<!-- Edit Scholarship Modal -->
+<div class="modal fade" id="scholarshipModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    កែប្រែអាហារូបករណ៍
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light text-uppercase small fw-bold">
-                    <tr>
-                        <th class="ps-4">សិស្ស</th>
-                        <th>ជំនាញ</th>
-                        <th>ប្រភេទ</th>
-                        <th>កម្រិត</th>
-                        <th class="text-end pe-4">សកម្មភាព</th>
-                    </tr>
-                </thead>
-                <tbody id="scholarshipTableBody"></tbody>
-            </table>
+            <div class="modal-body">
+                <form id="scholarshipForm">
+                    <input type="hidden" id="studentId">
+
+                    <div class="text-center mb-4">
+                        <div class="student-avatar-large" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 auto;" id="studentInitials">?</div>
+                        <h5 class="mt-3" id="studentName"></h5>
+                        <p class="text-muted" id="studentInfo"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label fw-bold">ជ្រើសរើសកម្រិតអាហារូបករណ៍</label>
+                        <div class="scholarship-options" id="scholarshipOptions">
+                            <div class="scholarship-option" onclick="selectScholarship('100%', this)">
+                                <div class="percentage">100%</div>
+                                <div class="label">ពេញ</div>
+                            </div>
+                            <div class="scholarship-option" onclick="selectScholarship('75%', this)">
+                                <div class="percentage">75%</div>
+                                <div class="label">ច្រើន</div>
+                            </div>
+                            <div class="scholarship-option" onclick="selectScholarship('50%', this)">
+                                <div class="percentage">50%</div>
+                                <div class="label">ពាក់កណ្តាល</div>
+                            </div>
+                            <div class="scholarship-option" onclick="selectScholarship('25%', this)">
+                                <div class="percentage">25%</div>
+                                <div class="label">តិច</div>
+                            </div>
+                            <div class="scholarship-option" onclick="selectScholarship('0%', this)">
+                                <div class="percentage">0%</div>
+                                <div class="label">គ្មាន</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="scholarshipValue">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label fw-bold">កំណត់ចំណាំ</label>
+                        <input type="text" id="scholarshipNote" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ (បើមាន)...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
+                <button type="button" class="btn" style="background: #f97316; color: white;" onclick="saveScholarship()">រក្សាទុក</button>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Removed .btn-back-blue styles */
-
-    .stat-circle-card {
-        background: white;
-        border-radius: 50%;
-        width: 150px;
-        height: 150px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        transition: 0.3s;
-    }
-
-    .shadow-hover:hover {
-        transform: translateY(-7px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
-    }
-
-    .circle-content {
-        position: absolute;
-        z-index: 2;
-        text-align: center;
-        width: 100%;
-    }
-
-    .circular-chart {
-        width: 100%;
-        height: 100%;
-    }
-
-    .circle-bg {
-        fill: none;
-        stroke: #f0f2f5;
-        stroke-width: 2.2;
-    }
-
-    .circle {
-        fill: none;
-        stroke-width: 2.5;
-        stroke-linecap: round;
-        transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .deposit-safe .circle {
-        stroke: #198754;
-    }
-
-    .deposit-safe h2 {
-        color: #198754;
-    }
-
-    .deposit-warning .circle {
-        stroke: #fd7e14;
-    }
-
-    .deposit-warning h2 {
-        color: #fd7e14;
-    }
-
-    .deposit-danger .circle {
-        stroke: #dc3545;
-    }
-
-    .deposit-danger h2 {
-        color: #dc3545;
-    }
-
-    .primary .circle {
-        stroke: #0d6efd;
-    }
-
-    .success .circle {
-        stroke: #198754;
-    }
-
-    .edit-badge {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: #6c757d;
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        z-index: 3;
-        border: 2px solid white;
-    }
-
-    .style-search {
-        width: 280px;
-        border-radius: 50px;
-        overflow: hidden;
-        border: 1px solid #eee;
-        background: #f8f9fa;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(13, 110, 253, 0.04);
-    }
-
-    .avatar-img {
-        width: 42px;
-        height: 42px;
-        object-fit: cover;
-        border: 2px solid #eee;
-    }
-</style>
-
 <script>
-    (function() {
-        const RATE_PER_STUDENT = 600;
-        let baseDeposit = parseFloat(localStorage.getItem('base_deposit_rate')) || 0;
+    let students = [];
+    let filteredStudents = [];
 
-        function loadScholarshipData() {
-            const students = JSON.parse(localStorage.getItem('students')) || [];
-            const searchTerm = (document.getElementById('searchScholarship')?.value || "").toLowerCase();
+    $(document).ready(function() {
+        loadStudents();
+    });
 
-            const scholarshipList = students.filter(s => {
-                const perc = parseInt(s.scholarship) || 0;
-                return perc > 0 && s.name.toLowerCase().includes(searchTerm);
-            });
+    function loadStudents() {
+        $.ajax({
+            url: '/Student/GetStudents',
+            type: 'GET',
+            success: function(data) {
+                students = data;
+                applyFilter();
+                updateStats();
+                generateSummary();
+            }
+        });
+    }
 
-            document.getElementById('totalScholarshipStudents').innerText = scholarshipList.length;
-            document.getElementById('scholarshipTypesCount').innerText = [...new Set(scholarshipList.map(s => s.scholarship_type || 'ទូទៅ'))].length;
+    function displayScholarshipCards() {
+        var grid = $('#scholarshipGrid');
+        grid.empty();
 
-            updateDepositUI(scholarshipList.length);
-            renderTable(scholarshipList);
+        if (filteredStudents.length === 0) {
+            grid.html(`
+                <div class="text-center py-5" style="grid-column: 1 / -1;">
+                    <i class="bi bi-gift" style="font-size: 4rem; color: #cbd5e1;"></i>
+                    <h5 class="mt-3 text-muted">មិនមានទិន្នន័យសិស្សនៅឡើយទេ</h5>
+                </div>
+            `);
+            return;
         }
 
-        function renderTable(list) {
-            const tbody = document.getElementById('scholarshipTableBody');
-            if (!tbody) return;
+        filteredStudents.forEach(s => {
+            var scholarshipPercent = parseInt(s.scholarship) || 0;
+            var badgeClass = scholarshipPercent >= 100 ? 'badge-100' :
+                            scholarshipPercent >= 75 ? 'badge-75' :
+                            scholarshipPercent >= 50 ? 'badge-50' :
+                            scholarshipPercent >= 25 ? 'badge-25' : 'badge-0';
 
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted small">មិនមានទិន្នន័យសិស្សឡើយ</td></tr>';
-                return;
+            var totalDue = s.amountDue || 0;
+            var scholarshipAmount = (totalDue * scholarshipPercent / 100);
+            var finalAmount = totalDue - scholarshipAmount;
+
+            var card = `
+                <div class="scholarship-card">
+                    <div class="card-header">
+                        <div class="student-avatar-large">
+                            ${s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div class="student-info">
+                            <h4>${s.name || 'មិនមានឈ្មោះ'}</h4>
+                            <p><i class="bi bi-upc-scan"></i> ${s.id}</p>
+                            <p><i class="bi bi-star"></i> ${s.major || 'N/A'} | ឆ្នាំទី${s.year || '?'}</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <span class="scholarship-badge ${badgeClass}">${s.scholarship || '0%'}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">ថ្លៃសិក្សាសរុប:</span>
+                        <span class="info-value">$${totalDue.toFixed(2)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">អាហារូបករណ៍ទទួលបាន:</span>
+                        <span class="info-value amount-paid">-$${scholarshipAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ទឹកប្រាក់ត្រូវបង់:</span>
+                        <span class="info-value amount-due">$${finalAmount.toFixed(2)}</span>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>ភាគរយអាហារូបករណ៍</span>
+                            <span>${s.scholarship || '0%'}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${scholarshipPercent}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-action btn-edit" onclick="openEditModal('${s.id}')">
+                            <i class="bi bi-pencil-square"></i>
+                            កែប្រែ
+                        </button>
+                        <button class="btn-action" onclick="viewDetails('${s.id}')">
+                            <i class="bi bi-eye"></i>
+                            មើល
+                        </button>
+                    </div>
+                </div>
+            `;
+            grid.append(card);
+        });
+    }
+
+    function updateStats() {
+        var total = students.length;
+        var withScholarship = students.filter(s => {
+            var percent = parseInt(s.scholarship) || 0;
+            return percent > 0;
+        }).length;
+
+        var avgScholarship = withScholarship > 0
+            ? students.filter(s => parseInt(s.scholarship) > 0)
+                .reduce((sum, s) => sum + (parseInt(s.scholarship) || 0), 0) / withScholarship
+            : 0;
+
+        var totalAmount = students.reduce((sum, s) => {
+            var percent = parseInt(s.scholarship) || 0;
+            var amount = (s.amountDue || 0) * percent / 100;
+            return sum + amount;
+        }, 0);
+
+        $('#totalStudents').text(total);
+        $('#totalScholarship').text(withScholarship);
+        $('#avgScholarship').text(avgScholarship.toFixed(0) + '%');
+        $('#totalAmount').text('$' + totalAmount.toFixed(2));
+    }
+
+    function generateSummary() {
+        var levels = {
+            '100%': { count: 0, total: 0 },
+            '75%': { count: 0, total: 0 },
+            '50%': { count: 0, total: 0 },
+            '25%': { count: 0, total: 0 },
+            '0%': { count: 0, total: 0 }
+        };
+
+        students.forEach(s => {
+            var percent = s.scholarship || '0%';
+            if (levels[percent]) {
+                levels[percent].count++;
+                levels[percent].total += (s.amountDue || 0) * (parseInt(percent) / 100);
             }
+        });
 
-            tbody.innerHTML = list.map(s => `
-                <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <img src="${s.photo || 'https://ui-avatars.com/api/?name='+encodeURIComponent(s.name)+'&background=random'}" class="rounded-circle avatar-img me-3">
-                            <div>
-                                <div class="fw-bold text-dark small">${s.name}</div>
-                                <small class="text-muted" style="font-size:10px;">ID: ${s.id}</small>
+        var html = '';
+        for (var level in levels) {
+            var color = level === '100%' ? '#f97316' :
+                       level === '75%' ? '#ea580c' :
+                       level === '50%' ? '#2563eb' :
+                       level === '25%' ? '#16a34a' : '#64748b';
+
+            html += `
+                <div class="summary-item">
+                    <div class="value" style="color: ${color};">${levels[level].count}</div>
+                    <div class="label">${level}</div>
+                    <small class="text-muted">$${levels[level].total.toFixed(2)}</small>
+                </div>
+            `;
+        }
+        $('#scholarshipSummary').html(html);
+    }
+
+    function openEditModal(studentId) {
+        var student = students.find(s => s.id === studentId);
+        if (!student) return;
+
+        $('#studentId').val(student.id);
+        $('#studentName').text(student.name || 'មិនមានឈ្មោះ');
+        $('#studentInfo').text(`${student.major || 'N/A'} | ឆ្នាំទី${student.year || '?'}`);
+        $('#studentInitials').text(student.name ? student.name.charAt(0).toUpperCase() : '?');
+
+        // Select current scholarship
+        $('.scholarship-option').removeClass('selected');
+        $(`.scholarship-option:contains('${student.scholarship || '0%'}')`).addClass('selected');
+        $('#scholarshipValue').val(student.scholarship || '0%');
+        $('#scholarshipNote').val(student.scholarshipNote || '');
+
+        $('#scholarshipModal').modal('show');
+    }
+
+    function selectScholarship(value, element) {
+        $('.scholarship-option').removeClass('selected');
+        $(element).addClass('selected');
+        $('#scholarshipValue').val(value);
+    }
+
+    function saveScholarship() {
+        var studentId = $('#studentId').val();
+        var scholarship = $('#scholarshipValue').val();
+        var note = $('#scholarshipNote').val();
+
+        var student = students.find(s => s.id === studentId);
+        if (student) {
+            student.scholarship = scholarship;
+            student.scholarshipNote = note;
+
+            // Here you would typically save to the server
+            // For now, we'll just update the UI
+            $('#scholarshipModal').modal('hide');
+
+            Swal.fire({
+                icon: 'success',
+                title: 'ជោគជ័យ!',
+                text: 'បានកែប្រែអាហារូបករណ៍ដោយជោគជ័យ',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            applyFilter();
+            updateStats();
+            generateSummary();
+        }
+    }
+
+    function viewDetails(studentId) {
+        var student = students.find(s => s.id === studentId);
+        if (!student) return;
+
+        var scholarshipPercent = parseInt(student.scholarship) || 0;
+        var totalDue = student.amountDue || 0;
+        var scholarshipAmount = totalDue * scholarshipPercent / 100;
+        var finalAmount = totalDue - scholarshipAmount;
+
+        Swal.fire({
+            title: 'ព័ត៌មានអាហារូបករណ៍',
+            html: `
+                <div class="text-start">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="student-avatar-large" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            ${student.name ? student.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">${student.name}</h5>
+                            <p class="text-muted mb-0">${student.id}</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block">កម្រិតអាហារូបករណ៍</small>
+                                <strong class="fs-4" style="color: #f97316;">${student.scholarship || '0%'}</strong>
                             </div>
                         </div>
-                    </td>
-                    <td class="small fw-bold text-secondary">${s.major || 'N/A'}</td>
-                    <td><span class="badge bg-primary bg-opacity-10 text-primary small px-3 rounded-pill border border-primary border-opacity-25">${s.scholarship_type || 'អាហារូបករណ៍'}</span></td>
-                    <td><span class="small fw-bold text-success">${s.scholarship}%</span></td>
-                    <td class="text-end pe-4">
-                        <div class="btn-group shadow-sm rounded-pill overflow-hidden">
-                            <button class="btn btn-sm btn-light px-3 border-end" title="កែប្រែ" onclick="editScholarship('${s.id}')">
-                                <i class="bi bi-pencil-square text-warning"></i>
-                            </button>
-                            <button class="btn btn-sm btn-light px-3" title="លុប" onclick="deleteScholarship('${s.id}')">
-                                <i class="bi bi-trash3 text-danger"></i>
-                            </button>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block">ថ្លៃសិក្សា</small>
+                                <strong class="fs-4">$${totalDue.toFixed(2)}</strong>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block">ទទួលបាន</small>
+                                <strong class="fs-4 text-success">-$${scholarshipAmount.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <small class="text-muted d-block">ត្រូវបង់</small>
+                                <strong class="fs-4 text-danger">$${finalAmount.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    </div>
 
-        window.addNewScholarship = async function() {
-            const { value: formValues } = await Swal.fire({
-                title: 'បញ្ចូលសិស្សអាហារូបករណ៍ថ្មី',
-                html: `<div class="text-start">
-                        <label class="small fw-bold mb-1">ឈ្មោះសិស្ស</label>
-                        <input id="swal-name" class="form-control mb-3 rounded-3" placeholder="ឧ. សុខ ហេង">
-                        <label class="small fw-bold mb-1">អត្តលេខ (ID)</label>
-                        <input id="swal-id" class="form-control mb-3 rounded-3" placeholder="ឧ. STU-001">
-                        <label class="small fw-bold mb-1">ជំនាញ</label>
-                        <input id="swal-major" class="form-control mb-3 rounded-3" placeholder="ឧ. IT">
-                        <label class="small fw-bold mb-1">កម្រិតអាហារូបករណ៍ (%)</label>
-                        <input id="swal-perc" type="number" class="form-control rounded-3" placeholder="ឧ. 100">
-                    </div>`,
-                focusConfirm: false,
-                confirmButtonText: '<i class="bi bi-save me-1"></i> រក្សាទុក',
-                confirmButtonColor: '#0d6efd',
-                showCancelButton: true,
-                cancelButtonText: 'បោះបង់',
-                preConfirm: () => {
-                    const name = document.getElementById('swal-name').value;
-                    const id = document.getElementById('swal-id').value;
-                    const major = document.getElementById('swal-major').value;
-                    const scholarship = document.getElementById('swal-perc').value;
-                    if (!name || !id || !scholarship) {
-                        Swal.showValidationMessage('សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់');
-                    }
-                    return { name, id, major, scholarship, scholarship_type: 'អាហារូបករណ៍' };
-                }
-            });
+                    ${student.scholarshipNote ? `
+                        <div class="mt-3 p-3 bg-light rounded-3">
+                            <small class="text-muted d-block">កំណត់ចំណាំ</small>
+                            <p class="mb-0">${student.scholarshipNote}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `,
+            confirmButtonColor: '#f97316'
+        });
+    }
 
-            if (formValues) {
-                let students = JSON.parse(localStorage.getItem('students')) || [];
-                students.push(formValues);
-                localStorage.setItem('students', JSON.stringify(students));
-                loadScholarshipData();
-                Swal.fire({ icon: 'success', title: 'ជោគជ័យ', text: 'ទិន្នន័យត្រូវបានរក្សាទុក', timer: 1500, showConfirmButton: false });
-            }
-        };
+    function applyFilter() {
+        var major = $('#filterMajor').val();
+        var year = $('#filterYear').val();
+        var scholarship = $('#filterScholarship').val();
+        var search = $('#searchInput').val().toLowerCase();
 
-        window.editScholarship = async function(id) {
-            let students = JSON.parse(localStorage.getItem('students')) || [];
-            const s = students.find(item => item.id === id);
-            if (!s) return;
+        filteredStudents = students.filter(s => {
+            var matchMajor = !major || s.major === major;
+            var matchYear = !year || s.year === year;
+            var matchScholarship = !scholarship || s.scholarship === scholarship;
+            var matchSearch = !search ||
+                (s.name && s.name.toLowerCase().includes(search)) ||
+                (s.id && s.id.toLowerCase().includes(search));
 
-            const { value: formValues } = await Swal.fire({
-                title: 'កែប្រែព័ត៌មានសិស្ស',
-                html: `<div class="text-start">
-                        <label class="small fw-bold mb-1">ឈ្មោះសិស្ស</label>
-                        <input id="swal-name" class="form-control mb-3 rounded-3" value="${s.name}">
-                        <label class="small fw-bold mb-1">ជំនាញ</label>
-                        <input id="swal-major" class="form-control mb-3 rounded-3" value="${s.major}">
-                        <label class="small fw-bold mb-1">កម្រិតអាហារូបករណ៍ (%)</label>
-                        <input id="swal-perc" type="number" class="form-control rounded-3" value="${s.scholarship}">
-                    </div>`,
-                confirmButtonText: 'ធ្វើបច្ចុប្បន្នភាព',
-                confirmButtonColor: '#ffc107',
-                showCancelButton: true,
-                preConfirm: () => {
-                    return {
-                        name: document.getElementById('swal-name').value,
-                        major: document.getElementById('swal-major').value,
-                        scholarship: document.getElementById('swal-perc').value
-                    };
-                }
-            });
+            return matchMajor && matchYear && matchScholarship && matchSearch;
+        });
 
-            if (formValues) {
-                const index = students.findIndex(item => item.id === id);
-                students[index] = { ...students[index], ...formValues };
-                localStorage.setItem('students', JSON.stringify(students));
-                loadScholarshipData();
-                Swal.fire('រួចរាល់!', 'ទិន្នន័យត្រូវបានកែប្រែ', 'success');
-            }
-        };
+        displayScholarshipCards();
+    }
 
-        window.deleteScholarship = function(id) {
-            Swal.fire({
-                title: 'តើអ្នកប្រាកដទេ?',
-                text: "ទិន្នន័យនឹងត្រូវលុបចេញជារៀងរហូត!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'បាទ/ចាស លុបចេញ',
-                cancelButtonText: 'បោះបង់'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let students = JSON.parse(localStorage.getItem('students')) || [];
-                    students = students.filter(item => item.id !== id);
-                    localStorage.setItem('students', JSON.stringify(students));
-                    loadScholarshipData();
-                    Swal.fire('លុបរួចរាល់!', '', 'success');
-                }
-            });
-        };
-
-        function updateDepositUI(studentCount) {
-            const requiredAmount = studentCount * RATE_PER_STUDENT;
-            const displayEl = document.getElementById('displayDeposit');
-            const container = document.getElementById('depositCardContainer');
-            const labelEl = document.getElementById('studentCountLabel');
-            if(!displayEl || !container) return;
-
-            displayEl.innerText = `$${baseDeposit.toLocaleString()}`;
-            labelEl.innerText = `តម្រូវការ: $${requiredAmount.toLocaleString()} (${studentCount} នាក់)`;
-
-            container.classList.remove('deposit-safe', 'deposit-warning', 'deposit-danger');
-            if (baseDeposit > requiredAmount && requiredAmount > 0) container.classList.add('deposit-safe');
-            else if (baseDeposit === requiredAmount && requiredAmount > 0) container.classList.add('deposit-warning');
-            else container.classList.add('deposit-danger');
-        }
-
-        window.loadScholarshipData = loadScholarshipData;
-        window.editBaseDeposit = async function() {
-            const { value: newRate } = await Swal.fire({
-                title: 'កំណត់ថវិកាទំនុកបម្រុង',
-                input: 'number',
-                inputValue: baseDeposit,
-                showCancelButton: true,
-                confirmButtonColor: '#0d6efd'
-            });
-            if (newRate !== undefined) {
-                baseDeposit = parseFloat(newRate) || 0;
-                localStorage.setItem('base_deposit_rate', baseDeposit);
-                loadScholarshipData();
-            }
-        };
-
-        window.exportScholarshipToExcel = function() {
-            const students = JSON.parse(localStorage.getItem('students')) || [];
-            const data = students.filter(s => parseInt(s.scholarship) > 0).map(s => ({
-                "ID": s.id, "Name": s.name, "Major": s.major, "Scholarship": s.scholarship + "%"
-            }));
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Scholarship");
-            XLSX.writeFile(wb, "Scholarship_Report.xlsx");
-        };
-
-        loadScholarshipData();
-    })();
+    function resetFilter() {
+        $('#filterMajor').val('');
+        $('#filterYear').val('');
+        $('#filterScholarship').val('');
+        $('#searchInput').val('');
+        filteredStudents = students;
+        displayScholarshipCards();
+    }
 </script>

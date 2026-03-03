@@ -1,254 +1,964 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+﻿@model IEnumerable<WebApplication2.Models.Grade>
+@{
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "គ្រប់គ្រងពិន្ទុ";
+}
 
-<div class="animate__animated animate__fadeIn">
-    <div class="d-flex align-items-center mb-4 bg-primary bg-gradient p-4 rounded-4 text-white shadow-sm" style="background-color: #0d6efd !important;">
-        <div class="icon-circle bg-white text-primary me-3" style="width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #0d6efd !important;">
-            <i class="bi bi-award fs-3"></i>
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 3rem;
+        opacity: 0.1;
+        color: #f97316;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    [data-theme="dark"] .stat-value {
+        color: white;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .filter-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .filter-title {
+        color: white;
+    }
+
+    .filter-title i {
+        color: #f97316;
+        font-size: 1.5rem;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .filter-item label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+    [data-theme="dark"] .filter-item label {
+        color: #cbd5e1;
+    }
+
+    .filter-item select,
+    .filter-item input {
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .filter-item select,
+    [data-theme="dark"] .filter-item input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249,115,22,0.3);
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        overflow-x: auto;
+    }
+
+    [data-theme="dark"] .table-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .grades-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1200px;
+    }
+
+        .grades-table th {
+            padding: 16px;
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+    [data-theme="dark"] .grades-table th {
+        background: #0f172a;
+        color: #cbd5e1;
+        border-bottom-color: #334155;
+    }
+
+    .grades-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .grades-table td {
+        color: white;
+        border-bottom-color: #334155;
+    }
+
+    .grades-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    [data-theme="dark"] .grades-table tbody tr:hover {
+        background: #0f172a;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+    }
+
+    .grade-input {
+        width: 80px;
+        padding: 8px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        text-align: center;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .grade-input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .grade-input:focus {
+        outline: none;
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+    }
+
+    .total-cell {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .grade-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .grade-a {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .grade-b {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .grade-c {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .grade-d {
+        background: #ffe4e6;
+        color: #f43f5e;
+    }
+
+    .grade-f {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    .btn-save-grade {
+        background: #10b981;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-save-grade:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+    .btn-edit-grade {
+        background: #f97316;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-edit-grade:hover {
+            background: #ea580c;
+        }
+
+    .summary-section {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    [data-theme="dark"] .summary-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .summary-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #f97316;
+        margin-bottom: 5px;
+    }
+
+    .summary-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 24px;
+        border: none;
+    }
+
+    [data-theme="dark"] .modal-content {
+        background: #1e293b;
+        color: white;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        padding: 20px 24px;
+        border: none;
+    }
+
+    .grade-distribution {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 16px;
+    }
+
+    [data-theme="dark"] .grade-distribution {
+        background: #0f172a;
+    }
+
+    .distribution-bar {
+        display: flex;
+        height: 30px;
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+
+    .bar-segment {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-section {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h2><i class="bi bi-bar-chart-fill me-2"></i>គ្រប់គ្រងពិន្ទុ</h2>
+    <p class="text-muted">បញ្ចូល និងគ្រប់គ្រងពិន្ទុសិស្ស</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <i class="bi bi-people-fill stat-icon"></i>
+        <div class="stat-value" id="totalStudents">0</div>
+        <div class="stat-label">សិស្សសរុប</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-check-circle-fill stat-icon"></i>
+        <div class="stat-value" id="passedStudents">0</div>
+        <div class="stat-label">ប្រលងជាប់</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-x-circle-fill stat-icon"></i>
+        <div class="stat-value" id="failedStudents">0</div>
+        <div class="stat-label">ធ្លាក់</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-star-fill stat-icon"></i>
+        <div class="stat-value" id="avgGrade">0.0</div>
+        <div class="stat-label">ពិន្ទុមធ្យម</div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-title">
+        <i class="bi bi-funnel-fill"></i>
+        <span>តម្រងស្វែងរក</span>
+    </div>
+
+    <div class="filter-grid">
+        <div class="filter-item">
+            <label>ជំនាញ</label>
+            <select id="filterMajor">
+                <option value="">ទាំងអស់</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="English Literature">English Literature</option>
+                <option value="Law">Law</option>
+                <option value="Accounting">Accounting</option>
+            </select>
         </div>
-        <div>
-            <h3 class="fw-bold mb-0">គ្រប់គ្រងពិន្ទុ និងលទ្ធផលសិក្សា</h3>
-            <p class="mb-0 opacity-75">បញ្ចូលពិន្ទុ និងពិនិត្យលទ្ធផលតាមវេនសិក្សា ជំនាញ និងបន្ទប់</p>
+
+        <div class="filter-item">
+            <label>ឆ្នាំសិក្សា</label>
+            <select id="filterYear">
+                <option value="">ទាំងអស់</option>
+                <option value="1">ឆ្នាំទី១</option>
+                <option value="2">ឆ្នាំទី២</option>
+                <option value="3">ឆ្នាំទី៣</option>
+                <option value="4">ឆ្នាំទី៤</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label>វេនសិក្សា</label>
+            <select id="filterShift">
+                <option value="">ទាំងអស់</option>
+                <option value="ព្រឹក">ព្រឹក</option>
+                <option value="រសៀល">រសៀល</option>
+                <option value="យប់">យប់</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label>ស្វែងរក</label>
+            <input type="text" id="searchInput" placeholder="ឈ្មោះ ឬលេខសម្គាល់...">
         </div>
     </div>
 
-    <ul class="nav nav-pills mb-4 bg-white p-2 rounded-pill shadow-sm d-inline-flex" id="gradeTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#input-tab" onclick="loadStudentGrades()">បញ្ចូលពិន្ទុ</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#report-tab" onclick="initReportFilters()">មើលលទ្ធផលតាមវេនសិក្សា</button>
-        </li>
-    </ul>
+    <div class="mt-3">
+        <button class="btn-filter" onclick="applyFilter()">
+            <i class="bi bi-search"></i>
+            អនុវត្តតម្រង
+        </button>
+        <button class="btn btn-outline-secondary ms-2" onclick="resetFilter()">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            កំណត់ឡើងវិញ
+        </button>
+    </div>
+</div>
 
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="input-tab">
-            <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
-                <div class="row g-3">
-                    <div class="col-md-5">
-                        <select id="gradeFilterMajor" class="form-select border-0 bg-light rounded-pill" onchange="loadStudentGrades()">
-                            <option value="">គ្រប់ជំនាញទាំងអស់</option>
-                            <option>Information Technology</option>
-                            <option>Business Administration</option>
-                            <option>English Literature</option>
-                            <option>Law</option>
-                        </select>
-                    </div>
-                    <div class="col-md-7">
-                        <input type="text" id="gradeSearchInput" class="form-control bg-light border-0 rounded-pill" placeholder="ស្វែងរកឈ្មោះសិស្ស..." oninput="loadStudentGrades()">
-                    </div>
-                </div>
+<!-- Grades Table -->
+<div class="table-container">
+    <table class="grades-table">
+        <thead>
+            <tr>
+                <th>សិស្ស</th>
+                <th>វត្តមាន (១០%)</th>
+                <th>កិច្ចការ (២០%)</th>
+                <th>ពាក់កណ្តាលឆ្នាំ (៣០%)</th>
+                <th>ប្រឡងចុងឆ្នាំ (៤០%)</th>
+                <th>ពិន្ទុសរុប</th>
+                <th>និទ្ទេស</th>
+                <th class="text-center">សកម្មភាព</th>
+            </tr>
+        </thead>
+        <tbody id="gradesTableBody">
+            <!-- Data will be loaded by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Grade Summary -->
+<div class="summary-section">
+    <div class="summary-card">
+        <div class="summary-value" id="gradeA">0</div>
+        <div class="summary-label">និទ្ទេស A (៩០-១០០)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="gradeB">0</div>
+        <div class="summary-label">និទ្ទេស B (៨០-៨៩)</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="gradeC">0</div>
+        <div class="summary-label">និទ្ទេស C (៧០-៧៩)</div>
+    </div>
+</div>
+
+<!-- Grade Distribution -->
+<div class="grade-distribution">
+    <h6 class="fw-bold mb-3">ការចែកចាយនិទ្ទេស</h6>
+    <div class="distribution-bar" id="distributionBar"></div>
+    <div class="row text-center mt-2">
+        <div class="col">A</div>
+        <div class="col">B</div>
+        <div class="col">C</div>
+        <div class="col">D</div>
+        <div class="col">F</div>
+    </div>
+</div>
+
+<!-- Edit Grade Modal -->
+<div class="modal fade" id="gradeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    កែប្រែពិន្ទុ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+            <div class="modal-body">
+                <form id="gradeForm">
+                    <input type="hidden" id="gradeId">
+                    <input type="hidden" id="studentId">
 
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light text-uppercase small">
-                            <tr>
-                                <th class="ps-4">ឈ្មោះសិស្ស & ជំនាញ</th>
-                                <th class="text-center">វត្តមាន (10%)</th>
-                                <th class="text-center">កិច្ចការ (20%)</th>
-                                <th class="text-center text-primary">Mid-Term (30%)</th>
-                                <th class="text-center text-primary">Final (40%)</th>
-                                <th class="text-center">សរុប (100)</th>
-                                <th class="text-end pe-4">សកម្មភាព</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gradeTableBody">
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ឈ្មោះសិស្ស</label>
+                        <input type="text" id="studentName" class="form-control" readonly>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">វត្តមាន (១០%)</label>
+                            <input type="number" id="attendance" class="form-control" min="0" max="10" step="0.1" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">កិច្ចការ (២០%)</label>
+                            <input type="number" id="assignment" class="form-control" min="0" max="20" step="0.1" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">ពាក់កណ្តាលឆ្នាំ (៣០%)</label>
+                            <input type="number" id="midTerm" class="form-control" min="0" max="30" step="0.1" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">ប្រឡងចុងឆ្នាំ (៤០%)</label>
+                            <input type="number" id="finalExam" class="form-control" min="0" max="40" step="0.1" value="0">
+                        </div>
+                    </div>
+                </form>
             </div>
-        </div>
-
-        <div class="tab-pane fade" id="report-tab">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 p-4">
-                        <h6 class="fw-bold text-primary mb-3">ជ្រើសរើសលក្ខខណ្ឌ</h6>
-                        <div class="mb-3">
-                            <label class="small fw-bold mb-1">វេនសិក្សា</label>
-                            <select id="reportShift" class="form-select border-0 bg-light" onchange="updateMajorOptions()">
-                                <option value="">-- គ្រប់វេនទាំងអស់ --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="small fw-bold mb-1">ជំនាញ</label>
-                            <select id="reportMajor" class="form-select border-0 bg-light" onchange="updateRoomOptions()">
-                                <option value="">-- គ្រប់ជំនាញទាំងអស់ --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="small fw-bold mb-1">បន្ទប់</label>
-                            <select id="reportRoom" class="form-select border-0 bg-light" onchange="showFilteredReport()">
-                                <option value="">-- គ្រប់បន្ទប់ទាំងអស់ --</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-8">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="card-body bg-light border-bottom d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold mb-0 text-dark" id="reportTitle">លទ្ធផលសិក្សាទូទៅ</h5>
-                            <span class="badge bg-primary rounded-pill" id="studentCount">0 នាក់</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="text-uppercase small fw-bold">
-                                    <tr>
-                                        <th class="ps-4">ចំណាត់ថ្នាក់</th>
-                                        <th>ឈ្មោះសិស្ស</th>
-                                        <th class="text-center">មធ្យមភាគ</th>
-                                        <th class="text-center">និទ្ទេស</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="majorReportBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
+                <button type="button" class="btn" style="background: #f97316; color: white;" onclick="saveGrade()">រក្សាទុក</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ១. Logic គណនាពិន្ទុ
-    function calculateTotal(s) {
-        return (parseFloat(s.grade_att) || 0) + (parseFloat(s.grade_asg) || 0) +
-               (parseFloat(s.grade_mid) || 0) + (parseFloat(s.grade_final) || 0);
+    let students = [];
+    let grades = [];
+    let currentFilteredData = [];
+
+    $(document).ready(function() {
+        loadData();
+    });
+
+        function loadData() {
+        // Load students
+        $.ajax({
+            url: '/Student/GetStudents',
+            type: 'GET',
+            cache: false,
+            success: function(data) {
+                students = data;
+                loadGrades();
+            }
+        });
     }
 
-    function getGrade(total) {
-        if (total >= 90) return { label: 'A', class: 'bg-success' };
-        if (total >= 80) return { label: 'B', class: 'bg-info text-dark' };
-        if (total >= 70) return { label: 'C', class: 'bg-primary' };
-        if (total >= 60) return { label: 'D', class: 'bg-warning text-dark' };
-        if (total >= 50) return { label: 'E', class: 'bg-secondary' };
-        return { label: 'F', class: 'bg-danger' };
+        function loadGrades() {
+        $.ajax({
+            url: '/Student/GetGrades',
+            type: 'GET',
+            cache: false,
+            success: function(data) {
+                grades = data;
+                displayGrades();
+                updateStats();
+                updateDistribution();
+            },
+            error: function() {
+                console.error("Error loading grades");
+                grades = [];
+                displayGrades();
+            }
+        });
     }
 
-    // ២. Function សំខាន់៖ បង្ហាញ Data ក្នុងតារាងបញ្ចូលពិន្ទុ
-    function loadStudentGrades() {
-        const students = JSON.parse(localStorage.getItem('students')) || [];
+    function displayGrades() {
+        var tbody = $('#gradesTableBody');
+        tbody.empty();
 
-        // ចាប់យកតម្លៃពី Filter (បើអត់ទាន់មាន វានឹងស្មើ "" ដែលមានន័យថាបង្ហាញទាំងអស់)
-        const filterMajorElement = document.getElementById('gradeFilterMajor');
-        const searchInputSelection = document.getElementById('gradeSearchInput');
-
-        const major = filterMajorElement ? filterMajorElement.value : "";
-        const query = searchInputSelection ? searchInputSelection.value.toLowerCase() : "";
-
-        const tbody = document.getElementById('gradeTableBody');
-        if (!tbody) return;
-
-        const filtered = students.filter(s =>
-            (s.name || "").toLowerCase().includes(query) && (major === "" || s.major === major)
-        );
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-muted">មិនមានទិន្នន័យសិស្សឡើយ</td></tr>`;
+        if (students.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="bi bi-bar-chart" style="font-size: 4rem; color: #cbd5e1;"></i>
+                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យពិន្ទុនៅឡើយទេ</h5>
+                    </td>
+                </tr>
+            `);
             return;
         }
 
-        tbody.innerHTML = filtered.map(s => {
-            const total = calculateTotal(s);
-            const grade = getGrade(total);
-            return `
-                <tr>
-                    <td class="ps-4">
-                        <div class="fw-bold text-dark">${s.name}</div>
-                        <div class="text-muted small">${s.major}</div>
-                    </td>
-                    <td class="text-center">${s.grade_att || 0}</td>
-                    <td class="text-center">${s.grade_asg || 0}</td>
-                    <td class="text-center text-primary fw-bold">${s.grade_mid || 0}</td>
-                    <td class="text-center text-primary fw-bold">${s.grade_final || 0}</td>
-                    <td class="text-center"><span class="badge ${grade.class} rounded-pill">${total.toFixed(0)} (${grade.label})</span></td>
-                    <td class="text-end pe-4">
-                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="openGradeModal('${s.id}')">កែពិន្ទុ</button>
-                    </td>
-                </tr>`;
-        }).join('');
-    }
+        var major = $('#filterMajor').val();
+        var year = $('#filterYear').val();
+        var shift = $('#filterShift').val();
+        var search = $('#searchInput').val().toLowerCase();
 
-    // ៣. Logic សម្រាប់ Tab ទី២ (ទុកធម្មតា)
-    function initReportFilters() {
-        const students = JSON.parse(localStorage.getItem('students')) || [];
-        const shifts = [...new Set(students.map(s => s.shift))].filter(Boolean);
-        const shiftSelect = document.getElementById('reportShift');
-        if(shiftSelect) {
-            shiftSelect.innerHTML = '<option value="">-- គ្រប់វេនទាំងអស់ --</option>' +
-                shifts.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-        showFilteredReport();
-    }
+        var filteredStudents = students.filter(s => {
+            var matchMajor = !major || s.major === major;
+            var matchYear = !year || s.year === year;
+            var matchShift = !shift || s.shift === shift;
+            var matchSearch = !search ||
+                (s.name && s.name.toLowerCase().includes(search)) ||
+                (s.id && s.id.toLowerCase().includes(search));
 
-    function updateMajorOptions() {
-        const shift = document.getElementById('reportShift').value;
-        const students = JSON.parse(localStorage.getItem('students')) || [];
-        let filtered = shift ? students.filter(s => s.shift === shift) : students;
-        const majors = [...new Set(filtered.map(s => s.major))].filter(Boolean);
-        document.getElementById('reportMajor').innerHTML = '<option value="">-- គ្រប់ជំនាញទាំងអស់ --</option>' +
-            majors.map(m => `<option value="${m}">${m}</option>`).join('');
-        showFilteredReport();
-    }
-
-    function updateRoomOptions() {
-        const shift = document.getElementById('reportShift').value;
-        const major = document.getElementById('reportMajor').value;
-        const students = JSON.parse(localStorage.getItem('students')) || [];
-        let filtered = students;
-        if (shift) filtered = filtered.filter(s => s.shift === shift);
-        if (major) filtered = filtered.filter(s => s.major === major);
-        const rooms = [...new Set(filtered.map(s => s.room))].filter(Boolean);
-        document.getElementById('reportRoom').innerHTML = '<option value="">-- គ្រប់បន្ទប់ទាំងអស់ --</option>' +
-            rooms.map(r => `<option value="${r}">${r}</option>`).join('');
-        showFilteredReport();
-    }
-
-    function showFilteredReport() {
-        const shift = document.getElementById('reportShift').value;
-        const major = document.getElementById('reportMajor').value;
-        const room = document.getElementById('reportRoom').value;
-        const students = JSON.parse(localStorage.getItem('students')) || [];
-        let filtered = students.filter(s => (!shift || s.shift === shift) && (!major || s.major === major) && (!room || s.room === room));
-        filtered = filtered.map(s => ({ ...s, total: calculateTotal(s) })).sort((a, b) => b.total - a.total);
-        document.getElementById('studentCount').innerText = `${filtered.length} នាក់`;
-        const tbody = document.getElementById('majorReportBody');
-        if (!tbody) return;
-        tbody.innerHTML = filtered.map((s, i) => {
-            const grade = getGrade(s.total);
-            return `<tr><td class="ps-4"><span class="badge ${i < 3 ? 'bg-primary' : 'bg-light text-dark'} rounded-circle" style="width:25px; height:25px; display:inline-flex; align-items:center; justify-content:center;">${i+1}</span></td><td><div class="fw-bold">${s.name}</div><small class="text-muted">${s.major} | ${s.room || 'គ្មានបន្ទប់'}</small></td><td class="text-center fw-bold text-primary">${s.total.toFixed(0)}</td><td class="text-center"><span class="badge ${grade.class} rounded-pill px-3">${grade.label}</span></td></tr>`;
-        }).join('');
-    }
-
-    // ៤. Modal កែពិន្ទុ
-    async function openGradeModal(id) {
-        let students = JSON.parse(localStorage.getItem('students')) || [];
-        const idx = students.findIndex(s => s.id === id);
-        const s = students[idx];
-        const { value: v } = await Swal.fire({
-            title: `បញ្ចូលពិន្ទុ៖ ${s.name}`,
-            html: `<div class="row g-2 text-start px-2"><div class="col-6"><label class="small fw-bold">វត្តមាន (10)</label><input id="att" type="number" class="form-control" value="${s.grade_att||0}"></div><div class="col-6"><label class="small fw-bold">កិច្ចការ (20)</label><input id="asg" type="number" class="form-control" value="${s.grade_asg||0}"></div><div class="col-6"><label class="small fw-bold text-primary">Mid-Term (30)</label><input id="mid" type="number" class="form-control" value="${s.grade_mid||0}"></div><div class="col-6"><label class="small fw-bold text-primary">Final (40)</label><input id="final" type="number" class="form-control" value="${s.grade_final||0}"></div></div>`,
-            showCancelButton: true, confirmButtonText: 'រក្សាទុក',
-            preConfirm: () => ({ att: parseFloat(document.getElementById('att').value)||0, asg: parseFloat(document.getElementById('asg').value)||0, mid: parseFloat(document.getElementById('mid').value)||0, final: parseFloat(document.getElementById('final').value)||0 })
+            return matchMajor && matchYear && matchShift && matchSearch;
         });
-        if (v) {
-            students[idx] = { ...s, grade_att: v.att, grade_asg: v.asg, grade_mid: v.mid, grade_final: v.final };
-            localStorage.setItem('students', JSON.stringify(students));
-            loadStudentGrades();
-            Swal.fire({ icon: 'success', title: 'រក្សាទុកជោគជ័យ', timer: 800, showConfirmButton: false });
-        }
+
+        currentFilteredData = filteredStudents;
+
+        filteredStudents.forEach(s => {
+            var grade = grades.find(g => g.studentId === s.id) || {
+                attendance: 0,
+                assignment: 0,
+                midTerm: 0,
+                finalExam: 0,
+                total: 0,
+                gradeLetter: 'F'
+            };
+
+            var total = (grade.attendance || 0) + (grade.assignment || 0) +
+                       (grade.midTerm || 0) + (grade.finalExam || 0);
+
+            var gradeClass = 'grade-f';
+            if (total >= 90) gradeClass = 'grade-a';
+            else if (total >= 80) gradeClass = 'grade-b';
+            else if (total >= 70) gradeClass = 'grade-c';
+            else if (total >= 60) gradeClass = 'grade-d';
+
+            var row = `
+                <tr>
+                    <td>
+                        <div class="student-info">
+                            <div class="student-avatar">
+                                ${s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${s.name || 'មិនមានឈ្មោះ'}</div>
+                                <small class="text-muted">${s.id}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="number" class="grade-input" id="att_${s.id}"
+                               value="${grade.attendance || 0}" min="0" max="10" step="0.1"
+                               onchange="updateGrade('${s.id}')">
+                    </td>
+                    <td>
+                        <input type="number" class="grade-input" id="asg_${s.id}"
+                               value="${grade.assignment || 0}" min="0" max="20" step="0.1"
+                               onchange="updateGrade('${s.id}')">
+                    </td>
+                    <td>
+                        <input type="number" class="grade-input" id="mid_${s.id}"
+                               value="${grade.midTerm || 0}" min="0" max="30" step="0.1"
+                               onchange="updateGrade('${s.id}')">
+                    </td>
+                    <td>
+                        <input type="number" class="grade-input" id="final_${s.id}"
+                               value="${grade.finalExam || 0}" min="0" max="40" step="0.1"
+                               onchange="updateGrade('${s.id}')">
+                    </td>
+                    <td class="total-cell" id="total_${s.id}">${total.toFixed(1)}</td>
+                    <td>
+                        <span class="grade-badge ${gradeClass}" id="grade_${s.id}">
+                            ${total >= 90 ? 'A' : total >= 80 ? 'B' : total >= 70 ? 'C' : total >= 60 ? 'D' : 'F'}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn-edit-grade" onclick="openEditModal('${s.id}', '${s.name}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
     }
 
-    // *** ៥. ចំណុចសំខាន់បំផុត៖ បញ្ជាឱ្យរត់ loadStudentGrades ភ្លាមៗពេលបើកទំព័រ ***
-    // ប្រើ setTimeout បន្តិចដើម្បីធានាថា HTML បង្កើតរួចរាល់
-    setTimeout(() => {
-        loadStudentGrades();
-    }, 100);
+       function updateGrade(studentId) {
+        var attendance = parseFloat($(`#att_${studentId}`).val()) || 0;
+        var assignment = parseFloat($(`#asg_${studentId}`).val()) || 0;
+        var midTerm = parseFloat($(`#mid_${studentId}`).val()) || 0;
+        var finalExam = parseFloat($(`#final_${studentId}`).val()) || 0;
 
-    // ហៅម្តងទៀតពេល Window Load រួចរាល់
-    window.onload = loadStudentGrades;
+        var total = attendance + assignment + midTerm + finalExam;
+        $(`#total_${studentId}`).text(total.toFixed(1));
 
+        var gradeSpan = $(`#grade_${studentId}`);
+        gradeSpan.removeClass('grade-a grade-b grade-c grade-d grade-f');
+
+        var gradeLetter = 'F';
+        if (total >= 90) {
+            gradeLetter = 'A';
+            gradeSpan.addClass('grade-a');
+        } else if (total >= 80) {
+            gradeLetter = 'B';
+            gradeSpan.addClass('grade-b');
+        } else if (total >= 70) {
+            gradeLetter = 'C';
+            gradeSpan.addClass('grade-c');
+        } else if (total >= 60) {
+            gradeLetter = 'D';
+            gradeSpan.addClass('grade-d');
+        } else if (total >= 50) {
+            gradeLetter = 'E';
+            gradeSpan.addClass('grade-e');
+        } else {
+            gradeSpan.addClass('grade-f');
+        }
+        gradeSpan.text(gradeLetter);
+
+        // Save grade to database
+        var gradeData = {
+            studentId: studentId,
+            subject: 'ទូទៅ',
+            attendance: attendance,
+            assignment: assignment,
+            midTerm: midTerm,
+            finalExam: finalExam,
+            semester: 'ឆមាសទី ១',
+            academicYear: '2025-2026'
+        };
+
+        $.ajax({
+            url: '/Student/SaveGrade',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(gradeData),
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    // បង្ហាញសារជោគជ័យតែម្តងគត់
+                    if (!window.gradeSaved) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ជោគជ័យ!',
+                            text: 'រក្សាទុកពិន្ទុដោយជោគជ័យ',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                        window.gradeSaved = true;
+                        setTimeout(() => { window.gradeSaved = false; }, 3000);
+                    }
+                    loadGrades(); // ផ្ទុកទិន្នន័យថ្មី
+                }
+            },
+            error: function() {
+                console.error("Error saving grade");
+            }
+        });
+    }
+
+    function openEditModal(studentId, studentName) {
+        var grade = grades.find(g => g.studentId === studentId) || {};
+
+        $('#gradeId').val(grade.id || 0);
+        $('#studentId').val(studentId);
+        $('#studentName').val(studentName);
+        $('#attendance').val(grade.attendance || 0);
+        $('#assignment').val(grade.assignment || 0);
+        $('#midTerm').val(grade.midTerm || 0);
+        $('#finalExam').val(grade.finalExam || 0);
+
+        $('#gradeModal').modal('show');
+    }
+
+    function saveGrade() {
+        var gradeData = {
+            id: $('#gradeId').val(),
+            studentId: $('#studentId').val(),
+            attendance: parseFloat($('#attendance').val()) || 0,
+            assignment: parseFloat($('#assignment').val()) || 0,
+            midTerm: parseFloat($('#midTerm').val()) || 0,
+            finalExam: parseFloat($('#finalExam').val()) || 0
+        };
+
+        $.ajax({
+            url: '/Student/SaveGrade',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(gradeData),
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#gradeModal').modal('hide');
+                    loadGrades();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            }
+        });
+    }
+
+    function updateStats() {
+        var total = currentFilteredData.length;
+        var passed = 0;
+        var totalScore = 0;
+        var gradeCounts = {A:0, B:0, C:0, D:0, F:0};
+
+        currentFilteredData.forEach(s => {
+            var grade = grades.find(g => g.studentId === s.id);
+            if (grade) {
+                var total = (grade.attendance || 0) + (grade.assignment || 0) +
+                           (grade.midTerm || 0) + (grade.finalExam || 0);
+                totalScore += total;
+
+                if (total >= 50) passed++;
+
+                if (total >= 90) gradeCounts.A++;
+                else if (total >= 80) gradeCounts.B++;
+                else if (total >= 70) gradeCounts.C++;
+                else if (total >= 60) gradeCounts.D++;
+                else gradeCounts.F++;
+            }
+        });
+
+        $('#totalStudents').text(total);
+        $('#passedStudents').text(passed);
+        $('#failedStudents').text(total - passed);
+        $('#avgGrade').text(total > 0 ? (totalScore / total).toFixed(1) : '0.0');
+
+        $('#gradeA').text(gradeCounts.A);
+        $('#gradeB').text(gradeCounts.B);
+        $('#gradeC').text(gradeCounts.C);
+    }
+
+    function updateDistribution() {
+        var total = currentFilteredData.length;
+        if (total === 0) return;
+
+        var counts = {A:0, B:0, C:0, D:0, F:0};
+
+        currentFilteredData.forEach(s => {
+            var grade = grades.find(g => g.studentId === s.id);
+            if (grade) {
+                var totalScore = (grade.attendance || 0) + (grade.assignment || 0) +
+                                (grade.midTerm || 0) + (grade.finalExam || 0);
+
+                if (totalScore >= 90) counts.A++;
+                else if (totalScore >= 80) counts.B++;
+                else if (totalScore >= 70) counts.C++;
+                else if (totalScore >= 60) counts.D++;
+                else counts.F++;
+            }
+        });
+
+        var bar = $('#distributionBar');
+        bar.empty();
+
+        var colors = ['#10b981', '#3b82f6', '#f59e0b', '#f43f5e', '#ef4444'];
+        var grades = ['A', 'B', 'C', 'D', 'F'];
+
+        grades.forEach((g, i) => {
+            var percentage = (counts[g] / total * 100).toFixed(1);
+            if (percentage > 0) {
+                bar.append(`<div class="bar-segment" style="width: ${percentage}%; background: ${colors[i]};">${percentage}%</div>`);
+            }
+        });
+    }
+
+    function applyFilter() {
+        displayGrades();
+    }
+
+    function resetFilter() {
+        $('#filterMajor').val('');
+        $('#filterYear').val('');
+        $('#filterShift').val('');
+        $('#searchInput').val('');
+        displayGrades();
+    }
 </script>

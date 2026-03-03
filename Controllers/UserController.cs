@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WebApplication2.Data;
 using WebApplication2.Models;
-using WebApplication2.Service;
+using WebApplication2.Services;
 
 namespace WebApplication2.Controllers
 {

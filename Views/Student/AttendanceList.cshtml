@@ -1,493 +1,924 @@
 ﻿@model IEnumerable<WebApplication2.Models.Student>
 @{
-    Layout = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest" ? null : "_Layout";
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "វត្តមាន";
 }
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
 <style>
-    :root {
-        --khmer-font: 'Kantumruy Pro', sans-serif;
-        --hru-blue: #2563eb;
-        --blue-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        /* Color Mapping for Modes */
-        --bg-page: #f8fafc;
-        --bg-card: #ffffff;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-        --border-color: #edf2f7;
-        --table-head-bg: #f8fafc;
-        --input-bg: #f1f5f9;
-        --item-hover: #f1f5f9;
+    .page-header {
+        margin-bottom: 30px;
     }
 
-    /* Dark Mode Variables */
-    [data-bs-theme="dark"] {
-        --bg-page: #0f172a;
-        --bg-card: #1e293b;
-        --text-main: #f1f5f9;
-        --text-muted: #94a3b8;
-        --border-color: #334155;
-        --table-head-bg: #0f172a;
-        --input-bg: #0f172a;
-        --item-hover: #334155;
-    }
-
-    body {
-        font-family: var(--khmer-font);
-        background-color: var(--bg-page);
-        color: var(--text-main);
-        transition: background-color 0.3s ease;
-    }
-
-    .attendance-list-container {
-        padding: 2rem;
-    }
-
-    /* Summary Banner (Gradient stays the same for look) */
-    .summary-banner {
-        background: var(--blue-gradient);
-        border-radius: 24px;
-        padding: 35px;
-        color: white;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
-    }
-
-    .stat-mini-card {
-        border-radius: 20px;
-        padding: 22px;
-        color: white;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-        .stat-mini-card:hover {
-            transform: translateY(-5px);
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
-    .bg-p {
-        background: var(--success-gradient);
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
-    .bg-l {
-        background: var(--warning-gradient);
-    }
-
-    .bg-a {
-        background: var(--danger-gradient);
-    }
-
-    .card-icon-bg {
-        position: absolute;
-        right: -10px;
-        bottom: -10px;
-        font-size: 4rem;
-        opacity: 0.2;
-        transform: rotate(-15deg);
-    }
-
-    /* Filters */
-    .filter-section {
-        background: var(--bg-card);
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        margin-top: 25px;
-        margin-bottom: 25px;
-        border: 1px solid var(--border-color);
-    }
-
-    .form-label-kh {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-    }
-
-    .form-control, .form-select {
-        background-color: var(--input-bg) !important;
-        color: var(--text-main) !important;
-        border: 1px solid var(--border-color) !important;
-    }
-
-    /* Table Styling */
-    .data-card {
-        background: var(--bg-card);
-        border-radius: 25px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        position: relative;
         overflow: hidden;
-        border: 1px solid var(--border-color);
     }
 
-    .custom-table thead th {
-        background-color: var(--table-head-bg);
-        color: var(--text-muted);
-        font-weight: 700;
-        font-size: 0.75rem;
-        padding: 20px;
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: #334155;
     }
 
-    .custom-table td {
-        padding: 18px 20px;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-main);
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 3rem;
+        opacity: 0.1;
+        color: #06b6d4;
     }
 
-    .room-badge {
-        background: rgba(37, 99, 235, 0.1);
-        color: var(--hru-blue);
-        padding: 6px 14px;
-        border-radius: 10px;
-        font-weight: 700;
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
     }
 
-    /* Student Item Item in Modal */
-    .student-item {
+    [data-theme="dark"] .stat-value {
+        color: white;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .date-section {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
         display: flex;
         align-items: center;
-        padding: 15px;
-        background: var(--bg-card);
-        border-radius: 18px;
-        margin-bottom: 12px;
-        border: 1px solid var(--border-color);
-        transition: 0.2s;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
-        .student-item:hover {
-            border-color: var(--hru-blue);
-            background-color: var(--item-hover);
+    [data-theme="dark"] .date-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .date-picker {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+        .date-picker label {
+            font-weight: 600;
+            color: #475569;
         }
 
-    .student-icon-avatar {
-        background: rgba(37, 99, 235, 0.1);
-        color: var(--hru-blue);
+    [data-theme="dark"] .date-picker label {
+        color: #cbd5e1;
     }
 
-    .modal-content {
-        background-color: var(--bg-card);
-        color: var(--text-main);
+    .date-picker input {
+        padding: 10px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1e293b;
     }
 
-    .text-dark {
-        color: var(--text-main) !important;
+    [data-theme="dark"] .date-picker input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
     }
 
-    .text-muted {
-        color: var(--text-muted) !important;
+    .summary-cards {
+        display: flex;
+        gap: 20px;
+    }
+
+    .summary-badge {
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-present {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .badge-late {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .badge-absent {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .filter-section {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .filter-item label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+    [data-theme="dark"] .filter-item label {
+        color: #cbd5e1;
+    }
+
+    .filter-item select,
+    .filter-item input {
+        padding: 10px 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .filter-item select,
+    [data-theme="dark"] .filter-item input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(6,182,212,0.3);
+        }
+
+    .btn-save {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        overflow-x: auto;
+    }
+
+    [data-theme="dark"] .table-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+
+        .attendance-table th {
+            padding: 16px;
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+    [data-theme="dark"] .attendance-table th {
+        background: #0f172a;
+        color: #cbd5e1;
+        border-bottom-color: #334155;
+    }
+
+    .attendance-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .attendance-table td {
+        color: white;
+        border-bottom-color: #334155;
+    }
+
+    .attendance-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    [data-theme="dark"] .attendance-table tbody tr:hover {
+        background: #0f172a;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+    }
+
+    .attendance-radio-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+    .radio-label {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .radio-option input[type="radio"]:checked + .radio-label {
+        color: white;
+    }
+
+        .radio-option input[type="radio"]:checked + .radio-label.present {
+            background: #10b981;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label.late {
+            background: #f59e0b;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label.absent {
+            background: #ef4444;
+        }
+
+    .radio-label.present {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .radio-label.late {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .radio-label.absent {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    .note-input {
+        width: 150px;
+        padding: 6px 10px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .note-input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .history-section {
+        margin-top: 40px;
+    }
+
+    .history-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .history-title {
+        color: white;
+    }
+
+    .history-title i {
+        color: #06b6d4;
+        font-size: 1.5rem;
+    }
+
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .history-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .history-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .history-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(6,182,212,0.1);
+        border-color: #06b6d4;
+    }
+
+    .history-date {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #06b6d4;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .history-stats {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .history-stat {
+        text-align: center;
+        flex: 1;
+    }
+
+        .history-stat .count {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .history-stat .label {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+    .btn-view {
+        width: 100%;
+        padding: 8px;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 12px;
+        color: #475569;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .btn-view {
+        background: #0f172a;
+        color: #cbd5e1;
+    }
+
+    .btn-view:hover {
+        background: #06b6d4;
+        color: white;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .date-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 
-<div class="attendance-list-container animate__animated animate__fadeIn">
+<div class="page-header">
+    <h2><i class="bi bi-calendar-check-fill me-2"></i>វត្តមានប្រចាំថ្ងៃ</h2>
+    <p class="text-muted">បំពេញ និងគ្រប់គ្រងវត្តមានសិស្ស</p>
+</div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1 text-dark">ប្រវត្តិវត្តមានសិស្ស</h2>
-            <p class="text-muted small">ពិនិត្យ និងគ្រប់គ្រងកំណត់ត្រាវត្តមានក្នុងប្រព័ន្ធ</p>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-danger border-0 fw-bold" onclick="clearAllAttendance()">
-                <i class="bi bi-trash3 me-1"></i> សម្អាតទាំងអស់
-            </button>
-            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="exportToExcel()">
-                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
-            </button>
-        </div>
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <i class="bi bi-people-fill stat-icon"></i>
+        <div class="stat-value" id="totalStudents">0</div>
+        <div class="stat-label">សិស្សសរុប</div>
     </div>
-
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="summary-banner h-100">
-                <div class="small opacity-75">ចំនួនកំណត់ត្រាសរុប</div>
-                <div class="d-flex align-items-center">
-                    <span class="summary-count h1 fw-bold mb-0" id="totalLogs">0</span>
-                    <span class="ms-3 badge bg-white bg-opacity-25 rounded-pill px-3 py-2">កំណត់ត្រា</span>
-                </div>
-                <div class="mt-4 small">
-                    <i class="bi bi-clock-history me-1"></i> បច្ចុប្បន្នភាព៖ @DateTime.Now.ToString("dd/MM/yyyy")
-                </div>
-                <i class="bi bi-journal-check card-icon-bg"></i>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-mini-card bg-p">
-                <div class="small">វត្តមាន (P)</div>
-                <div class="h2 fw-bold mb-0" id="grandP">0</div>
-                <i class="bi bi-person-check-fill card-icon-bg"></i>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-mini-card bg-l">
-                <div class="small">ច្បាប់ (L)</div>
-                <div class="h2 fw-bold mb-0" id="grandL">0</div>
-                <i class="bi bi-person-exclamation card-icon-bg"></i>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-mini-card bg-a">
-                <div class="small">អវត្តមាន (A)</div>
-                <div class="h2 fw-bold mb-0" id="grandA">0</div>
-                <i class="bi bi-person-x-fill card-icon-bg"></i>
-            </div>
-        </div>
+    <div class="stat-card">
+        <i class="bi bi-check-circle-fill stat-icon"></i>
+        <div class="stat-value" id="presentCount">0</div>
+        <div class="stat-label">វត្តមាន</div>
     </div>
-
-    <div class="filter-section">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label-kh">ស្វែងរកបន្ទប់</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                    <input type="text" id="searchAtt" class="form-control" placeholder="ឈ្មោះបន្ទប់..." onkeyup="filterAttendance()">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label-kh">ជំនាញ (Major)</label>
-                <select id="majorFilter" class="form-select fw-bold" onchange="filterAttendance()">
-                    <option value="">-- គ្រប់ជំនាញ --</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label-kh">បន្ទប់/ថ្នាក់</label>
-                <select id="roomFilter" class="form-select fw-bold" onchange="filterAttendance()">
-                    <option value="">-- គ្រប់បន្ទប់ --</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label-kh">កាលបរិច្ឆេទ</label>
-                <select id="dateSelectFilter" class="form-select fw-bold" onchange="filterAttendance()">
-                    <option value="">-- គ្រប់កាលបរិច្ឆេទ --</option>
-                </select>
-            </div>
-        </div>
+    <div class="stat-card">
+        <i class="bi bi-clock-fill stat-icon"></i>
+        <div class="stat-value" id="lateCount">0</div>
+        <div class="stat-label">មកយឺត</div>
     </div>
-
-    <div class="data-card">
-        <div class="table-responsive">
-            <table class="custom-table w-100">
-                <thead>
-                    <tr>
-                        <th>កាលបរិច្ឆេទ & ម៉ោង</th>
-                        <th>បន្ទប់សិក្សា</th>
-                        <th class="text-center">វត្តមាន (P)</th>
-                        <th class="text-center">ច្បាប់ (L)</th>
-                        <th class="text-center">អវត្តមាន (A)</th>
-                        <th class="text-center">សកម្មភាព</th>
-                    </tr>
-                </thead>
-                <tbody id="attendanceListBody"></tbody>
-            </table>
-        </div>
-        <div id="noAttData" class="text-center py-5 d-none">
-            <i class="bi bi-inbox display-1 text-muted opacity-25"></i>
-            <h5 class="text-muted mt-3">មិនទាន់មានទិន្នន័យឡើយ</h5>
-        </div>
+    <div class="stat-card">
+        <i class="bi bi-x-circle-fill stat-icon"></i>
+        <div class="stat-value" id="absentCount">0</div>
+        <div class="stat-label">អវត្តមាន</div>
     </div>
 </div>
 
-<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 30px;">
-            <div class="modal-header border-0 p-4 pb-0">
-                <h4 class="fw-bold mb-0 text-dark" id="modalTitle">បញ្ជីឈ្មោះសិស្ស</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div id="studentDetailList" style="max-height: 480px; overflow-y: auto; padding-right: 8px;"></div>
-            </div>
+<!-- Date Selection -->
+<div class="date-section">
+    <div class="date-picker">
+        <label><i class="bi bi-calendar3 me-2"></i>ជ្រើសរើសកាលបរិច្ឆេទ:</label>
+        <input type="date" id="attendanceDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+    </div>
+    <div class="summary-cards">
+        <span class="summary-badge badge-present" id="summaryPresent">វត្តមាន: 0</span>
+        <span class="summary-badge badge-late" id="summaryLate">មកយឺត: 0</span>
+        <span class="summary-badge badge-absent" id="summaryAbsent">អវត្តមាន: 0</span>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-grid">
+        <div class="filter-item">
+            <label>ជំនាញ</label>
+            <select id="filterMajor">
+                <option value="">ទាំងអស់</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="English Literature">English Literature</option>
+                <option value="Law">Law</option>
+                <option value="Accounting">Accounting</option>
+            </select>
         </div>
+
+        <div class="filter-item">
+            <label>ឆ្នាំសិក្សា</label>
+            <select id="filterYear">
+                <option value="">ទាំងអស់</option>
+                <option value="1">ឆ្នាំទី១</option>
+                <option value="2">ឆ្នាំទី២</option>
+                <option value="3">ឆ្នាំទី៣</option>
+                <option value="4">ឆ្នាំទី៤</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label>វេនសិក្សា</label>
+            <select id="filterShift">
+                <option value="">ទាំងអស់</option>
+                <option value="ព្រឹក">ព្រឹក</option>
+                <option value="រសៀល">រសៀល</option>
+                <option value="យប់">យប់</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label>ស្វែងរក</label>
+            <input type="text" id="searchInput" placeholder="ឈ្មោះ ឬលេខសម្គាល់...">
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn-filter" onclick="applyFilter()">
+            <i class="bi bi-search"></i>
+            អនុវត្តតម្រង
+        </button>
+        <button class="btn-filter" onclick="resetFilter()" style="background: #64748b;">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            កំណត់ឡើងវិញ
+        </button>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <button class="btn-save" onclick="saveAttendance()">
+            <i class="bi bi-save"></i>
+            រក្សាទុកវត្តមាន
+        </button>
+        <button class="btn-save ms-2" onclick="markAllPresent()" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <i class="bi bi-check-all"></i>
+            វត្តមានទាំងអស់
+        </button>
+    </div>
+</div>
+
+<!-- Attendance Table -->
+<div class="table-container">
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th>សិស្ស</th>
+                <th>ជំនាញ</th>
+                <th>ឆ្នាំ</th>
+                <th>វេន</th>
+                <th>ស្ថានភាពវត្តមាន</th>
+                <th>កំណត់ចំណាំ</th>
+            </tr>
+        </thead>
+        <tbody id="attendanceTableBody">
+            <!-- Data will be loaded by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Attendance History -->
+<div class="history-section">
+    <div class="history-title">
+        <i class="bi bi-clock-history"></i>
+        <span>ប្រវត្តិវត្តមានថ្មីៗ</span>
+    </div>
+
+    <div class="history-grid" id="historyGrid">
+        <!-- History will be loaded by JavaScript -->
     </div>
 </div>
 
 <script>
-    function displayAttendanceHistory() {
-        const history = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-        const tbody = document.getElementById('attendanceListBody');
-        const noData = document.getElementById('noAttData');
+    let students = [];
+    let attendanceRecords = [];
+    let currentAttendance = {};
 
-        const search = document.getElementById('searchAtt').value.toLowerCase();
-        const majorF = document.getElementById('majorFilter').value;
-        const roomF = document.getElementById('roomFilter').value;
-        const dateF = document.getElementById('dateSelectFilter').value;
+    $(document).ready(function() {
+        loadStudents();
+        loadAttendanceHistory();
+        $('#attendanceDate').val(new Date().toISOString().split('T')[0]);
+    });
 
-        updateFilterOptions(history);
-
-        let filtered = history.filter(item => {
-            const matchSearch = (item.room || '').toLowerCase().includes(search);
-            const matchDate = dateF ? item.date === dateF : true;
-            const matchRoom = roomF ? item.room === roomF : true;
-            let matchMajor = true;
-            if (majorF && item.students) {
-                matchMajor = item.students.some(s => s.major === majorF);
+    function loadStudents() {
+        $.ajax({
+            url: '/Student/GetStudents',
+            type: 'GET',
+            success: function(data) {
+                students = data;
+                displayAttendance();
             }
-            return matchSearch && matchDate && matchRoom && matchMajor;
         });
+    }
 
-        document.getElementById('totalLogs').innerText = filtered.length;
-        updateGrandStats(filtered);
+    function loadAttendanceHistory() {
+        $.ajax({
+            url: '/Student/GetAttendance',
+            type: 'GET',
+            success: function(data) {
+                attendanceRecords = data;
+                displayHistory();
+            }
+        });
+    }
 
-        if (filtered.length === 0) {
-            tbody.innerHTML = '';
-            noData.classList.remove('d-none');
+    function displayAttendance() {
+        var tbody = $('#attendanceTableBody');
+        tbody.empty();
+
+        if (students.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <i class="bi bi-people" style="font-size: 4rem; color: #cbd5e1;"></i>
+                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យសិស្សនៅឡើយទេ</h5>
+                    </td>
+                </tr>
+            `);
             return;
         }
 
-        noData.classList.add('d-none');
-        tbody.innerHTML = filtered.reverse().map(record => `
-            <tr class="animate__animated animate__fadeIn">
-                <td>
-                    <div class="fw-bold text-dark">${record.date}</div>
-                    <div class="text-muted small" style="font-size: 0.7rem;">${record.timestamp || '-'}</div>
-                </td>
-                <td><span class="room-badge">${record.room || 'ទូទៅ'}</span></td>
-                <td class="text-center fw-bold text-success fs-5">${record.present}</td>
-                <td class="text-center fw-bold text-warning fs-5">${record.leave}</td>
-                <td class="text-center fw-bold text-danger fs-5">${record.absent}</td>
-                <td class="text-center">
-                    <button class="action-btn btn-view me-1 border-0 rounded-3 p-2" onclick="viewDetails('${record.id}')">
-                        <i class="bi bi-eye-fill"></i>
-                    </button>
-                    <button class="action-btn btn-del border-0 rounded-3 p-2" onclick="deleteRecord('${record.id}')">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+        var major = $('#filterMajor').val();
+        var year = $('#filterYear').val();
+        var shift = $('#filterShift').val();
+        var search = $('#searchInput').val().toLowerCase();
+
+        var filteredStudents = students.filter(s => {
+            var matchMajor = !major || s.major === major;
+            var matchYear = !year || s.year === year;
+            var matchShift = !shift || s.shift === shift;
+            var matchSearch = !search ||
+                (s.name && s.name.toLowerCase().includes(search)) ||
+                (s.id && s.id.toLowerCase().includes(search));
+
+            return matchMajor && matchYear && matchShift && matchSearch;
+        });
+
+        $('#totalStudents').text(filteredStudents.length);
+
+        filteredStudents.forEach(s => {
+            var status = currentAttendance[s.id] || 'P';
+
+            var row = `
+                <tr>
+                    <td>
+                        <div class="student-info">
+                            <div class="student-avatar">
+                                ${s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${s.name || 'មិនមានឈ្មោះ'}</div>
+                                <small class="text-muted">${s.id}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${s.major || 'N/A'}</td>
+                    <td>ឆ្នាំទី${s.year || '?'}</td>
+                    <td>${s.shift || 'N/A'}</td>
+                    <td>
+                        <div class="attendance-radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="att_${s.id}" value="P" ${status === 'P' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
+                                <span class="radio-label present">វត្តមាន</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="att_${s.id}" value="L" ${status === 'L' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
+                                <span class="radio-label late">មកយឺត</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="att_${s.id}" value="A" ${status === 'A' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
+                                <span class="radio-label absent">អវត្តមាន</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="note-input" id="note_${s.id}" placeholder="កំណត់ចំណាំ..." value="${currentAttendance[`note_${s.id}`] || ''}">
+                    </td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
+
+        updateCounts();
     }
 
-    function updateFilterOptions(history) {
-        const majorSelect = document.getElementById('majorFilter');
-        const roomSelect = document.getElementById('roomFilter');
-        const dateSelect = document.getElementById('dateSelectFilter');
+    function updateAttendance(studentId, status) {
+        currentAttendance[studentId] = status;
+        updateCounts();
+    }
 
-        if (dateSelect.options.length > 1) return;
+    function updateCounts() {
+        var present = 0, late = 0, absent = 0;
 
-        const dates = [...new Set(history.map(h => h.date))].sort().reverse();
-        const rooms = [...new Set(history.map(h => h.room))].filter(r => r).sort();
+        $('input[type="radio"]:checked').each(function() {
+            var value = $(this).val();
+            if (value === 'P') present++;
+            else if (value === 'L') late++;
+            else if (value === 'A') absent++;
+        });
 
-        let allMajors = [];
-        history.forEach(record => {
-            if(record.students) {
-                record.students.forEach(s => { if(s.major) allMajors.push(s.major); });
+        $('#presentCount').text(present);
+        $('#lateCount').text(late);
+        $('#absentCount').text(absent);
+
+        $('#summaryPresent').text(`វត្តមាន: ${present}`);
+        $('#summaryLate').text(`មកយឺត: ${late}`);
+        $('#summaryAbsent').text(`អវត្តមាន: ${absent}`);
+    }
+
+    function saveAttendance() {
+        var date = $('#attendanceDate').val();
+        var attendanceData = [];
+
+        $('input[type="radio"]:checked').each(function() {
+            var name = $(this).attr('name');
+            var studentId = name.replace('att_', '');
+            var status = $(this).val();
+            var note = $(`#note_${studentId}`).val();
+
+            attendanceData.push({
+                studentId: studentId,
+                studentName: $(this).closest('tr').find('.fw-bold').text(),
+                date: date,
+                status: status,
+                note: note
+            });
+        });
+
+        $.ajax({
+            url: '/Student/SaveAttendance',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(attendanceData),
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    loadAttendanceHistory();
+                    currentAttendance = {};
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'កំហុស',
+                    text: 'មានបញ្ហាបច្ចេកទេស'
+                });
             }
         });
-        const majors = [...new Set(allMajors)].sort();
-
-        dates.forEach(d => dateSelect.add(new Option(d, d)));
-        rooms.forEach(r => roomSelect.add(new Option(r, r)));
-        majors.forEach(m => majorSelect.add(new Option(m, m)));
     }
 
-    function updateGrandStats(data) {
-        let p=0, l=0, a=0;
-        data.forEach(r => {
-            p += parseInt(r.present) || 0;
-            l += parseInt(r.leave) || 0;
-            a += parseInt(r.absent) || 0;
+    function markAllPresent() {
+        $('input[type="radio"][value="P"]').prop('checked', true);
+        updateCounts();
+    }
+
+    function displayHistory() {
+        var grid = $('#historyGrid');
+        grid.empty();
+
+        var grouped = {};
+        attendanceRecords.forEach(record => {
+            if (!grouped[record.date]) {
+                grouped[record.date] = {
+                    date: record.date,
+                    present: 0,
+                    late: 0,
+                    absent: 0,
+                    total: 0
+                };
+            }
+            grouped[record.date][record.status === 'P' ? 'present' : record.status === 'L' ? 'late' : 'absent']++;
+            grouped[record.date].total++;
         });
-        document.getElementById('grandP').innerText = p;
-        document.getElementById('grandL').innerText = l;
-        document.getElementById('grandA').innerText = a;
-    }
 
-    function viewDetails(id) {
-        const history = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-        const record = history.find(r => r.id === id);
-        if (!record) return;
+        var sorted = Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
 
-        document.getElementById('modalTitle').innerHTML = `
-            <div class="d-flex align-items-center">
-                <div class="p-3 bg-primary bg-opacity-10 rounded-4 me-3 text-primary">
-                    <i class="bi bi-door-open-fill fs-4"></i>
-                </div>
-                <div>
-                    <div class="h5 mb-0 fw-bold">បន្ទប់សិក្សា៖ ${record.room}</div>
-                    <div class="small text-muted">${record.date} | ${record.timestamp}</div>
-                </div>
-            </div>`;
-
-        const listContainer = document.getElementById('studentDetailList');
-        listContainer.innerHTML = record.students.map(s => `
-            <div class="student-item animate__animated animate__fadeInUp animate__faster">
-                <div class="student-icon-avatar p-3 rounded-4 me-3">
-                    <i class="bi bi-person-circle fs-4"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="fw-bold text-dark">${s.name} <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.6rem;">ID: ${s.id}</span></div>
-                    <div class="text-muted small" style="font-size: 0.75rem;">
-                        <i class="bi bi-mortarboard-fill me-1"></i>${s.major || 'ព័ត៌មានវិទ្យា'}
+        sorted.forEach(day => {
+            var card = `
+                <div class="history-card">
+                    <div class="history-date">
+                        <span><i class="bi bi-calendar3 me-2"></i>${day.date}</span>
+                        <span class="badge bg-secondary">${day.total} នាក់</span>
                     </div>
+                    <div class="history-stats">
+                        <div class="history-stat">
+                            <div class="count text-success">${day.present}</div>
+                            <div class="label">វត្តមាន</div>
+                        </div>
+                        <div class="history-stat">
+                            <div class="count text-warning">${day.late}</div>
+                            <div class="label">មកយឺត</div>
+                        </div>
+                        <div class="history-stat">
+                            <div class="count text-danger">${day.absent}</div>
+                            <div class="label">អវត្តមាន</div>
+                        </div>
+                    </div>
+                    <button class="btn-view" onclick="viewHistory('${day.date}')">
+                        <i class="bi bi-eye me-2"></i>មើលលម្អិត
+                    </button>
                 </div>
-                <div>
-                    <span class="status-badge px-3 py-1 rounded-pill ${getStatusBadge(s.status)}">
-                        ${getStatusText(s.status)}
-                    </span>
-                </div>
-            </div>
-        `).join('');
-
-        new bootstrap.Modal(document.getElementById('detailModal')).show();
-    }
-
-    function getStatusBadge(s) {
-        if (s === 'P') return 'bg-success text-white';
-        if (s === 'L') return 'bg-warning text-dark';
-        return 'bg-danger text-white';
-    }
-
-    function getStatusText(s) {
-        if (s === 'P') return 'វត្តមាន';
-        if (s === 'L') return 'ច្បាប់';
-        return 'អវត្តមាន';
-    }
-
-    function deleteRecord(id) {
-        Swal.fire({
-            title: 'លុបកំណត់ត្រានេះ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'បាទ, លុប!',
-            cancelButtonText: 'បោះបង់'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let history = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-                history = history.filter(item => item.id !== id);
-                localStorage.setItem('attendanceRecords', JSON.stringify(history));
-                displayAttendanceHistory();
-            }
+            `;
+            grid.append(card);
         });
     }
 
-    function clearAllAttendance() {
+    function viewHistory(date) {
+        var dayRecords = attendanceRecords.filter(r => r.date === date);
+
+        var html = '<div style="max-height: 400px; overflow-y: auto;">';
+        dayRecords.forEach(r => {
+            var statusColor = r.status === 'P' ? 'success' : r.status === 'L' ? 'warning' : 'danger';
+            var statusText = r.status === 'P' ? 'វត្តមាន' : r.status === 'L' ? 'មកយឺត' : 'អវត្តមាន';
+
+            html += `
+                <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                    <div>
+                        <strong>${r.studentName}</strong>
+                        <div class="small text-muted">${r.note || 'គ្មានកំណត់ចំណាំ'}</div>
+                    </div>
+                    <span class="badge bg-${statusColor}">${statusText}</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+
         Swal.fire({
-            title: 'សម្អាតទិន្នន័យទាំងអស់?',
-            icon: 'error',
-            showCancelButton: true,
-            confirmButtonText: 'សម្អាតទាំងអស់',
-            confirmButtonColor: '#ef4444'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('attendanceRecords');
-                displayAttendanceHistory();
-            }
+            title: `វត្តមានប្រចាំថ្ងៃទី ${date}`,
+            html: html,
+            width: 600,
+            confirmButtonColor: '#06b6d4'
         });
     }
 
-    function filterAttendance() { displayAttendanceHistory(); }
+    function applyFilter() {
+        displayAttendance();
+    }
 
-    $(document).ready(function() {
-        displayAttendanceHistory();
-    });
+    function resetFilter() {
+        $('#filterMajor').val('');
+        $('#filterYear').val('');
+        $('#filterShift').val('');
+        $('#searchInput').val('');
+        displayAttendance();
+    }
 </script>

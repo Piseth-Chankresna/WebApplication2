@@ -2,7 +2,7 @@
 using WebApplication2.Data;
 using WebApplication2.Models;
 
-namespace WebApplication2.Service
+namespace WebApplication2.Services  // កែតម្រូវពី Service ទៅ Services
 {
     public class ActivityLogService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
     {
@@ -31,7 +31,11 @@ namespace WebApplication2.Service
             }
             catch (Exception ex)
             {
+                // កត់ត្រាកំហុស (អាចប្រើ ILogger បាន)
                 Console.WriteLine($"Error logging activity: {ex.Message}");
+
+                // បើចង់ប្រើ ILogger អាច Inject បន្ថែម
+                // _logger.LogError(ex, "Error logging activity");
             }
         }
     }
