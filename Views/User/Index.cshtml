@@ -2,44 +2,206 @@
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "User List";
 }
 
 <style>
-    /* Your original working styles */
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #4361ee, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 20px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
     }
 
     .stat-card {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
-    .search-bar {
-        background: var(--card-bg);
-        border-radius: 50px;
-        padding: 8px 20px;
-        margin-bottom: 25px;
-        border: 1px solid var(--border-color);
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        color: #4361ee;
+        margin-bottom: 16px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    [data-theme="dark"] .stat-value {
+        color: white;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    /* Action Bar */
+    .action-bar {
+        background: white;
+        border-radius: 60px;
+        padding: 6px 6px 6px 24px;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
     }
 
-        .search-bar input {
+    [data-theme="dark"] .action-bar {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .search-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .search-wrapper i {
+            color: #94a3b8;
+        }
+
+        .search-wrapper input {
             border: none;
             background: transparent;
-            padding: 12px;
+            padding: 12px 0;
             width: 100%;
             outline: none;
-            color: var(--text-main);
+            color: #1e293b;
         }
+
+    [data-theme="dark"] .search-wrapper input {
+        color: white;
+    }
+
+    .search-wrapper input::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-create, .btn-excel {
+        padding: 12px 28px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        color: white;
+    }
+
+    .btn-excel {
+        background: #10b981;
+        color: white;
+    }
+
+        .btn-create:hover, .btn-excel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(67,97,238,0.3);
+        }
+
+    /* Filter Card */
+    .filter-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .filter-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-card h5 {
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    [data-theme="dark"] .filter-card h5 {
+        color: white;
+    }
+
+    .filter-card .form-label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    [data-theme="dark"] .filter-card .form-label {
+        color: #cbd5e1;
+    }
+
+    .filter-card .form-select,
+    .filter-card .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    [data-theme="dark"] .filter-card .form-select,
+    [data-theme="dark"] .filter-card .form-control {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .table-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
 
     .user-table {
         width: 100%;
@@ -47,201 +209,464 @@
     }
 
         .user-table th {
+            padding: 16px;
             text-align: left;
-            padding: 15px;
-            color: var(--text-muted);
+            color: #64748b;
             font-weight: 600;
             font-size: 0.85rem;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        .user-table td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
+    [data-theme="dark"] .user-table th {
+        border-bottom-color: #334155;
+    }
+
+    .user-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .user-table td {
+        border-bottom-color: #334155;
+        color: white;
+    }
+
+    .user-table tbody tr:hover {
+        background: #f8fafc;
+        cursor: pointer;
+    }
+
+    [data-theme="dark"] .user-table tbody tr:hover {
+        background: #0f172a;
+    }
 
     .user-info {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
     }
 
     .user-avatar {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: bold;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .user-details h4 {
+        font-weight: 700;
+        margin: 0 0 4px;
+        font-size: 1rem;
+    }
+
+    .user-details span {
+        color: #64748b;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     .role-badge {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-        padding: 5px 12px;
-        border-radius: 20px;
+        background: #e0e7ff;
+        color: #4361ee;
+        padding: 6px 14px;
+        border-radius: 30px;
         font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
     }
 
     .status-active {
+        background: #d1fae5;
         color: #10b981;
-        background: rgba(16, 185, 129, 0.1);
-        padding: 5px 12px;
-        border-radius: 20px;
     }
 
     .status-inactive {
+        background: #fee2e2;
         color: #ef4444;
-        background: rgba(239, 68, 68, 0.1);
-        padding: 5px 12px;
-        border-radius: 20px;
     }
 
-    .btn-group {
+    .action-group {
         display: flex;
         gap: 8px;
+        justify-content: flex-end;
     }
 
     .btn-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-        background: transparent;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-    }
-
-        .btn-icon:hover {
-            background: #667eea;
-            border-color: #667eea;
-            color: white;
-        }
-
-    .btn-create {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        padding: 12px 25px;
-        border-radius: 50px;
-        text-decoration: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    [data-theme="dark"] .btn-icon {
+        background: #0f172a;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .btn-icon:hover {
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .filtered-count {
+        background: #4361ee;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            border-radius: 20px;
+            padding: 16px;
+        }
+
+        .search-wrapper {
+            width: 100%;
+        }
     }
 </style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h2><i class="bi bi-people-fill me-2"></i>គ្រប់គ្រងអ្នកប្រើប្រាស់</h2>
+    <p class="text-muted">គ្រប់គ្រងអ្នកប្រើប្រាស់ តួនាទី និងសិទ្ធិប្រើប្រាស់</p>
+</div>
 
 <!-- Stats Cards -->
 <div class="stats-grid">
     <div class="stat-card">
-        <h3 class="fw-bold mb-2">@Model.Count()</h3>
-        <p class="mb-0 opacity-75">អ្នកប្រើប្រាស់សរុប</p>
+        <div class="stat-icon"><i class="bi bi-people"></i></div>
+        <div class="stat-value">@Model.Count()</div>
+        <div class="stat-label">អ្នកប្រើប្រាស់សរុប</div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
-        <h3 class="fw-bold mb-2">@Model.Count(u => u.IsActive)</h3>
-        <p class="mb-0 opacity-75">សកម្ម</p>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-value">@Model.Count(u => u.IsActive)</div>
+        <div class="stat-label">សកម្ម</div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-        <h3 class="fw-bold mb-2">@Model.Count(u => !u.IsActive)</h3>
-        <p class="mb-0 opacity-75">អសកម្ម</p>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+        <div class="stat-value">@Model.Count(u => !u.IsActive)</div>
+        <div class="stat-label">អសកម្ម</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-shield"></i></div>
+        <div class="stat-value">@Model.Select(u => u.Role).Distinct().Count()</div>
+        <div class="stat-label">តួនាទី</div>
     </div>
 </div>
 
-<!-- Search and Create -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="search-bar flex-grow-1 me-3">
-        <i class="bi bi-search me-2" style="color: var(--text-muted);"></i>
-        <input type="text" id="searchInput" placeholder="ស្វែងរកអ្នកប្រើប្រាស់...">
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="search-wrapper">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="ស្វែងរកតាមឈ្មោះ អ៊ីមែល...">
     </div>
-    <a href="/User/Create" class="btn-create ajax-link" data-url="/User/Create">
-        <i class="bi bi-plus-circle"></i> បង្កើតថ្មី
-    </a>
+    <div class="d-flex gap-2">
+        <a href="/User/ExportToExcel" class="btn-excel">
+            <i class="bi bi-file-earmark-excel"></i>
+            <span class="d-none d-md-inline">Excel</span>
+        </a>
+        <a href="/User/Create" class="btn-create ajax-link" data-url="/User/Create">
+            <i class="bi bi-plus-lg"></i>
+            <span class="d-none d-md-inline">ថ្មី</span>
+        </a>
+    </div>
+</div>
+
+<!-- Advanced Filter Card -->
+<div class="filter-card">
+    <div class="d-flex align-items-center mb-3">
+        <i class="bi bi-sliders2 fs-4 me-2" style="color: #4361ee;"></i>
+        <h5 class="fw-bold mb-0">តម្រងកម្រិតខ្ពស់</h5>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fw-bold">តួនាទី</label>
+            <select id="filterRole" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="Admin">Admin</option>
+                <option value="Super Admin">Super Admin</option>
+                <option value="Registrar">Registrar</option>
+                <option value="Accounting">Accounting</option>
+                <option value="User">User</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">ស្ថានភាព</label>
+            <select id="filterStatus" class="form-select">
+                <option value="">ទាំងអស់</option>
+                <option value="active">សកម្ម</option>
+                <option value="inactive">អសកម្ម</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">កាលបរិច្ឆេទចាប់ពី</label>
+            <input type="date" id="filterDateFrom" class="form-control">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-bold">រហូតដល់</label>
+            <input type="date" id="filterDateTo" class="form-control">
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary" onclick="applyAdvancedFilter()" style="border-radius: 12px; padding: 10px 24px;">
+            <i class="bi bi-search me-2"></i>ស្វែងរក
+        </button>
+        <button class="btn btn-outline-secondary" onclick="resetAdvancedFilter()" style="border-radius: 12px; padding: 10px 24px;">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>កំណត់ឡើងវិញ
+        </button>
+    </div>
+</div>
+
+<!-- Filtered Count -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="filtered-count" id="filteredCount">@Model.Count() / @Model.Count()</span>
 </div>
 
 <!-- User Table -->
-<div class="table-responsive">
-    <table class="user-table">
-        <thead>
-            <tr>
-                <th>អ្នកប្រើប្រាស់</th>
-                <th>តួនាទី</th>
-                <th>ស្ថានភាព</th>
-                <th>ថ្ងៃបង្កើត</th>
-                <th>សកម្មភាព</th>
-            </tr>
-        </thead>
-        <tbody id="userTableBody">
-            @foreach (var user in Model)
-            {
-                <tr id="row-@user.Id">
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">@(user.FullName?.Substring(0, 1))</div>
-                            <div>
-                                <div class="fw-bold">@user.FullName</div>
-                                <small class="text-muted">@user.Email</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="role-badge">@user.Role</span></td>
-                    <td>
-                        <span class="@(user.IsActive ? "status-active" : "status-inactive")">
-                            @(user.IsActive ? "សកម្ម" : "អសកម្ម")
-                        </span>
-                    </td>
-                    <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <div class="btn-group">
-                            <a href="/User/Edit/@user.Id" class="btn-icon ajax-link" data-url="/User/Edit/@user.Id" title="កែប្រែ">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a href="/User/ResetPassword/@user.Id" class="btn-icon ajax-link" data-url="/User/ResetPassword/@user.Id" title="ប្តូរលេខសម្ងាត់">
-                                <i class="bi bi-key"></i>
-                            </a>
-                            <button class="btn-icon" onclick="deleteUser(@user.Id, '@user.FullName')" title="លុប">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>អ្នកប្រើប្រាស់</th>
+                    <th>តួនាទី</th>
+                    <th>ស្ថានភាព</th>
+                    <th>ថ្ងៃបង្កើត</th>
+                    <th class="text-end">សកម្មភាព</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody id="userTableBody">
+                @foreach (var user in Model)
+                {
+                    <tr id="row-@user.Id" onclick="viewUser(@user.Id, '@user.FullName', '@user.Email', '@user.Role', @user.IsActive.ToString().ToLower())">
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    @(user.FullName?.Length > 0 ? user.FullName.Substring(0, 1).ToUpper() : "?")
+                                </div>
+                                <div class="user-details">
+                                    <h4>@user.FullName</h4>
+                                    <span><i class="bi bi-envelope"></i> @user.Email</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge"><i class="bi bi-shield me-1"></i>@user.Role</span>
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="status-badge status-active"><i class="bi bi-check-circle-fill me-1"></i>សកម្ម</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-inactive"><i class="bi bi-x-circle-fill me-1"></i>អសកម្ម</span>
+                            }
+                        </td>
+                        <td>
+                            <span><i class="bi bi-calendar3 me-2"></i>@user.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="action-group" onclick="event.stopPropagation()">
+                                <a href="/User/Profile/@user.Id" class="btn-icon" title="ប្រវត្តិរូប">
+                                    <i class="bi bi-person"></i>
+                                </a>
+                                <a href="/User/Edit/@user.Id" class="btn-icon ajax-link" data-url="/User/Edit/@user.Id" title="កែប្រែ">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/User/ResetPassword" class="btn-icon" title="ប្តូរពាក្យសម្ងាត់">
+                                    <i class="bi bi-key"></i>
+                                </a>
+                                <button class="btn-icon" onclick="deleteUser(@user.Id, '@user.FullName')" title="លុប">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    // Search
+    // ស្វែងរកធម្មតា
     $('#searchInput').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
-        $('#userTableBody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
+        applyAdvancedFilter();
     });
 
-    // Delete
+    // តម្រងកម្រិតខ្ពស់
+    function applyAdvancedFilter() {
+        var searchText = $('#searchInput').val().toLowerCase();
+        var role = $('#filterRole').val();
+        var status = $('#filterStatus').val();
+        var dateFrom = $('#filterDateFrom').val();
+        var dateTo = $('#filterDateTo').val();
+
+        var visibleCount = 0;
+        var totalCount = $('#userTableBody tr').length;
+
+        $('#userTableBody tr').each(function() {
+            var row = $(this);
+            var text = row.text().toLowerCase();
+            var rowRole = row.find('.role-badge').text();
+            var rowStatus = row.find('.status-badge').text().includes('សកម្ម') ? 'active' : 'inactive';
+            var rowDate = row.find('td:eq(3)').text().trim(); // កាលបរិច្ឆេទ
+
+            var matchesSearch = searchText === '' || text.indexOf(searchText) > -1;
+            var matchesRole = !role || rowRole.includes(role);
+            var matchesStatus = !status || rowStatus === status;
+            var matchesDate = true;
+
+            // ពិនិត្យកាលបរិច្ឆេទ (បើមាន)
+            if (dateFrom && rowDate) {
+                matchesDate = rowDate >= dateFrom;
+            }
+            if (dateTo && rowDate && matchesDate) {
+                matchesDate = rowDate <= dateTo;
+            }
+
+            if (matchesSearch && matchesRole && matchesStatus && matchesDate) {
+                row.show();
+                visibleCount++;
+            } else {
+                row.hide();
+            }
+        });
+
+        $('#filteredCount').text(visibleCount + ' / ' + totalCount);
+    }
+
+    function resetAdvancedFilter() {
+        $('#searchInput').val('');
+        $('#filterRole').val('');
+        $('#filterStatus').val('');
+        $('#filterDateFrom').val('');
+        $('#filterDateTo').val('');
+        $('#userTableBody tr').show();
+        $('#filteredCount').text($('#userTableBody tr').length + ' / ' + $('#userTableBody tr').length);
+    }
+
+    // មើលព័ត៌មានអ្នកប្រើប្រាស់
+    function viewUser(id, name, email, role, isActive) {
+        Swal.fire({
+            title: 'ព័ត៌មានអ្នកប្រើប្រាស់',
+            html: `
+                <div style="text-align: center;">
+                    <div style="width:80px;height:80px;background:linear-gradient(135deg,#4361ee,#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:white;font-size:32px;font-weight:bold;">
+                        ${name.substring(0,1).toUpperCase()}
+                    </div>
+                    <h4 style="font-weight:700;margin-bottom:5px;">${name}</h4>
+                    <p style="color:#666;margin-bottom:20px;">${email}</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div style="background:#f8f9ff;padding:15px;border-radius:15px;">
+                            <small style="color:#666;">តួនាទី</small>
+                            <div style="font-weight:700;color:#4361ee;">${role}</div>
+                        </div>
+                        <div style="background:#f8f9ff;padding:15px;border-radius:15px;">
+                            <small style="color:#666;">ស្ថានភាព</small>
+                            <div style="font-weight:700;color:${isActive ? '#10b981' : '#ef4444'};">
+                                ${isActive ? 'សកម្ម' : 'អសកម្ម'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            showCloseButton: true,
+            showConfirmButton: false,
+            background: 'white',
+            customClass: { popup: 'rounded-4' }
+        });
+    }
+
+    // លុបអ្នកប្រើប្រាស់
     function deleteUser(id, name) {
         Swal.fire({
             title: 'លុបអ្នកប្រើប្រាស់?',
-            text: `លុប ${name} មែនទេ?`,
+            text: `តើអ្នកពិតជាចង់លុប ${name} មែនទេ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            confirmButtonText: 'លុប',
-            cancelButtonText: 'បោះបង់'
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'បាទ/ចាស លុប',
+            cancelButtonText: 'បោះបង់',
+            reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                $.post('/User/Delete/' + id, function(res) {
-                    if (res.success) {
-                        $('#row-' + id).remove();
-                        Swal.fire('ជោគជ័យ', res.message, 'success');
+                $.ajax({
+                    url: '/User/Delete',
+                    type: 'POST',
+                    data: { id: id },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#row-' + id).fadeOut(400, function() {
+                                $(this).remove();
+                                applyAdvancedFilter();
+                            });
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ជោគជ័យ!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'កំហុស',
+                                text: response.message
+                            });
+                        }
                     }
                 });
             }

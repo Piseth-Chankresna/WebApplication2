@@ -448,3 +448,11 @@ D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.pdb
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.genruntimeconfig.cache
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\ref\WebApplication2.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\ClosedXML.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\ClosedXML.Parser.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\ExcelNumberFormat.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\RBush.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\SixLabors.Fonts.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\System.IO.Packaging.dll

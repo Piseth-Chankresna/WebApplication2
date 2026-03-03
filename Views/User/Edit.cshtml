@@ -6,58 +6,136 @@
 }
 
 <style>
-    .form-card {
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 30px;
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #4361ee, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+    .edit-container {
         max-width: 600px;
         margin: 0 auto;
     }
 
+    .edit-card {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .edit-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: white;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
 
     .form-label {
-        font-weight: 600;
-        color: var(--text-main);
-        margin-bottom: 8px;
         display: block;
-    }
-
-    .form-control, .form-select {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid var(--border-color);
-        border-radius: 12px;
-        background: var(--card-bg);
-        color: var(--text-main);
-    }
-
-    .btn-save {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 12px;
         font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
     }
 
-    .btn-cancel {
-        background: transparent;
-        color: var(--text-muted);
-        padding: 12px 30px;
-        border: 2px solid var(--border-color);
-        border-radius: 12px;
-        text-decoration: none;
-        margin-right: 10px;
+    [data-theme="dark"] .form-label {
+        color: #cbd5e1;
+    }
+
+    .form-label i {
+        margin-right: 8px;
+        color: #4361ee;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .input-wrapper input,
+        .input-wrapper select {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: white;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+
+    [data-theme="dark"] .input-wrapper input,
+    [data-theme="dark"] .input-wrapper select {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+        outline: none;
+        border-color: #4361ee;
+        box-shadow: 0 0 0 4px #e0e7ff;
+    }
+
+    .switch-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #f1f5f9;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .switch-wrapper {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    .switch-wrapper span {
+        font-weight: 600;
+        color: #475569;
+    }
+
+    [data-theme="dark"] .switch-wrapper span {
+        color: #cbd5e1;
     }
 
     .switch {
         position: relative;
         display: inline-block;
-        width: 50px;
-        height: 24px;
+        width: 56px;
+        height: 28px;
     }
 
         .switch input {
@@ -73,16 +151,16 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: #ccc;
+        background-color: #cbd5e1;
         transition: .3s;
-        border-radius: 24px;
+        border-radius: 28px;
     }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 22px;
+            width: 22px;
             left: 3px;
             bottom: 3px;
             background-color: white;
@@ -91,56 +169,158 @@
         }
 
     input:checked + .slider {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
     }
 
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(28px);
         }
+
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(67,97,238,0.3);
+        }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .btn-secondary {
+        background: #0f172a;
+        color: #cbd5e1;
+        border-color: #334155;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .alert {
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #10b981;
+        border: 1px solid #a7f3d0;
+    }
 </style>
 
-<div class="form-card">
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="Password" />
-        <input type="hidden" asp-for="CreatedAt" />
+<div class="page-header">
+    <h2><i class="bi bi-pencil-square me-2"></i>កែប្រែព័ត៌មានអ្នកប្រើប្រាស់</h2>
+    <p class="text-muted">កែប្រែព័ត៌មានរបស់ @Model.FullName</p>
+</div>
 
-        <div class="form-group">
-            <label class="form-label">ឈ្មោះពេញ</label>
-            <input asp-for="FullName" class="form-control" required>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        @TempData["Error"]
+    </div>
+}
+
+<div class="edit-container">
+    <div class="edit-card">
+        <div class="user-avatar">
+            @(Model.FullName?.Length > 0 ? Model.FullName.Substring(0, 1).ToUpper() : "?")
         </div>
 
-        <div class="form-group">
-            <label class="form-label">អ៊ីមែល</label>
-            <input asp-for="Email" type="email" class="form-control" required>
-        </div>
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Password" />
+            <input type="hidden" asp-for="CreatedAt" />
 
-        <div class="form-group">
-            <label class="form-label">តួនាទី</label>
-            <select asp-for="Role" class="form-select" required>
-                <option value="Admin">Admin</option>
-                <option value="Super Admin">Super Admin</option>
-                <option value="Registrar">Registrar</option>
-                <option value="Accounting">Accounting</option>
-                <option value="User">User</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">ស្ថានភាព</label>
-            <div class="d-flex align-items-center">
-                <label class="switch me-2">
-                    <input asp-for="IsActive" type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <span>@(Model.IsActive ? "សកម្ម" : "អសកម្ម")</span>
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-person"></i> ឈ្មោះពេញ</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-person"></i>
+                    <input asp-for="FullName" class="form-control" required />
+                </div>
             </div>
-        </div>
 
-        <div class="text-end mt-4">
-            <a href="/User/Index" class="btn-cancel ajax-link" data-url="/User/Index">បោះបង់</a>
-            <button type="submit" class="btn-save">រក្សាទុក</button>
-        </div>
-    </form>
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-envelope"></i> អ៊ីមែល</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-envelope"></i>
+                    <input asp-for="Email" type="email" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-shield"></i> តួនាទី</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-shield"></i>
+                    <select asp-for="Role" class="form-control" required>
+                        <option value="Admin">Admin</option>
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Registrar">Registrar</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="User">User</option>
+                    </select>
+                    <i class="bi bi-chevron-down" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none;"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-toggle-on"></i> ស្ថានភាព</label>
+                <div class="switch-wrapper">
+                    <span><i class="bi bi-check-circle me-2"></i>គណនីសកម្ម</span>
+                    <label class="switch">
+                        <input asp-for="IsActive" type="checkbox" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/User/Index" class="btn btn-secondary ajax-link" data-url="/User/Index">
+                    <i class="bi bi-x-lg"></i> បោះបង់
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> រក្សាទុក
+                </button>
+            </div>
+        </form>
+    </div>
 </div>

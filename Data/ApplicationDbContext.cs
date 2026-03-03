@@ -12,6 +12,7 @@ namespace WebApplication2.Data
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; } // បន្ថែមនេះ
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
+using WebApplication2.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
+
+// បន្ថែម HttpContextAccessor និង ActivityLogService
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ActivityLogService>();
 
 var app = builder.Build();
 

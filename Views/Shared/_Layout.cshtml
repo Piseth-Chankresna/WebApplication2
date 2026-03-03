@@ -4,372 +4,774 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HR University - @ViewData["Title"]</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root {
-            --sidebar-width: 260px;
-            --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            --accent-color: #5e5ce6;
-            --body-bg: #f4f7fe;
-            --sidebar-bg: #ffffff;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #6c757d;
-            --border-color: rgba(0,0,0,0.05);
-            --nav-hover: #f0f3ff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        [data-bs-theme="dark"] {
-            --body-bg: #0b0e14;
-            --sidebar-bg: #151921;
-            --card-bg: #151921;
-            --text-main: #e1e1e1;
-            --text-muted: #a0aec0;
-            --border-color: rgba(255,255,255,0.1);
-            --nav-hover: #1c222d;
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --primary-soft: #e0e7ff;
+            --secondary: #8b5cf6;
+            --secondary-light: #a78bfa;
+            --secondary-soft: #ede9fe;
+            --success: #10b981;
+            --success-soft: #d1fae5;
+            --warning: #f59e0b;
+            --warning-soft: #fef3c7;
+            --danger: #ef4444;
+            --danger-soft: #fee2e2;
+            --info: #3b82f6;
+            --info-soft: #dbeafe;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --border-radius: 24px;
+            --card-radius: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+            --shadow-colored: 0 10px 40px -12px var(--primary);
+        }
+
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --primary-soft: #1e1b4b;
+            --secondary: #a78bfa;
+            --secondary-light: #c4b5fd;
+            --secondary-soft: #2e1065;
+            --success: #34d399;
+            --success-soft: #064e3b;
+            --warning: #fbbf24;
+            --warning-soft: #78350f;
+            --danger: #f87171;
+            --danger-soft: #7f1d1d;
+            --info: #60a5fa;
+            --info-soft: #1e3a8a;
+            --gray-50: #0f172a;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #64748b;
+            --gray-500: #94a3b8;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+            --gray-900: #f8fafc;
+            --light: #0f172a;
+            --dark: #f8fafc;
         }
 
         body {
-            background-color: var(--body-bg);
-            font-family: 'Inter', 'Kantumruy Pro', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            color: var(--text-main);
-            transition: background-color 0.3s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+            position: relative;
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
+        /* Animated Background */
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            z-index: 1000;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+            .animated-bg span {
+                position: absolute;
+                display: block;
+                width: 20px;
+                height: 20px;
+                background: rgba(255,255,255,0.1);
+                animation: animate 25s linear infinite;
+                bottom: -150px;
+                border-radius: 50%;
+            }
+
+        @@keyframes animate {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: var(--sidebar-width);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            box-shadow: var(--shadow-xl);
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        [data-theme="dark"] .sidebar {
+            background: rgba(15,23,42,0.95);
+            border-color: rgba(255,255,255,0.05);
         }
 
         .sidebar-header {
-            padding: 20px 15px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-            .sidebar-header img {
-                width: 50px;
-                height: auto;
-                margin-bottom: 8px;
-            }
-
-            .sidebar-header h5 {
-                font-size: 15px;
-                color: #0d6efd;
-                font-weight: 800;
-                margin: 0;
-            }
-
-        .sidebar-scroll-area {
-            flex: 1;
-            overflow-y: auto;
-            padding-top: 10px;
-        }
-
-        .sidebar .nav-link {
-            color: var(--text-muted);
-            padding: 10px 20px;
-            border-radius: 12px;
-            margin: 4px 15px;
-            transition: all 0.25s ease;
-            text-decoration: none;
             display: flex;
             align-items: center;
-            font-size: 13.5px;
-            font-weight: 500;
-            cursor: pointer;
+            gap: 12px;
+            padding: 0 12px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-            .sidebar .nav-link:hover {
-                background-color: var(--nav-hover);
-                color: var(--accent-color);
-                transform: translateX(5px);
+        [data-theme="dark"] .sidebar-header {
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+
+        .sidebar-header img {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            object-fit: cover;
+        }
+
+        .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+            .sidebar-menu::-webkit-scrollbar {
+                width: 4px;
             }
 
-            .sidebar .nav-link.active {
-                background-color: var(--nav-hover);
-                color: var(--accent-color);
-                font-weight: 700;
+            .sidebar-menu::-webkit-scrollbar-thumb {
+                background: var(--gray-300);
+                border-radius: 4px;
             }
 
-        .arrow-icon {
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-500);
+            font-weight: 700;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--gray-700);
+            border-radius: 18px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .nav-link {
+            color: var(--gray-300);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary-soft), transparent);
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 20px -10px var(--primary);
+        }
+
+        .nav-link i {
+            font-size: 1.3rem;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-link .arrow {
             margin-left: auto;
             transition: transform 0.3s ease;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
 
-        .nav-link:not(.collapsed) .arrow-icon {
+        .nav-link[aria-expanded="true"] .arrow {
             transform: rotate(90deg);
         }
 
         .submenu {
             list-style: none;
-            padding-left: 0;
-            margin: 5px 15px 10px 40px;
-            border-left: 1px dashed var(--border-color);
+            padding-left: 44px;
+            margin-top: 4px;
         }
 
             .submenu .nav-link {
-                padding: 7px 15px;
-                font-size: 12.5px;
-                margin: 2px 0;
+                padding: 10px 12px;
+                font-size: 0.85rem;
             }
 
-        .main-wrapper {
-            margin-left: var(--sidebar-width);
+        /* Main Content */
+        .main-content {
+            margin-left: calc(var(--sidebar-width) + 40px);
+            padding: 20px 40px 20px 20px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .top-navbar {
-            height: 70px;
+        /* Top Bar */
+        .top-bar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 12px 24px;
+            margin-bottom: 30px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding: 0 40px;
-            background: var(--primary-gradient);
-            gap: 15px;
+            justify-content: space-between;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .dark-mode-toggle {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+        [data-theme="dark"] .top-bar {
+            background: rgba(15,23,42,0.95);
+        }
+
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .page-title p {
+            color: var(--gray-500);
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+            .search-box i {
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--gray-400);
+                font-size: 1rem;
+            }
+
+            .search-box input {
+                width: 100%;
+                padding: 12px 16px 12px 44px;
+                border: 1px solid var(--gray-200);
+                border-radius: 30px;
+                background: white;
+                color: var(--gray-900);
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+            }
+
+        [data-theme="dark"] .search-box input {
+            background: var(--gray-800);
+            border-color: var(--gray-700);
+            color: white;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-700);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            color: white;
-            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
-        .search-box {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            padding: 8px 18px;
+        [data-theme="dark"] .theme-toggle {
+            background: var(--gray-800);
+            border-color: var(--gray-700);
+            color: var(--gray-300);
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .profile-dropdown {
             display: flex;
             align-items: center;
-            width: 280px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            gap: 10px;
+            padding: 6px 6px 6px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-            .search-box input {
-                background: transparent;
-                border: none;
-                color: white;
-                margin-left: 10px;
-                outline: none;
-                width: 100%;
+        [data-theme="dark"] .profile-dropdown {
+            background: var(--gray-800);
+            border-color: var(--gray-700);
+        }
+
+        .profile-dropdown:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .profile-dropdown img {
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            object-fit: cover;
+        }
+
+        .profile-dropdown span {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        [data-theme="dark"] .profile-dropdown span {
+            color: white;
+        }
+
+        /* Content Area */
+        #display-area {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-                .search-box input::placeholder {
-                    color: rgba(255, 255, 255, 0.8);
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .stat-card {
+            background: var(--gray-800);
+            border-color: var(--gray-700);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-soft), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Responsive */
+        @@media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                left: 10px;
+            }
+
+                .sidebar.show {
+                    transform: translateX(0);
                 }
 
-        .header-gradient {
-            background: var(--primary-gradient);
-            height: 120px;
-            padding: 30px 40px 0;
-            color: white;
-            width: 100%;
-        }
-
-        .content-body {
-            margin-top: -40px;
-            padding: 0 40px 40px;
-            flex: 1;
-        }
-
-        #display-area {
-            background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
-            padding: 30px;
-            min-height: calc(100vh - 260px);
-            transition: background 0.3s ease;
-        }
-
-        .login-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-        }
-
-            .login-profile img {
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                border: 2px solid rgba(255,255,255,0.6);
-                object-fit: cover;
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
             }
+
+            .search-box {
+                width: 200px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-box {
+                flex: 1;
+            }
+        }
     </style>
 </head>
-<body data-bs-theme="light">
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg" id="animatedBg"></div>
+
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="/images/logo.png" alt="Logo" />
-            <h5>HRU UNIVERSITY</h5>
+            <img src="/images/logo.png" alt="HRU" onerror="this.src='https://ui-avatars.com/api/?name=HRU&background=6366f1&color=fff&size=100'">
+            <h5>HR UNIVERSITY</h5>
         </div>
-        <div class="sidebar-scroll-area">
-            <nav class="nav flex-column mt-2">
-                <a class="nav-link ajax-link active" data-url="/Home/Index">
-                    <i class="bi bi-house-door-fill me-3"></i> HOME
-                </a>
-            </nav>
 
-            <nav class="nav flex-column">
-                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#userMenu">
-                    <i class="bi bi-shield-lock-fill me-3"></i> User Management
-                    <i class="bi bi-chevron-right arrow-icon"></i>
-                </a>
-                <div class="collapse" id="userMenu">
-                    <ul class="submenu nav flex-column">
-                        <li><a class="nav-link ajax-link" data-url="/User/Create">1.1. Create User</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/User/Roles">1.2. Role & Right</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/User/Index">1.3. User List</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/User/ResetPassword/1">1.4. Reset Password</a></li>
-                    </ul>
-                </div>
-            </nav>
+        <div class="sidebar-menu">
+            <!-- Main -->
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link ajax-link" data-url="/Home/Index">
+                        <i class="bi bi-house-door"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </nav>
+            </div>
 
-            <nav class="nav flex-column">
-                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#studentMenu">
-                    <i class="bi bi-people-fill me-3"></i> Students
-                    <i class="bi bi-chevron-right arrow-icon"></i>
-                </a>
-                <div class="collapse" id="studentMenu">
-                    <ul class="submenu nav flex-column">
-                        <li><a class="nav-link ajax-link" data-url="/Student/Create">Create Student</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/StudentCenter">Student Center</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/Payment">Payment</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/Reports">Reports</a></li>
-                    </ul>
-                </div>
-            </nav>
+            <!-- User Management -->
+            <div class="nav-section">
+                <div class="nav-section-title">USER</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#userMenu" role="button">
+                        <i class="bi bi-people"></i>
+                        <span>User Management</span>
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+                    <div class="collapse" id="userMenu">
+                        <ul class="submenu">
+                            <li><a class="nav-link ajax-link" data-url="/User/Create">✨ Create User</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/User/Roles">⚡ Role & Permissions</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/User/Index">👥 User List</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/User/ResetPassword/1">🔐 Reset Password</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
 
-            <nav class="nav flex-column">
-                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#attendanceMenu">
-                    <i class="bi bi-calendar2-check-fill me-3"></i> Attendance
-                    <i class="bi bi-chevron-right arrow-icon"></i>
-                </a>
-                <div class="collapse" id="attendanceMenu">
-                    <ul class="submenu nav flex-column">
-                        <li><a class="nav-link ajax-link" data-url="/Student/CheckAttendance">3.1. Check Attendance</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/AttendanceList">3.2. Attendance List</a></li>
-                    </ul>
-                </div>
-            </nav>
+            <!-- Students -->
+            <div class="nav-section">
+                <div class="nav-section-title">ACADEMIC</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#studentMenu">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Students</span>
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+                    <div class="collapse" id="studentMenu">
+                        <ul class="submenu">
+                            <li><a class="nav-link ajax-link" data-url="/Student/Create">📝 Add Student</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/Student/Index">📋 Student List</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/Student/Classes">🏫 Classes</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/Student/Grades">📊 Grades</a></li>
+                        </ul>
+                    </div>
 
-            <nav class="nav flex-column">
-                <a class="nav-link ajax-link" data-url="/SystemSettings/Index"><i class="bi bi-gear-fill me-3"></i> System Settings</a>
-                <a class="nav-link ajax-link" data-url="/SystemSettings/ActivityLogs"><i class="bi bi-file-earmark-text-fill me-3"></i> Activity Logs</a>
-            </nav>
+                    <a class="nav-link" data-bs-toggle="collapse" href="#attendanceMenu">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Attendance</span>
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+                    <div class="collapse" id="attendanceMenu">
+                        <ul class="submenu">
+                            <li><a class="nav-link ajax-link" data-url="/Student/CheckAttendance">✅ Check Attendance</a></li>
+                            <li><a class="nav-link ajax-link" data-url="/Student/AttendanceList">📋 Attendance List</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Finance -->
+            <div class="nav-section">
+                <div class="nav-section-title">FINANCE</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link ajax-link" data-url="/Student/Payment">
+                        <i class="bi bi-credit-card"></i>
+                        <span>Payments</span>
+                    </a>
+                    <a class="nav-link ajax-link" data-url="/Student/Scholarship">
+                        <i class="bi bi-gift"></i>
+                        <span>Scholarships</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Reports -->
+            <div class="nav-section">
+                <div class="nav-section-title">ANALYTICS</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link ajax-link" data-url="/Student/Reports">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Reports</span>
+                    </a>
+                    <a class="nav-link ajax-link" data-url="/Student/StudentCenter">
+                        <i class="bi bi-layout-text-window"></i>
+                        <span>Student Center</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- System -->
+            <div class="nav-section">
+                <div class="nav-section-title">SYSTEM</div>
+                <nav class="nav flex-column">
+                    <a class="nav-link ajax-link" data-url="/SystemSettings/Index">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a class="nav-link ajax-link" data-url="/SystemSettings/ActivityLogs">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Activity Logs</span>
+                    </a>
+                </nav>
+            </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="main-wrapper">
-        <!-- Top Navbar -->
-        <div class="top-navbar">
-            <div class="search-box">
-                <i class="bi bi-search text-white"></i>
-                <input type="text" placeholder="ស្វែងរក..." />
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <h1 id="page-title">Dashboard</h1>
+                <p id="page-subtitle">Welcome back, Admin</p>
             </div>
-            <div class="dark-mode-toggle" id="btnThemeToggle">
-                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+            <div class="top-actions">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Search...">
+                </div>
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i>
+                </div>
+                <div class="dropdown">
+                    <div class="profile-dropdown" data-bs-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff&size=100" alt="Profile">
+                        <span>Admin</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="dropdown">
-                <a href="#" class="login-profile dropdown-toggle" data-bs-toggle="dropdown">
-                    <img id="navbarProfileImg" src="https://ui-avatars.com/api/?name=Admin&background=random" alt="User">
-                    <span class="fw-bold" id="navUsername">Admin</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li><a class="dropdown-item" href="#" id="btnLogout">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Header Gradient -->
-        <div class="header-gradient">
-            <h2 class="fw-bold m-0" id="page-title">Home Overview</h2>
-            <p class="opacity-75 small">Welcome to HR University Management System</p>
         </div>
 
         <!-- Content Area -->
-        <div class="content-body">
-            <div id="display-area">
-                @RenderBody()
-            </div>
+        <div id="display-area">
+            @RenderBody()
         </div>
     </div>
 
     <script>
-        $(document).ready(function() {
-            // Theme Toggle
-            $('#btnThemeToggle').click(function() {
-                let theme = $('body').attr('data-bs-theme');
-                if (theme === 'dark') {
-                    $('body').attr('data-bs-theme', 'light');
-                    $('#themeIcon').removeClass('bi-sun-fill').addClass('bi-moon-stars-fill');
-                } else {
-                    $('body').attr('data-bs-theme', 'dark');
-                    $('#themeIcon').removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
+        // Create animated background particles
+        function createParticles() {
+            const bg = document.getElementById('animatedBg');
+            for (let i = 0; i < 50; i++) {
+                const span = document.createElement('span');
+                const size = Math.random() * 30 + 10;
+                span.style.width = size + 'px';
+                span.style.height = size + 'px';
+                span.style.left = Math.random() * 100 + '%';
+                span.style.animationDuration = Math.random() * 20 + 10 + 's';
+                span.style.animationDelay = Math.random() * 5 + 's';
+                bg.appendChild(span);
+            }
+        }
+        createParticles();
+
+        // Theme Toggle
+        $('#themeToggle').click(function() {
+            let theme = $('body').attr('data-theme');
+            if (theme === 'dark') {
+                $('body').removeAttr('data-theme');
+                $('#themeIcon').removeClass('bi-sun').addClass('bi-moon-stars');
+            } else {
+                $('body').attr('data-theme', 'dark');
+                $('#themeIcon').removeClass('bi-moon-stars').addClass('bi-sun');
+            }
+        });
+
+        // AJAX Navigation
+        $(document).on('click', '.ajax-link', function(e) {
+            e.preventDefault();
+            let url = $(this).data('url');
+            let text = $(this).find('span').text() || $(this).text().trim();
+
+            $('.ajax-link').removeClass('active');
+            $(this).addClass('active');
+            $('#page-title').text(text);
+
+            $('#display-area').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <p class="mt-3 text-muted">Loading...</p>
+                </div>
+            `);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(data) {
+                    $('#display-area').html(data);
+                    window.history.pushState({}, '', url);
+                },
+                error: function() {
+                    $('#display-area').html(`
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Error loading content
+                        </div>
+                    `);
                 }
             });
-
-            // AJAX Navigation
-            $(document).on("click", ".ajax-link", function(e) {
-                e.preventDefault();
-                var url = $(this).attr("data-url");
-                var title = $(this).text().trim();
-
-                $(".ajax-link").removeClass("active");
-                $(this).addClass("active");
-                $("#page-title").text(title);
-
-                $("#display-area").html('<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">កំពុងទាញយកទិន្នន័យ...</p></div>');
-
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(res) {
-                        $("#display-area").html(res);
-                        window.history.pushState(null, '', url);
-                    },
-                    error: function() {
-                        $("#display-area").html('<div class="alert alert-danger">Error loading page</div>');
-                    }
-                });
-            });
-
-            // Logout
-            $('#btnLogout').click(function() {
-                window.location.href = '/Account/Login';
-            });
         });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            $('#sidebar').toggleClass('show');
+        }
+
+        // Global search
+        $('#globalSearch').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            // Add your search logic here
+        });
+
+        // Logout
+        $('#logoutBtn').click(function(e) {
+            e.preventDefault();
+            window.location.href = '/Account/Login';
+        });
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
     </script>
 </body>
 </html>

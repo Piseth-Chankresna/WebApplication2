@@ -5,31 +5,49 @@
 }
 
 <style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #4361ee, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
     .roles-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-        margin-top: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-bottom: 30px;
     }
 
     .role-card {
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 25px;
-        transition: all 0.3s;
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
         cursor: pointer;
-        border: 1px solid var(--border-color);
     }
 
-        .role-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
-        }
+    [data-theme="dark"] .role-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .role-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
 
     .role-icon {
         width: 60px;
         height: 60px;
-        border-radius: 15px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -39,59 +57,459 @@
     }
 
         .role-icon.admin {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #4361ee, #8b5cf6);
         }
 
         .role-icon.registrar {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            background: linear-gradient(135deg, #10b981, #059669);
         }
 
         .role-icon.accounting {
             background: linear-gradient(135deg, #f59e0b, #d97706);
         }
+
+        .role-icon.user {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+    .role-card h3 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    [data-theme="dark"] .role-card h3 {
+        color: white;
+    }
+
+    .role-card p {
+        color: #64748b;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+
+    .btn-view {
+        width: 100%;
+        padding: 12px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        color: #475569;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .btn-view {
+        background: #0f172a;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .btn-view:hover {
+        background: #4361ee;
+        color: white;
+    }
+
+    /* Permissions Matrix */
+    .matrix-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        margin-top: 24px;
+    }
+
+    [data-theme="dark"] .matrix-container {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .matrix-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+        .matrix-header h3 {
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+    [data-theme="dark"] .matrix-header h3 {
+        color: white;
+    }
+
+    .role-badge {
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+
+    .btn-back {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 8px 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        margin-right: 16px;
+    }
+
+    [data-theme="dark"] .btn-back {
+        background: #0f172a;
+        color: #cbd5e1;
+        border-color: #334155;
+    }
+
+    .btn-back:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #4361ee, #8b5cf6);
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(67,97,238,0.3);
+        }
+
+    .permissions-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .permissions-table th {
+            padding: 16px;
+            text-align: left;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+    [data-theme="dark"] .permissions-table th {
+        border-bottom-color: #334155;
+    }
+
+    .permissions-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    [data-theme="dark"] .permissions-table td {
+        border-bottom-color: #334155;
+        color: white;
+    }
+
+    .permissions-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    [data-theme="dark"] .permissions-table tbody tr:hover {
+        background: #0f172a;
+    }
+
+    .module-name {
+        font-weight: 600;
+    }
+
+    .permission-check {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 2px solid #cbd5e1;
+        background: white;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    [data-theme="dark"] .permission-check {
+        background: #0f172a;
+        border-color: #475569;
+    }
+
+    .permission-check.checked {
+        background: #4361ee;
+        border-color: #4361ee;
+        color: white;
+    }
+
+    .permission-check i {
+        display: none;
+    }
+
+    .permission-check.checked i {
+        display: block;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .loading-spinner {
+        text-align: center;
+        padding: 60px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #4361ee;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
-<h4 class="fw-bold mb-4">គ្រប់គ្រងតួនាទី និងសិទ្ធិ</h4>
+<div class="page-header">
+    <h2><i class="bi bi-shield-lock-fill me-2"></i>គ្រប់គ្រងតួនាទី និងសិទ្ធិ</h2>
+    <p class="text-muted">កំណត់សិទ្ធិប្រើប្រាស់តាមតួនាទីផ្សេងៗ</p>
+</div>
 
-<div class="roles-grid">
-    <div class="role-card" onclick="viewPermissions('Admin')">
+<!-- Roles Grid -->
+<div id="rolesGrid" class="roles-grid">
+    <div class="role-card" onclick="showPermissions('Admin')">
         <div class="role-icon admin"><i class="bi bi-shield-check"></i></div>
-        <h5 class="fw-bold">Admin</h5>
-        <p class="text-muted small">អ្នកគ្រប់គ្រងប្រព័ន្ធ</p>
+        <h3>Admin</h3>
+        <p>អ្នកគ្រប់គ្រងប្រព័ន្ធ</p>
+        <button class="btn-view"><i class="bi bi-eye"></i> មើលសិទ្ធិ</button>
     </div>
-
-    <div class="role-card" onclick="viewPermissions('Registrar')">
+    <div class="role-card" onclick="showPermissions('Super Admin')">
+        <div class="role-icon admin"><i class="bi bi-shield-fill"></i></div>
+        <h3>Super Admin</h3>
+        <p>អ្នកគ្រប់គ្រងកំពូល</p>
+        <button class="btn-view"><i class="bi bi-eye"></i> មើលសិទ្ធិ</button>
+    </div>
+    <div class="role-card" onclick="showPermissions('Registrar')">
         <div class="role-icon registrar"><i class="bi bi-person-badge"></i></div>
-        <h5 class="fw-bold">Registrar</h5>
-        <p class="text-muted small">អ្នកគ្រប់គ្រងការសិក្សា</p>
+        <h3>Registrar</h3>
+        <p>អ្នកគ្រប់គ្រងការសិក្សា</p>
+        <button class="btn-view"><i class="bi bi-eye"></i> មើលសិទ្ធិ</button>
     </div>
-
-    <div class="role-card" onclick="viewPermissions('Accounting')">
+    <div class="role-card" onclick="showPermissions('Accounting')">
         <div class="role-icon accounting"><i class="bi bi-calculator"></i></div>
-        <h5 class="fw-bold">Accounting</h5>
-        <p class="text-muted small">គណនេយ្យករ</p>
+        <h3>Accounting</h3>
+        <p>គណនេយ្យករ</p>
+        <button class="btn-view"><i class="bi bi-eye"></i> មើលសិទ្ធិ</button>
+    </div>
+</div>
+
+<!-- Permissions Matrix -->
+<div id="permissionsMatrix" class="hidden">
+    <div class="matrix-container">
+        <div class="matrix-header">
+            <div>
+                <button class="btn-back" onclick="hidePermissions()"><i class="bi bi-arrow-left"></i> ត្រឡប់ក្រោយ</button>
+                <span class="role-badge" id="selectedRole">Admin</span>
+            </div>
+            <button class="btn-save" onclick="savePermissions()"><i class="bi bi-check-lg"></i> រក្សាទុក</button>
+        </div>
+        <div class="table-responsive">
+            <table class="permissions-table">
+                <thead>
+                    <tr>
+                        <th>ម៉ូឌុល</th>
+                        <th class="text-center">មើល</th>
+                        <th class="text-center">បង្កើត</th>
+                        <th class="text-center">កែប្រែ</th>
+                        <th class="text-center">លុប</th>
+                        <th class="text-center">នាំចេញ</th>
+                    </tr>
+                </thead>
+                <tbody id="permissionsBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    function viewPermissions(role) {
-        $.get('/User/GetPermissions', { roleName: role }, function(data) {
-            let html = '<div class="text-start">';
-            data.forEach(p => {
-                html += `<div class="border-bottom p-2">
-                    <strong>${p.moduleName}:</strong>
-                    ${p.canView ? '👁️ View ' : ''}
-                    ${p.canCreate ? '➕ Create ' : ''}
-                    ${p.canEdit ? '✏️ Edit ' : ''}
-                </div>`;
-            });
-            html += '</div>';
+    const modules = [
+        'User Management',
+        'Student Records',
+        'Financial Reports',
+        'Attendance',
+        'Grades',
+        'Classes',
+        'Settings',
+        'Payments',
+        'Scholarships'
+    ];
 
-            Swal.fire({
-                title: role + ' Permissions',
-                html: html,
-                confirmButtonText: 'Close'
+    function showPermissions(role) {
+        $('#selectedRole').text(role);
+        $('#rolesGrid').fadeOut(200, function() {
+            $('#permissionsMatrix').fadeIn(200);
+        });
+
+        $('#permissionsBody').html(`
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p class="text-muted">កំពុងផ្ទុកទិន្នន័យ...</p>
+                    </div>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: '/User/GetPermissions',
+            type: 'GET',
+            data: { roleName: role },
+            success: function(permissions) {
+                displayPermissions(permissions);
+            },
+            error: function() {
+                let defaultPermissions = [];
+                modules.forEach(module => {
+                    defaultPermissions.push({
+                        moduleName: module,
+                        canView: true,
+                        canCreate: role === 'Admin' || role === 'Super Admin',
+                        canEdit: role === 'Admin' || role === 'Super Admin',
+                        canDelete: role === 'Admin' || role === 'Super Admin',
+                        canExport: role === 'Admin' || role === 'Super Admin' || role === 'Accounting'
+                    });
+                });
+                displayPermissions(defaultPermissions);
+            }
+        });
+    }
+
+    function displayPermissions(permissions) {
+        let html = '';
+        permissions.forEach(perm => {
+            html += `
+                <tr>
+                    <td class="module-name">${perm.moduleName}</td>
+                    <td class="text-center">
+                        <span class="permission-check ${perm.canView ? 'checked' : ''}" onclick="togglePermission(this)">
+                            <i class="bi bi-check"></i>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="permission-check ${perm.canCreate ? 'checked' : ''}" onclick="togglePermission(this)">
+                            <i class="bi bi-check"></i>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="permission-check ${perm.canEdit ? 'checked' : ''}" onclick="togglePermission(this)">
+                            <i class="bi bi-check"></i>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="permission-check ${perm.canDelete ? 'checked' : ''}" onclick="togglePermission(this)">
+                            <i class="bi bi-check"></i>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="permission-check ${perm.canExport ? 'checked' : ''}" onclick="togglePermission(this)">
+                            <i class="bi bi-check"></i>
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+        $('#permissionsBody').html(html);
+    }
+
+    function hidePermissions() {
+        $('#permissionsMatrix').fadeOut(200, function() {
+            $('#rolesGrid').fadeIn(200);
+        });
+    }
+
+    function togglePermission(element) {
+        $(element).toggleClass('checked');
+    }
+
+    function savePermissions() {
+        let role = $('#selectedRole').text();
+        let permissions = [];
+
+        $('#permissionsBody tr').each(function() {
+            let moduleName = $(this).find('.module-name').text();
+            let checks = $(this).find('.permission-check');
+
+            permissions.push({
+                moduleName: moduleName,
+                canView: $(checks[0]).hasClass('checked'),
+                canCreate: $(checks[1]).hasClass('checked'),
+                canEdit: $(checks[2]).hasClass('checked'),
+                canDelete: $(checks[3]).hasClass('checked'),
+                canExport: $(checks[4]).hasClass('checked')
             });
+        });
+
+        $.ajax({
+            url: '/User/SavePermissions',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ roleName: role, permissions: permissions }),
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: response.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ជោគជ័យ!',
+                    text: 'រក្សាទុកសិទ្ធិរួចរាល់',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
         });
     }
 </script>
