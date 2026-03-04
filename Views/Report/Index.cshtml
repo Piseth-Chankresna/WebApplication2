@@ -1,0 +1,126 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
+        }
+
+        // Today's Attendance Chart
+        var todayCtx = document.getElementById('todayAttendanceChart');
+        if (todayCtx) {
+            new Chart(todayCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['វត្តមាន', 'មកយឺត', 'អវត្តមាន'],
+                    datasets: [{
+                        data: [
+                            @(Model.TodayAttendance?.ContainsKey("P") == true ? Model.TodayAttendance["P"] : 0),
+                            @(Model.TodayAttendance?.ContainsKey("L") == true ? Model.TodayAttendance["L"] : 0),
+                            @(Model.TodayAttendance?.ContainsKey("A") == true ? Model.TodayAttendance["A"] : 0)
+                        ],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Weekly Attendance Chart
+        var weeklyCtx = document.getElementById('weeklyAttendanceChart');
+        if (weeklyCtx) {
+            var weeklyData = @Html.Raw(Json.Serialize(Model.WeeklyAttendance ?? new List<object>()));
+
+            new Chart(weeklyCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: weeklyData.map(d => {
+                        var date = new Date(d.date);
+                        return date.toLocaleDateString('km-KH', { weekday: 'short', day: 'numeric' });
+                    }),
+                    datasets: [{
+                        label: 'វត្តមាន',
+                        data: weeklyData.map(d => d.present),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'មកយឺត',
+                        data: weeklyData.map(d => d.late),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245,158,11,0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'អវត្តមាន',
+                        data: weeklyData.map(d => d.absent),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239,68,68,0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Monthly Payment Chart
+        var paymentCtx = document.getElementById('monthlyPaymentChart');
+        if (paymentCtx) {
+            var paymentData = @Html.Raw(Json.Serialize(Model.MonthlyPayments ?? new List<object>()));
+            var months = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
+                          'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+
+            new Chart(paymentCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: paymentData.map(d => months[d.month - 1]),
+                    datasets: [{
+                        label: 'ទឹកប្រាក់ ($)',
+                        data: paymentData.map(d => d.total),
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>

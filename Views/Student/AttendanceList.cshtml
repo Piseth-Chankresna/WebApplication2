@@ -1,8 +1,9 @@
-﻿@model IEnumerable<WebApplication2.Models.Student>
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "វត្តមាន";
+    ViewData["Title"] = "បញ្ជីវត្តមាន";
+    var startDate = ViewBag.StartDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
+    var endDate = ViewBag.EndDate ?? DateTime.Now.ToString("yyyy-MM-dd");
 }
 
 <style>
@@ -12,135 +13,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #06b6d4;
             margin-bottom: 8px;
         }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        border: 1px solid #e2e8f0;
-        position: relative;
-        overflow: hidden;
-    }
-
-    [data-theme="dark"] .stat-card {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .stat-card .stat-icon {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        font-size: 3rem;
-        opacity: 0.1;
-        color: #06b6d4;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #1e293b;
-        margin-bottom: 4px;
-    }
-
-    [data-theme="dark"] .stat-value {
-        color: white;
-    }
-
-    .stat-label {
-        color: #64748b;
-        font-size: 0.9rem;
-    }
-
-    .date-section {
-        background: white;
-        border-radius: 24px;
-        padding: 24px;
-        margin-bottom: 30px;
-        border: 1px solid #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    [data-theme="dark"] .date-section {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .date-picker {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-        .date-picker label {
-            font-weight: 600;
-            color: #475569;
-        }
-
-    [data-theme="dark"] .date-picker label {
-        color: #cbd5e1;
-    }
-
-    .date-picker input {
-        padding: 10px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        background: white;
-        color: #1e293b;
-    }
-
-    [data-theme="dark"] .date-picker input {
-        background: #0f172a;
-        border-color: #334155;
-        color: white;
-    }
-
-    .summary-cards {
-        display: flex;
-        gap: 20px;
-    }
-
-    .summary-badge {
-        padding: 8px 20px;
-        border-radius: 40px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .badge-present {
-        background: #d1fae5;
-        color: #10b981;
-    }
-
-    .badge-late {
-        background: #fef3c7;
-        color: #f59e0b;
-    }
-
-    .badge-absent {
-        background: #fee2e2;
-        color: #ef4444;
-    }
+            .page-header h2 i {
+                background: linear-gradient(135deg, #06b6d4, #0891b2);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .filter-section {
         background: white;
@@ -159,6 +41,7 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 15px;
+        margin-bottom: 15px;
     }
 
     .filter-item {
@@ -211,22 +94,22 @@
             box-shadow: 0 10px 20px rgba(6,182,212,0.3);
         }
 
-    .btn-save {
-        background: linear-gradient(135deg, #10b981, #059669);
+    .btn-excel {
+        background: #10b981;
         color: white;
-        padding: 12px 32px;
+        padding: 10px 24px;
         border: none;
-        border-radius: 40px;
+        border-radius: 12px;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         transition: all 0.3s ease;
     }
 
-        .btn-save:hover {
+        .btn-excel:hover {
+            background: #059669;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(16,185,129,0.3);
         }
 
     .table-container {
@@ -246,7 +129,7 @@
     .attendance-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1000px;
+        min-width: 1200px;
     }
 
         .attendance-table th {
@@ -278,6 +161,7 @@
 
     .attendance-table tbody tr:hover {
         background: #f8fafc;
+        cursor: pointer;
     }
 
     [data-theme="dark"] .attendance-table tbody tr:hover {
@@ -300,243 +184,348 @@
         justify-content: center;
         color: white;
         font-weight: 700;
+        overflow: hidden;
+        flex-shrink: 0;
     }
 
-    .attendance-radio-group {
-        display: flex;
-        gap: 10px;
-    }
-
-    .radio-option {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-    }
-
-        .radio-option input[type="radio"] {
-            display: none;
+        .student-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-    .radio-label {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.9rem;
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.85rem;
         font-weight: 600;
-        transition: all 0.2s ease;
-        cursor: pointer;
+        display: inline-block;
     }
 
-    .radio-option input[type="radio"]:checked + .radio-label {
-        color: white;
-    }
-
-        .radio-option input[type="radio"]:checked + .radio-label.present {
-            background: #10b981;
-        }
-
-        .radio-option input[type="radio"]:checked + .radio-label.late {
-            background: #f59e0b;
-        }
-
-        .radio-option input[type="radio"]:checked + .radio-label.absent {
-            background: #ef4444;
-        }
-
-    .radio-label.present {
+    .status-present {
         background: #d1fae5;
         color: #10b981;
     }
 
-    .radio-label.late {
+    .status-late {
         background: #fef3c7;
         color: #f59e0b;
     }
 
-    .radio-label.absent {
+    .status-absent {
         background: #fee2e2;
         color: #ef4444;
     }
 
-    .note-input {
-        width: 150px;
-        padding: 6px 10px;
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    [data-theme="dark"] .btn-icon {
+        background: #0f172a;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+
+    .btn-icon:hover {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    [data-theme="dark"] .summary-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .icon-present {
+        background: #10b981;
+    }
+
+    .icon-late {
+        background: #f59e0b;
+    }
+
+    .icon-absent {
+        background: #ef4444;
+    }
+
+    .summary-info h4 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .summary-info p {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.85rem;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+
+        .pagination .btn-page {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+    [data-theme="dark"] .pagination .btn-page {
+        background: #1e293b;
+        color: white;
+        border-color: #334155;
+    }
+
+    .pagination .btn-page.active {
+        background: #06b6d4;
+        color: white;
+        border-color: #06b6d4;
+    }
+
+    .pagination .btn-page:hover:not(.active) {
+        background: #f1f5f9;
+    }
+
+    .items-per-page {
+        width: 80px;
+        padding: 8px;
         border: 2px solid #e2e8f0;
         border-radius: 8px;
         background: white;
         color: #1e293b;
     }
 
-    [data-theme="dark"] .note-input {
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .modal-content {
+        background: #1e293b;
+        color: white;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        padding: 20px 24px;
+        border: none;
+    }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-footer {
+        padding: 20px 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    [data-theme="dark"] .modal-footer {
+        border-top-color: #334155;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    [data-theme="dark"] .form-label {
+        color: #cbd5e1;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #1e293b;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .form-control,
+    [data-theme="dark"] .form-select {
         background: #0f172a;
         border-color: #334155;
         color: white;
     }
 
-    .history-section {
-        margin-top: 40px;
-    }
-
-    .history-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
-    [data-theme="dark"] .history-title {
-        color: white;
-    }
-
-    .history-title i {
-        color: #06b6d4;
-        font-size: 1.5rem;
-    }
-
-    .history-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-    }
-
-    .history-card {
-        background: white;
-        border-radius: 20px;
-        padding: 20px;
-        border: 1px solid #e2e8f0;
-        transition: all 0.3s ease;
-    }
-
-    [data-theme="dark"] .history-card {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .history-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(6,182,212,0.1);
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
         border-color: #06b6d4;
+        box-shadow: 0 0 0 4px rgba(6,182,212,0.1);
     }
 
-    .history-date {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #06b6d4;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .history-stats {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .history-stat {
-        text-align: center;
-        flex: 1;
-    }
-
-        .history-stat .count {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .history-stat .label {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-    .btn-view {
-        width: 100%;
-        padding: 8px;
-        background: #f1f5f9;
+    .btn-save {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        padding: 12px 32px;
         border: none;
         border-radius: 12px;
-        color: #475569;
         font-weight: 600;
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-view {
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(6,182,212,0.3);
+        }
+
+    .btn-cancel {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 12px 32px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .btn-cancel {
         background: #0f172a;
         color: #cbd5e1;
+        border-color: #334155;
     }
 
-    .btn-view:hover {
-        background: #06b6d4;
-        color: white;
+    .btn-cancel:hover {
+        background: #e2e8f0;
     }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
 
     @@media (max-width: 1024px) {
-        .stats-grid {
+        .filter-grid {
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .filter-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .summary-cards {
+            grid-template-columns: 1fr;
         }
     }
 
     @@media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
         .filter-grid {
             grid-template-columns: 1fr;
-        }
-
-        .date-section {
-            flex-direction: column;
-            align-items: flex-start;
         }
     }
 </style>
 
+<!-- AntiForgeryToken Form (Hidden) -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="page-header">
-    <h2><i class="bi bi-calendar-check-fill me-2"></i>វត្តមានប្រចាំថ្ងៃ</h2>
-    <p class="text-muted">បំពេញ និងគ្រប់គ្រងវត្តមានសិស្ស</p>
+    <h2><i class="bi bi-clock-history me-2"></i>៣.២. បញ្ជីវត្តមាន</h2>
+    <p class="text-muted">មើលប្រវត្តិវត្តមានរបស់សិស្ស</p>
 </div>
 
-<!-- Stats Cards -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <i class="bi bi-people-fill stat-icon"></i>
-        <div class="stat-value" id="totalStudents">0</div>
-        <div class="stat-label">សិស្សសរុប</div>
+<!-- Summary Cards -->
+<div class="summary-cards" id="summaryCards">
+    <div class="summary-card">
+        <div class="summary-icon icon-present">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="summary-info">
+            <h4 id="totalPresent">0</h4>
+            <p>វត្តមានសរុប</p>
+        </div>
     </div>
-    <div class="stat-card">
-        <i class="bi bi-check-circle-fill stat-icon"></i>
-        <div class="stat-value" id="presentCount">0</div>
-        <div class="stat-label">វត្តមាន</div>
+    <div class="summary-card">
+        <div class="summary-icon icon-late">
+            <i class="bi bi-clock-fill"></i>
+        </div>
+        <div class="summary-info">
+            <h4 id="totalLate">0</h4>
+            <p>មកយឺតសរុប</p>
+        </div>
     </div>
-    <div class="stat-card">
-        <i class="bi bi-clock-fill stat-icon"></i>
-        <div class="stat-value" id="lateCount">0</div>
-        <div class="stat-label">មកយឺត</div>
-    </div>
-    <div class="stat-card">
-        <i class="bi bi-x-circle-fill stat-icon"></i>
-        <div class="stat-value" id="absentCount">0</div>
-        <div class="stat-label">អវត្តមាន</div>
-    </div>
-</div>
-
-<!-- Date Selection -->
-<div class="date-section">
-    <div class="date-picker">
-        <label><i class="bi bi-calendar3 me-2"></i>ជ្រើសរើសកាលបរិច្ឆេទ:</label>
-        <input type="date" id="attendanceDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-    </div>
-    <div class="summary-cards">
-        <span class="summary-badge badge-present" id="summaryPresent">វត្តមាន: 0</span>
-        <span class="summary-badge badge-late" id="summaryLate">មកយឺត: 0</span>
-        <span class="summary-badge badge-absent" id="summaryAbsent">អវត្តមាន: 0</span>
+    <div class="summary-card">
+        <div class="summary-icon icon-absent">
+            <i class="bi bi-x-circle-fill"></i>
+        </div>
+        <div class="summary-info">
+            <h4 id="totalAbsent">0</h4>
+            <p>អវត្តមានសរុប</p>
+        </div>
     </div>
 </div>
 
@@ -544,8 +533,16 @@
 <div class="filter-section">
     <div class="filter-grid">
         <div class="filter-item">
+            <label>ចាប់ពីថ្ងៃទី</label>
+            <input type="date" id="startDate" value="@startDate">
+        </div>
+        <div class="filter-item">
+            <label>ដល់ថ្ងៃទី</label>
+            <input type="date" id="endDate" value="@endDate">
+        </div>
+        <div class="filter-item">
             <label>ជំនាញ</label>
-            <select id="filterMajor">
+            <select id="filterMajor" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="Information Technology">Information Technology</option>
                 <option value="Business Administration">Business Administration</option>
@@ -554,57 +551,35 @@
                 <option value="Accounting">Accounting</option>
             </select>
         </div>
-
-        <div class="filter-item">
-            <label>ឆ្នាំសិក្សា</label>
-            <select id="filterYear">
-                <option value="">ទាំងអស់</option>
-                <option value="1">ឆ្នាំទី១</option>
-                <option value="2">ឆ្នាំទី២</option>
-                <option value="3">ឆ្នាំទី៣</option>
-                <option value="4">ឆ្នាំទី៤</option>
-            </select>
-        </div>
-
-        <div class="filter-item">
-            <label>វេនសិក្សា</label>
-            <select id="filterShift">
-                <option value="">ទាំងអស់</option>
-                <option value="ព្រឹក">ព្រឹក</option>
-                <option value="រសៀល">រសៀល</option>
-                <option value="យប់">យប់</option>
-            </select>
-        </div>
-
         <div class="filter-item">
             <label>ស្វែងរក</label>
             <input type="text" id="searchInput" placeholder="ឈ្មោះ ឬលេខសម្គាល់...">
         </div>
     </div>
 
-    <div class="mt-3 d-flex gap-2">
-        <button class="btn-filter" onclick="applyFilter()">
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn-filter" onclick="loadAttendanceRecords()">
             <i class="bi bi-search"></i>
-            អនុវត្តតម្រង
+            ស្វែងរក
         </button>
-        <button class="btn-filter" onclick="resetFilter()" style="background: #64748b;">
-            <i class="bi bi-arrow-counterclockwise"></i>
-            កំណត់ឡើងវិញ
+        <button class="btn-excel" onclick="exportAttendance()">
+            <i class="bi bi-file-earmark-excel"></i>
+            នាំចេញ Excel
         </button>
     </div>
 </div>
 
-<!-- Action Buttons -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <button class="btn-save" onclick="saveAttendance()">
-            <i class="bi bi-save"></i>
-            រក្សាទុកវត្តមាន
-        </button>
-        <button class="btn-save ms-2" onclick="markAllPresent()" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
-            <i class="bi bi-check-all"></i>
-            វត្តមានទាំងអស់
-        </button>
+<!-- Items per page -->
+<div class="d-flex justify-content-end mb-3">
+    <div class="d-flex align-items-center gap-2">
+        <span class="text-muted">បង្ហាញ:</span>
+        <select id="itemsPerPage" class="items-per-page" onchange="loadAttendanceRecords()">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span class="text-muted">កំណត់ត្រា</span>
     </div>
 </div>
 
@@ -613,312 +588,510 @@
     <table class="attendance-table">
         <thead>
             <tr>
+                <th>កាលបរិច្ឆេទ</th>
                 <th>សិស្ស</th>
                 <th>ជំនាញ</th>
                 <th>ឆ្នាំ</th>
-                <th>វេន</th>
-                <th>ស្ថានភាពវត្តមាន</th>
+                <th>ស្ថានភាព</th>
                 <th>កំណត់ចំណាំ</th>
+                <th class="text-center">សកម្មភាព</th>
             </tr>
         </thead>
         <tbody id="attendanceTableBody">
-            <!-- Data will be loaded by JavaScript -->
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
 
-<!-- Attendance History -->
-<div class="history-section">
-    <div class="history-title">
-        <i class="bi bi-clock-history"></i>
-        <span>ប្រវត្តិវត្តមានថ្មីៗ</span>
-    </div>
+<!-- Pagination -->
+<div class="pagination" id="pagination"></div>
 
-    <div class="history-grid" id="historyGrid">
-        <!-- History will be loaded by JavaScript -->
+<!-- Edit Attendance Modal -->
+<div class="modal fade" id="editAttendanceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    កែប្រែវត្តមាន
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAttendanceForm">
+                    <input type="hidden" id="editAttendanceId" value="0">
+
+                    <div class="form-group">
+                        <label class="form-label">ឈ្មោះសិស្ស</label>
+                        <input type="text" id="editStudentName" class="form-control" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">កាលបរិច្ឆេទ</label>
+                        <input type="date" id="editDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">ស្ថានភាពវត្តមាន</label>
+                        <select id="editStatus" class="form-select" required>
+                            <option value="P">វត្តមាន</option>
+                            <option value="L">មកយឺត</option>
+                            <option value="A">អវត្តមាន</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">កំណត់ចំណាំ</label>
+                        <input type="text" id="editNote" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">បោះបង់</button>
+                <button type="button" class="btn-save" onclick="updateAttendance()">រក្សាទុកការកែប្រែ</button>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteAttendanceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #ef4444;">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    បញ្ជាក់ការលុប
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-trash3-fill text-danger" style="font-size: 4rem;"></i>
+                <h5 class="mt-3">តើអ្នកពិតជាចង់លុបកំណត់ត្រាវត្តមាននេះមែនទេ?</h5>
+                <p class="text-muted" id="deleteInfo">កំណត់ត្រាដែលលុបហើយមិនអាចត្រឡប់វិញបានទេ</p>
+                <input type="hidden" id="deleteAttendanceId" value="0">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">បោះបង់</button>
+                <button type="button" class="btn-delete" onclick="confirmDelete()">បាទ/ចាស លុប</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
-    let students = [];
-    let attendanceRecords = [];
-    let currentAttendance = {};
+    let allRecords = [];
+    let currentPage = 1;
+    let itemsPerPage = 25;
 
     $(document).ready(function() {
-        loadStudents();
-        loadAttendanceHistory();
-        $('#attendanceDate').val(new Date().toISOString().split('T')[0]);
+        loadAttendanceRecords();
     });
 
-    function loadStudents() {
+    function loadAttendanceRecords() {
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+        itemsPerPage = parseInt($('#itemsPerPage').val());
+
+        $('#attendanceTableBody').html(`
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                </td>
+            </tr>
+        `);
+
         $.ajax({
-            url: '/Student/GetStudents',
+            url: `/Student/GetAttendanceRecords?startDate=${startDate}&endDate=${endDate}`,
             type: 'GET',
-            success: function(data) {
-                students = data;
-                displayAttendance();
+            cache: false,
+            success: function(response) {
+                console.log("Attendance response:", response);
+
+                if (response && response.success) {
+                    allRecords = response.data || [];
+                } else if (Array.isArray(response)) {
+                    allRecords = response;
+                } else {
+                    console.error("Unexpected response format:", response);
+                    allRecords = [];
+                }
+
+                displayRecords();
+                updateSummary();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading attendance:', error);
+                console.error('Response:', xhr.responseText);
+
+                $('#attendanceTableBody').html(`
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
+                            <p class="text-muted">${xhr.status} - ${error}</p>
+                            <button class="btn btn-primary mt-3" onclick="loadAttendanceRecords()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាមម្តងទៀត
+                            </button>
+                        </td>
+                    </tr>
+                `);
             }
         });
     }
 
-    function loadAttendanceHistory() {
-        $.ajax({
-            url: '/Student/GetAttendance',
-            type: 'GET',
-            success: function(data) {
-                attendanceRecords = data;
-                displayHistory();
-            }
-        });
-    }
-
-    function displayAttendance() {
+    function displayRecords() {
         var tbody = $('#attendanceTableBody');
         tbody.empty();
 
-        if (students.length === 0) {
+        if (!Array.isArray(allRecords) || allRecords.length === 0) {
             tbody.html(`
                 <tr>
-                    <td colspan="6" class="text-center py-5">
-                        <i class="bi bi-people" style="font-size: 4rem; color: #cbd5e1;"></i>
-                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យសិស្សនៅឡើយទេ</h5>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="bi bi-clock-history" style="font-size: 4rem; color: #cbd5e1;"></i>
+                        <h5 class="mt-3 text-muted">មិនទាន់មានកំណត់ត្រាវត្តមាននៅឡើយទេ</h5>
                     </td>
                 </tr>
             `);
+            $('#pagination').empty();
             return;
         }
 
         var major = $('#filterMajor').val();
-        var year = $('#filterYear').val();
-        var shift = $('#filterShift').val();
         var search = $('#searchInput').val().toLowerCase();
 
-        var filteredStudents = students.filter(s => {
-            var matchMajor = !major || s.major === major;
-            var matchYear = !year || s.year === year;
-            var matchShift = !shift || s.shift === shift;
+        var filtered = allRecords.filter(record => {
+            var matchMajor = !major || (record.studentMajor && record.studentMajor === major);
             var matchSearch = !search ||
-                (s.name && s.name.toLowerCase().includes(search)) ||
-                (s.id && s.id.toLowerCase().includes(search));
+                (record.studentName && record.studentName.toLowerCase().includes(search)) ||
+                (record.studentId && record.studentId.toLowerCase().includes(search));
 
-            return matchMajor && matchYear && matchShift && matchSearch;
+            return matchMajor && matchSearch;
         });
 
-        $('#totalStudents').text(filteredStudents.length);
+        // Pagination
+        var totalPages = Math.ceil(filtered.length / itemsPerPage);
+        var start = (currentPage - 1) * itemsPerPage;
+        var end = start + itemsPerPage;
+        var pageData = filtered.slice(start, end);
 
-        filteredStudents.forEach(s => {
-            var status = currentAttendance[s.id] || 'P';
+        pageData.forEach(record => {
+            var date = new Date(record.date);
+            var formattedDate = date.toLocaleDateString('km-KH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            var avatarHtml = record.studentPhoto ?
+                `<img src="${record.studentPhoto}" alt="${record.studentName || ''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(record.studentName || 'User')}&background=06b6d4&color=fff'">` :
+                `<span>${record.studentName ? record.studentName.charAt(0).toUpperCase() : '?'}</span>`;
+
+            var statusText = record.status === 'P' ? 'វត្តមាន' : record.status === 'L' ? 'មកយឺត' : 'អវត្តមាន';
+            var statusClass = record.status === 'P' ? 'status-present' : record.status === 'L' ? 'status-late' : 'status-absent';
 
             var row = `
                 <tr>
+                    <td>${formattedDate}</td>
                     <td>
                         <div class="student-info">
                             <div class="student-avatar">
-                                ${s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                                ${avatarHtml}
                             </div>
                             <div>
-                                <div class="fw-bold">${s.name || 'មិនមានឈ្មោះ'}</div>
-                                <small class="text-muted">${s.id}</small>
+                                <div class="fw-bold">${record.studentName || 'មិនមានឈ្មោះ'}</div>
+                                <small class="text-muted">${record.studentId || ''}</small>
                             </div>
                         </div>
                     </td>
-                    <td>${s.major || 'N/A'}</td>
-                    <td>ឆ្នាំទី${s.year || '?'}</td>
-                    <td>${s.shift || 'N/A'}</td>
+                    <td>${record.studentMajor || 'N/A'}</td>
+                    <td>ឆ្នាំទី${record.studentYear || '?'}</td>
                     <td>
-                        <div class="attendance-radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="att_${s.id}" value="P" ${status === 'P' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
-                                <span class="radio-label present">វត្តមាន</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="att_${s.id}" value="L" ${status === 'L' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
-                                <span class="radio-label late">មកយឺត</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="att_${s.id}" value="A" ${status === 'A' ? 'checked' : ''} onchange="updateAttendance('${s.id}', this.value)">
-                                <span class="radio-label absent">អវត្តមាន</span>
-                            </label>
-                        </div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
                     </td>
-                    <td>
-                        <input type="text" class="note-input" id="note_${s.id}" placeholder="កំណត់ចំណាំ..." value="${currentAttendance[`note_${s.id}`] || ''}">
+                    <td>${record.note || '-'}</td>
+                    <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
+                            <button class="btn-icon" onclick="editAttendance(${record.id})" title="កែប្រែ">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn-icon" onclick="deleteAttendance(${record.id}, '${record.studentName || ''}')" title="លុប">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
             tbody.append(row);
         });
 
-        updateCounts();
+        // Update pagination
+        updatePagination(totalPages);
     }
 
-    function updateAttendance(studentId, status) {
-        currentAttendance[studentId] = status;
-        updateCounts();
+    function updatePagination(totalPages) {
+        var pagination = $('#pagination');
+        pagination.empty();
+
+        if (totalPages <= 1) return;
+
+        // Previous button
+        pagination.append(`
+            <button class="btn-page" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                <i class="bi bi-chevron-left"></i>
+            </button>
+        `);
+
+        // Page numbers
+        for (var i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                pagination.append(`
+                    <button class="btn-page ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `);
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                pagination.append(`<span class="btn-page" disabled>...</span>`);
+            }
+        }
+
+        // Next button
+        pagination.append(`
+            <button class="btn-page" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        `);
     }
 
-    function updateCounts() {
-        var present = 0, late = 0, absent = 0;
-
-        $('input[type="radio"]:checked').each(function() {
-            var value = $(this).val();
-            if (value === 'P') present++;
-            else if (value === 'L') late++;
-            else if (value === 'A') absent++;
-        });
-
-        $('#presentCount').text(present);
-        $('#lateCount').text(late);
-        $('#absentCount').text(absent);
-
-        $('#summaryPresent').text(`វត្តមាន: ${present}`);
-        $('#summaryLate').text(`មកយឺត: ${late}`);
-        $('#summaryAbsent').text(`អវត្តមាន: ${absent}`);
+    function changePage(page) {
+        currentPage = page;
+        displayRecords();
     }
 
-    function saveAttendance() {
-        var date = $('#attendanceDate').val();
-        var attendanceData = [];
+    function updateSummary() {
+        if (!Array.isArray(allRecords) || allRecords.length === 0) {
+            $('#totalPresent').text('0');
+            $('#totalLate').text('0');
+            $('#totalAbsent').text('0');
+            return;
+        }
 
-        $('input[type="radio"]:checked').each(function() {
-            var name = $(this).attr('name');
-            var studentId = name.replace('att_', '');
-            var status = $(this).val();
-            var note = $(`#note_${studentId}`).val();
+        var present = allRecords.filter(r => r.status === 'P').length;
+        var late = allRecords.filter(r => r.status === 'L').length;
+        var absent = allRecords.filter(r => r.status === 'A').length;
 
-            attendanceData.push({
-                studentId: studentId,
-                studentName: $(this).closest('tr').find('.fw-bold').text(),
-                date: date,
-                status: status,
-                note: note
+        $('#totalPresent').text(present);
+        $('#totalLate').text(late);
+        $('#totalAbsent').text(absent);
+    }
+
+    function exportAttendance() {
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+        window.location.href = `/Student/ExportAttendance?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    // Edit Attendance Function
+    function editAttendance(id) {
+        console.log("Editing attendance ID:", id);
+
+        var record = allRecords.find(r => r.id === id);
+        if (!record) {
+            console.error("Record not found for ID:", id);
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'រកមិនឃើញកំណត់ត្រា'
             });
+            return;
+        }
+
+        console.log("Record found:", record);
+
+        $('#editAttendanceId').val(record.id);
+        $('#editStudentName').val(record.studentName || '');
+
+        // Format date for input (YYYY-MM-DD)
+        var date = new Date(record.date);
+        var year = date.getFullYear();
+        var month = (date.getMonth() + 1).toString().padStart(2, '0');
+        var day = date.getDate().toString().padStart(2, '0');
+        var formattedDate = `${year}-${month}-${day}`;
+
+        $('#editDate').val(formattedDate);
+        $('#editStatus').val(record.status || 'P');
+        $('#editNote').val(record.note || '');
+
+        $('#editAttendanceModal').modal('show');
+    }
+
+    // Update Attendance Function
+    function updateAttendance() {
+        var id = $('#editAttendanceId').val();
+        var date = $('#editDate').val();
+        var status = $('#editStatus').val();
+        var note = $('#editNote').val();
+
+        console.log("Updating attendance:", { id, date, status, note });
+
+        if (!id || id === '0') {
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'លេខសម្គាល់កំណត់ត្រាមិនត្រឹមត្រូវ'
+            });
+            return;
+        }
+
+        if (!date) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'សូមបញ្ចូលកាលបរិច្ឆេទ',
+                text: 'កាលបរិច្ឆេទមិនអាចទទេបានទេ'
+            });
+            return;
+        }
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        if (!token) {
+            console.error("AntiForgeryToken not found!");
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'មិនអាចរកឃើញ Token សុវត្ថិភាព'
+            });
+            return;
+        }
+
+        // Show loading
+        Swal.fire({
+            title: 'កំពុងរក្សាទុក...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
 
         $.ajax({
-            url: '/Student/SaveAttendance',
+            url: '/Student/UpdateAttendance',
             type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(attendanceData),
+            data: {
+                id: id,
+                date: date,
+                status: status,
+                note: note
+            },
             headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                'RequestVerificationToken': token
+            },
+            success: function(response) {
+                console.log("Update response:", response);
+
+                if (response && response.success) {
+                    $('#editAttendanceModal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message || 'កែប្រែវត្តមានដោយជោគជ័យ',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    loadAttendanceRecords(); // Reload data
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: response.message || 'មានបញ្ហាក្នុងការកែប្រែ'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                console.error("Status:", xhr.status);
+                console.error("Response:", xhr.responseText);
+
+                let errorMessage = 'មានបញ្ហាបច្ចេកទេស';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch(e) {
+                    if (xhr.responseText) {
+                        errorMessage = xhr.responseText;
+                    }
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: `កំហុស (${xhr.status})`,
+                    text: errorMessage
+                });
+            }
+        });
+    }
+
+    // Delete Attendance Function
+    function deleteAttendance(id, name) {
+        $('#deleteAttendanceId').val(id);
+        $('#deleteInfo').text(`លុបកំណត់ត្រាវត្តមានរបស់ ${name || 'សិស្ស'}`);
+        $('#deleteAttendanceModal').modal('show');
+    }
+
+    // Confirm Delete Function
+    function confirmDelete() {
+        var id = $('#deleteAttendanceId').val();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $('#deleteAttendanceModal').modal('hide');
+
+        Swal.fire({
+            title: 'កំពុងដំណើរការ...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '/Student/DeleteAttendance',
+            type: 'POST',
+            data: { id: id },
+            headers: {
+                'RequestVerificationToken': token
             },
             success: function(response) {
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'ជោគជ័យ!',
-                        text: response.message,
+                        text: response.message || 'លុបកំណត់ត្រាវត្តមានដោយជោគជ័យ',
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    loadAttendanceHistory();
-                    currentAttendance = {};
+                    loadAttendanceRecords();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: response.message || 'មានបញ្ហាក្នុងការលុប'
+                    });
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
                 Swal.fire({
                     icon: 'error',
                     title: 'កំហុស',
-                    text: 'មានបញ្ហាបច្ចេកទេស'
+                    text: 'មានបញ្ហាបច្ចេកទេស: ' + error
                 });
             }
         });
-    }
-
-    function markAllPresent() {
-        $('input[type="radio"][value="P"]').prop('checked', true);
-        updateCounts();
-    }
-
-    function displayHistory() {
-        var grid = $('#historyGrid');
-        grid.empty();
-
-        var grouped = {};
-        attendanceRecords.forEach(record => {
-            if (!grouped[record.date]) {
-                grouped[record.date] = {
-                    date: record.date,
-                    present: 0,
-                    late: 0,
-                    absent: 0,
-                    total: 0
-                };
-            }
-            grouped[record.date][record.status === 'P' ? 'present' : record.status === 'L' ? 'late' : 'absent']++;
-            grouped[record.date].total++;
-        });
-
-        var sorted = Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
-
-        sorted.forEach(day => {
-            var card = `
-                <div class="history-card">
-                    <div class="history-date">
-                        <span><i class="bi bi-calendar3 me-2"></i>${day.date}</span>
-                        <span class="badge bg-secondary">${day.total} នាក់</span>
-                    </div>
-                    <div class="history-stats">
-                        <div class="history-stat">
-                            <div class="count text-success">${day.present}</div>
-                            <div class="label">វត្តមាន</div>
-                        </div>
-                        <div class="history-stat">
-                            <div class="count text-warning">${day.late}</div>
-                            <div class="label">មកយឺត</div>
-                        </div>
-                        <div class="history-stat">
-                            <div class="count text-danger">${day.absent}</div>
-                            <div class="label">អវត្តមាន</div>
-                        </div>
-                    </div>
-                    <button class="btn-view" onclick="viewHistory('${day.date}')">
-                        <i class="bi bi-eye me-2"></i>មើលលម្អិត
-                    </button>
-                </div>
-            `;
-            grid.append(card);
-        });
-    }
-
-    function viewHistory(date) {
-        var dayRecords = attendanceRecords.filter(r => r.date === date);
-
-        var html = '<div style="max-height: 400px; overflow-y: auto;">';
-        dayRecords.forEach(r => {
-            var statusColor = r.status === 'P' ? 'success' : r.status === 'L' ? 'warning' : 'danger';
-            var statusText = r.status === 'P' ? 'វត្តមាន' : r.status === 'L' ? 'មកយឺត' : 'អវត្តមាន';
-
-            html += `
-                <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                    <div>
-                        <strong>${r.studentName}</strong>
-                        <div class="small text-muted">${r.note || 'គ្មានកំណត់ចំណាំ'}</div>
-                    </div>
-                    <span class="badge bg-${statusColor}">${statusText}</span>
-                </div>
-            `;
-        });
-        html += '</div>';
-
-        Swal.fire({
-            title: `វត្តមានប្រចាំថ្ងៃទី ${date}`,
-            html: html,
-            width: 600,
-            confirmButtonColor: '#06b6d4'
-        });
-    }
-
-    function applyFilter() {
-        displayAttendance();
-    }
-
-    function resetFilter() {
-        $('#filterMajor').val('');
-        $('#filterYear').val('');
-        $('#filterShift').val('');
-        $('#searchInput').val('');
-        displayAttendance();
     }
 </script>

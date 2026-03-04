@@ -502,10 +502,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    let classes = [];
-    let token = '';
+        let classes = [];
+        let token = '';
 
-    // Load classes on page load
     $(document).ready(function() {
         // Get anti-forgery token
         token = $('input[name="__RequestVerificationToken"]').val();
@@ -514,7 +513,7 @@
         loadClasses();
     });
 
-    function loadClasses() {
+        ffunction loadClasses() {
         $('#classTableBody').html(`
             <tr>
                 <td colspan="7" class="text-center py-5">
@@ -528,10 +527,23 @@
             url: '/Student/GetClasses',
             type: 'GET',
             cache: false,
-            success: function(data) {
-                classes = data;
-                displayClasses(data);
-                updateStats(data);
+            success: function(response) {
+                console.log("Classes response:", response);
+
+                // ពិនិត្យមើលទម្រង់ទិន្នន័យ
+                if (response && response.success) {
+                    // ទម្រង់ថ្មី: { success: true, data: [...] }
+                    classes = response.data || [];
+                } else if (Array.isArray(response)) {
+                    // ទម្រង់ចាស់: [...]
+                    classes = response;
+                } else {
+                    console.error("Unexpected classes data format:", response);
+                    classes = [];
+                }
+
+                displayClasses(classes);
+                updateStats(classes);
             },
             error: function(xhr, status, error) {
                 console.error('Error loading classes:', error);
@@ -540,6 +552,7 @@
                         <td colspan="7" class="text-center py-5">
                             <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
                             <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
+                            <p class="text-muted">${xhr.status} - ${error}</p>
                             <button class="btn btn-primary mt-3" onclick="loadClasses()">
                                 <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាមម្តងទៀត
                             </button>
@@ -550,11 +563,12 @@
         });
     }
 
-    function displayClasses(data) {
+        function displayClasses(data) {
         var tbody = $('#classTableBody');
         tbody.empty();
 
-        if (data.length === 0) {
+        // ពិនិត្យមើលថា data ជា Array មែនទេ
+        if (!Array.isArray(data) || data.length === 0) {
             tbody.html(`
                 <tr>
                     <td colspan="7" class="text-center py-5">
@@ -601,7 +615,12 @@
         });
     }
 
-    function updateStats(data) {
+        function updateStats(data) {
+        // ពិនិត្យមើលថា data ជា Array
+        if (!Array.isArray(data)) {
+            data = [];
+        }
+
         $('#totalClasses').text(data.length);
 
         var teachers = [...new Set(data.map(c => c.teacherName))].filter(t => t).length;
@@ -617,6 +636,12 @@
     // Search functionality
     $('#searchInput').on('keyup', function() {
         var searchText = $(this).val().toLowerCase();
+
+        // ពិនិត្យមើលថា classes ជា Array
+        if (!Array.isArray(classes)) {
+            classes = [];
+        }
+
         var filtered = classes.filter(c =>
             (c.className && c.className.toLowerCase().includes(searchText)) ||
             (c.classCode && c.classCode.toLowerCase().includes(searchText)) ||

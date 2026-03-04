@@ -1,24 +1,113 @@
-﻿@model IEnumerable<WebApplication2.Models.Payment>
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "ការបង់ប្រាក់";
 }
 
 <style>
-    .page-header {
-        margin-bottom: 30px;
+    /* ====== VARIABLES ====== */
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --primary-light: #d1fae5;
+        --secondary: #f59e0b;
+        --danger: #ef4444;
+        --dark: #1e293b;
+        --light: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        --shadow-colored: 0 10px 20px -5px rgba(16, 185, 129, 0.3);
     }
 
-        .page-header h2 {
-            font-weight: 800;
-            background: linear-gradient(135deg, #10b981, #059669);
+    [data-theme="dark"] {
+        --primary: #34d399;
+        --primary-dark: #10b981;
+        --primary-light: #1e293b;
+        --secondary: #fbbf24;
+        --danger: #f87171;
+        --dark: #f8fafc;
+        --light: #0f172a;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-400: #64748b;
+        --gray-500: #94a3b8;
+        --gray-600: #cbd5e1;
+        --gray-700: #e2e8f0;
+        --gray-800: #f1f5f9;
+        --gray-900: #f8fafc;
+    }
+
+    /* ====== BASE STYLES ====== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+        background-color: var(--light);
+        color: var(--gray-900);
+        transition: background-color 0.3s ease;
+    }
+
+    /* ====== PAGE HEADER ====== */
+    .page-header {
+        margin-bottom: 30px;
+        animation: slideDown 0.5s ease;
+    }
+
+    @@keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .page-header h2 {
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .page-header h2 i {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
+            font-size: 2.2rem;
         }
 
+    .page-header p {
+        color: var(--gray-500);
+        font-size: 1rem;
+    }
+
+    /* ====== STATS CARDS ====== */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -30,15 +119,55 @@
         background: white;
         border-radius: 24px;
         padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
         position: relative;
         overflow: hidden;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
+        animation-fill-mode: both;
+    }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     }
 
     [data-theme="dark"] .stat-card {
-        background: #1e293b;
-        border-color: #334155;
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
     }
 
     .stat-card .stat-icon {
@@ -47,13 +176,13 @@
         top: 20px;
         font-size: 3rem;
         opacity: 0.1;
-        color: #10b981;
+        color: var(--primary);
     }
 
     .stat-value {
         font-size: 2rem;
         font-weight: 800;
-        color: #1e293b;
+        color: var(--gray-900);
         margin-bottom: 4px;
     }
 
@@ -62,21 +191,37 @@
     }
 
     .stat-label {
-        color: #64748b;
+        color: var(--gray-500);
         font-size: 0.9rem;
     }
 
+    /* ====== FILTER SECTION ====== */
     .filter-section {
         background: white;
         border-radius: 24px;
         padding: 24px;
         margin-bottom: 30px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow);
+        animation: fadeIn 0.6s ease;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
     }
 
     [data-theme="dark"] .filter-section {
-        background: #1e293b;
-        border-color: #334155;
+        background: var(--gray-100);
+        border-color: var(--gray-200);
     }
 
     .filter-grid {
@@ -93,50 +238,40 @@
 
         .filter-item label {
             font-weight: 600;
-            color: #475569;
+            color: var(--gray-600);
             font-size: 0.9rem;
         }
 
     [data-theme="dark"] .filter-item label {
-        color: #cbd5e1;
+        color: var(--gray-400);
     }
 
     .filter-item select,
     .filter-item input {
-        padding: 10px 12px;
-        border: 2px solid #e2e8f0;
+        padding: 12px 16px;
+        border: 2px solid var(--gray-200);
         border-radius: 12px;
         background: white;
-        color: #1e293b;
+        color: var(--gray-900);
+        transition: all 0.2s ease;
     }
 
     [data-theme="dark"] .filter-item select,
     [data-theme="dark"] .filter-item input {
-        background: #0f172a;
-        border-color: #334155;
+        background: var(--gray-200);
+        border-color: var(--gray-300);
         color: white;
+    }
+
+    .filter-item select:focus,
+    .filter-item input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
     }
 
     .btn-filter {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        padding: 10px 24px;
-        border: none;
-        border-radius: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-    }
-
-        .btn-filter:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(16,185,129,0.3);
-        }
-
-    .btn-add {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
         padding: 12px 28px;
         border: none;
@@ -146,26 +281,105 @@
         align-items: center;
         gap: 10px;
         transition: all 0.3s ease;
-        text-decoration: none;
+        box-shadow: var(--shadow-colored);
+    }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-filter:active {
+            transform: translateY(0);
+        }
+
+    .btn-export {
+        background: white;
+        color: var(--primary);
+        padding: 12px 28px;
+        border: 2px solid var(--primary);
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .btn-export {
+        background: var(--gray-200);
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .btn-export:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-colored);
+    }
+
+    /* ====== ACTION BUTTONS ====== */
+    .action-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, var(--secondary), #d97706);
+        color: white;
+        padding: 14px 32px;
+        border: none;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.3);
+        font-size: 1rem;
     }
 
         .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(245,158,11,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px -5px rgba(245, 158, 11, 0.4);
         }
 
+        .btn-add i {
+            font-size: 1.2rem;
+        }
+
+    /* ====== TABLE STYLES ====== */
     .table-container {
         background: white;
         border-radius: 24px;
         padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
         overflow-x: auto;
+        animation: slideUp 0.7s ease;
+    }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     }
 
     [data-theme="dark"] .table-container {
-        background: #1e293b;
-        border-color: #334155;
+        background: var(--gray-100);
+        border-color: var(--gray-200);
     }
 
     .payment-table {
@@ -177,36 +391,44 @@
         .payment-table th {
             padding: 16px;
             text-align: left;
-            color: #64748b;
+            color: var(--gray-500);
             font-weight: 600;
             font-size: 0.85rem;
-            border-bottom: 2px solid #e2e8f0;
-            background: #f8fafc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-200);
+            background: var(--gray-100);
         }
 
     [data-theme="dark"] .payment-table th {
-        background: #0f172a;
-        color: #cbd5e1;
-        border-bottom-color: #334155;
+        background: var(--gray-200);
+        color: var(--gray-400);
+        border-bottom-color: var(--gray-300);
     }
 
     .payment-table td {
         padding: 16px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1e293b;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-900);
     }
 
     [data-theme="dark"] .payment-table td {
         color: white;
-        border-bottom-color: #334155;
+        border-bottom-color: var(--gray-300);
     }
 
-    .payment-table tbody tr:hover {
-        background: #f8fafc;
+    .payment-table tbody tr {
+        transition: all 0.2s ease;
     }
+
+        .payment-table tbody tr:hover {
+            background: var(--gray-100);
+            transform: scale(1.01);
+            box-shadow: var(--shadow);
+        }
 
     [data-theme="dark"] .payment-table tbody tr:hover {
-        background: #0f172a;
+        background: var(--gray-200);
     }
 
     .student-info {
@@ -216,356 +438,870 @@
     }
 
     .student-avatar {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #10b981, #059669);
-        border-radius: 12px;
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: var(--shadow);
     }
 
+        .student-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
     .receipt-badge {
-        background: #e0e7ff;
-        color: #4f46e5;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.85rem;
         font-weight: 600;
         display: inline-block;
+        border: 1px solid var(--primary);
+    }
+
+    [data-theme="dark"] .receipt-badge {
+        background: var(--gray-200);
+        color: var(--primary);
     }
 
     .amount-paid {
-        color: #10b981;
+        color: var(--primary);
         font-weight: 700;
         font-size: 1.1rem;
     }
 
     .amount-due {
-        color: #ef4444;
+        color: var(--danger);
         font-weight: 700;
         font-size: 1.1rem;
     }
 
     .status-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
+        padding: 6px 14px;
+        border-radius: 30px;
         font-size: 0.85rem;
         font-weight: 600;
         display: inline-block;
     }
 
     .status-paid {
-        background: #d1fae5;
-        color: #10b981;
+        background: var(--primary-light);
+        color: var(--primary);
+        border: 1px solid var(--primary);
     }
 
-    .status-pending {
-        background: #fef3c7;
-        color: #f59e0b;
-    }
-
-    .status-overdue {
-        background: #fee2e2;
-        color: #ef4444;
+    [data-theme="dark"] .status-paid {
+        background: var(--gray-200);
     }
 
     .btn-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
         background: white;
-        color: #64748b;
+        color: var(--gray-600);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         cursor: pointer;
         text-decoration: none;
     }
 
     [data-theme="dark"] .btn-icon {
-        background: #0f172a;
-        border-color: #334155;
-        color: #cbd5e1;
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: var(--gray-400);
     }
 
     .btn-icon:hover {
-        background: linear-gradient(135deg, #10b981, #059669);
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
-        transform: translateY(-2px);
+        transform: translateY(-3px) rotate(5deg);
+        box-shadow: var(--shadow-colored);
     }
 
-    /* Modal Styles */
+    /* ====== MODAL STYLES ====== */
     .modal-content {
-        border-radius: 24px;
+        border-radius: 28px;
         border: none;
         overflow: hidden;
+        box-shadow: var(--shadow-xl);
     }
 
     [data-theme="dark"] .modal-content {
-        background: #1e293b;
+        background: var(--gray-100);
         color: white;
     }
 
     .modal-header {
-        background: linear-gradient(135deg, #10b981, #059669);
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
-        padding: 20px 24px;
+        padding: 25px 30px;
         border: none;
     }
+
+        .modal-header .modal-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+
+            .modal-header .btn-close:hover {
+                opacity: 1;
+                transform: rotate(90deg);
+            }
 
     .modal-body {
         padding: 30px;
     }
 
+    .modal-footer {
+        padding: 20px 30px;
+        border-top: 2px solid var(--gray-200);
+    }
+
+    [data-theme="dark"] .modal-footer {
+        border-top-color: var(--gray-300);
+    }
+
+    /* ====== FORM STYLES ====== */
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-label {
         display: block;
         font-weight: 600;
-        color: #475569;
-        margin-bottom: 8px;
+        color: var(--gray-700);
+        margin-bottom: 10px;
+        font-size: 0.95rem;
     }
 
     [data-theme="dark"] .form-label {
-        color: #cbd5e1;
+        color: var(--gray-400);
     }
 
-    .form-control {
+    .form-label i {
+        margin-right: 8px;
+        color: var(--primary);
+    }
+
+    .form-control, .form-select {
         width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        padding: 14px 18px;
+        border: 2px solid var(--gray-200);
+        border-radius: 16px;
         background: white;
-        color: #1e293b;
-        transition: all 0.3s ease;
+        color: var(--gray-900);
+        font-size: 1rem;
+        transition: all 0.2s ease;
     }
 
-    [data-theme="dark"] .form-control {
-        background: #0f172a;
-        border-color: #334155;
+    [data-theme="dark"] .form-control,
+    [data-theme="dark"] .form-select {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
         color: white;
     }
 
-    .form-control:focus {
+    .form-control:focus,
+    .form-select:focus {
         outline: none;
-        border-color: #10b981;
-        box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
     }
 
-    .student-select {
-        max-height: 300px;
-        overflow-y: auto;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 10px;
+    /* ====== STUDENT SELECTION ====== */
+    .student-search {
+        position: relative;
+        margin-bottom: 15px;
     }
 
-    .student-option {
-        padding: 10px;
-        border-bottom: 1px solid #e2e8f0;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-radius: 8px;
-    }
-
-        .student-option:hover {
-            background: #f1f5f9;
+        .student-search i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1.2rem;
         }
 
-    [data-theme="dark"] .student-option:hover {
-        background: #0f172a;
+        .student-search input {
+            width: 100%;
+            padding: 14px 18px 14px 50px;
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            background: white;
+            color: var(--gray-900);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+    [data-theme="dark"] .student-search input {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: white;
     }
 
-    .student-option.selected {
-        background: #d1fae5;
-        border: 2px solid #10b981;
+    .student-search input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
     }
 
-    [data-theme="dark"] .student-option.selected {
-        background: #1e293b;
-        border-color: #10b981;
+    .student-list {
+        max-height: 280px;
+        overflow-y: auto;
+        border: 2px solid var(--gray-200);
+        border-radius: 16px;
+        padding: 8px;
+        margin-bottom: 15px;
     }
 
-    .payment-methods {
+    [data-theme="dark"] .student-list {
+        border-color: var(--gray-300);
+    }
+
+    .student-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .student-list::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 4px;
+    }
+
+    [data-theme="dark"] .student-list::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+    }
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        margin-bottom: 5px;
+    }
+
+        .student-item:hover {
+            background: var(--gray-100);
+            transform: translateX(5px);
+        }
+
+    [data-theme="dark"] .student-item:hover {
+        background: var(--gray-200);
+    }
+
+    .student-item.selected {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+
+    [data-theme="dark"] .student-item.selected {
+        background: var(--gray-200);
+    }
+
+    .student-avatar-sm {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .student-avatar-sm img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .student-info h5 {
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--gray-900);
+    }
+
+    [data-theme="dark"] .student-info h5 {
+        color: white;
+    }
+
+    .student-info p {
+        color: var(--gray-500);
+        font-size: 0.85rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .student-amount {
+        margin-left: auto;
+        text-align: right;
+    }
+
+        .student-amount .label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .student-amount .value {
+            font-weight: 700;
+            color: var(--danger);
+            font-size: 1.1rem;
+        }
+
+    .selected-student-card {
+        background: var(--primary-light);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 2px solid var(--primary);
+        animation: pulse 0.5s ease;
+    }
+
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    }
+
+    [data-theme="dark"] .selected-student-card {
+        background: var(--gray-200);
+    }
+
+    .selected-avatar {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+        .selected-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .selected-details h4 {
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: var(--gray-900);
+    }
+
+    [data-theme="dark"] .selected-details h4 {
+        color: white;
+    }
+
+    .selected-details p {
+        color: var(--gray-600);
+        margin-bottom: 8px;
+    }
+
+    .selected-details .badge {
+        background: var(--primary);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* ====== AMOUNT INPUT STYLES ====== */
+    .amount-display {
+        background: linear-gradient(135deg, var(--primary-light), white);
+        border-radius: 24px;
+        padding: 25px;
+        text-align: center;
+        margin-bottom: 25px;
+        border: 2px dashed var(--primary);
+    }
+
+    [data-theme="dark"] .amount-display {
+        background: var(--gray-200);
+    }
+
+    .amount-display .label {
+        color: var(--gray-600);
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .amount-display .value {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1.2;
+        text-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+    }
+
+    .amount-display .currency {
+        font-size: 1.5rem;
+        color: var(--gray-400);
+    }
+
+    .quick-amounts {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         margin-bottom: 20px;
     }
 
-    .payment-method {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+    .quick-amount-btn {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
         padding: 15px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    [data-theme="dark"] .quick-amount-btn {
+        background: var(--gray-200);
+    }
+
+    .quick-amount-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-colored);
+    }
+
+    .quick-amount-btn i {
+        font-size: 1.2rem;
+    }
+
+    .number-pad {
+        background: var(--gray-100);
+        border-radius: 24px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    [data-theme="dark"] .number-pad {
+        background: var(--gray-200);
+    }
+
+    .num-btn {
+        background: white;
+        border: none;
+        padding: 18px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: var(--gray-900);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow);
+    }
+
+    [data-theme="dark"] .num-btn {
+        background: var(--gray-300);
+        color: white;
+    }
+
+    .num-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(0.95);
+    }
+
+    .num-btn.wide {
+        grid-column: span 2;
+    }
+
+    .num-btn.danger {
+        background: var(--danger);
+        color: white;
+    }
+
+        .num-btn.danger:hover {
+            background: #dc2626;
+        }
+
+    /* ====== PAYMENT METHODS ====== */
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .payment-method-card {
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: 20px;
+        padding: 20px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
     }
 
-        .payment-method:hover {
-            border-color: #10b981;
-        }
-
-        .payment-method.selected {
-            border-color: #10b981;
-            background: #d1fae5;
-        }
-
-    [data-theme="dark"] .payment-method.selected {
-        background: #1e293b;
+    [data-theme="dark"] .payment-method-card {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
     }
 
-    .payment-method i {
-        font-size: 2rem;
-        color: #10b981;
-        margin-bottom: 8px;
-        display: block;
+    .payment-method-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-colored);
     }
 
-    .summary-section {
-        background: #f8fafc;
-        border-radius: 16px;
-        padding: 20px;
-        margin-top: 30px;
+    .payment-method-card.selected {
+        border-color: var(--primary);
+        background: var(--primary-light);
     }
 
-    [data-theme="dark"] .summary-section {
-        background: #0f172a;
+    [data-theme="dark"] .payment-method-card.selected {
+        background: var(--gray-300);
     }
 
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #e2e8f0;
+    .payment-method-card i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 10px;
     }
 
-        .summary-row:last-child {
-            border-bottom: none;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #10b981;
-        }
-
-    .btn-save {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        padding: 12px 32px;
-        border: none;
-        border-radius: 12px;
+    .payment-method-card span {
         font-weight: 600;
-        width: 100%;
+        color: var(--gray-900);
+    }
+
+    [data-theme="dark"] .payment-method-card span {
+        color: white;
+    }
+
+    /* ====== ACTION BUTTONS ====== */
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 16px 32px;
+        border: none;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
         transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-colored);
     }
 
         .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(16,185,129,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px -5px rgba(16, 185, 129, 0.4);
         }
 
-    /* Receipt Modal */
-    .receipt {
+        .btn-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-save i {
+            font-size: 1.2rem;
+        }
+
+    .btn-cancel {
         background: white;
-        padding: 30px;
-        border-radius: 16px;
-        max-width: 500px;
-        margin: 0 auto;
+        color: var(--gray-700);
+        padding: 16px 32px;
+        border: 2px solid var(--gray-200);
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
-    [data-theme="dark"] .receipt {
-        background: #1e293b;
+    [data-theme="dark"] .btn-cancel {
+        background: var(--gray-200);
         color: white;
+        border-color: var(--gray-300);
     }
 
-    .receipt-header {
+    .btn-cancel:hover {
+        background: var(--gray-200);
+        transform: translateY(-2px);
+    }
+
+    /* ====== EMPTY STATE ====== */
+    .empty-state {
         text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 2px dashed #e2e8f0;
+        padding: 60px 20px;
     }
 
-        .receipt-header h3 {
-            font-weight: 800;
-            color: #10b981;
+        .empty-state i {
+            font-size: 5rem;
+            color: var(--gray-300);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-weight: 700;
+            color: var(--gray-900);
             margin-bottom: 10px;
         }
 
-    .receipt-info {
-        margin-bottom: 20px;
-    }
-
-    .receipt-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-        .receipt-row.total {
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #10b981;
-            border-bottom: none;
-            margin-top: 20px;
-        }
-
-    .receipt-footer {
-        text-align: center;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 2px dashed #e2e8f0;
-        color: #64748b;
-        font-size: 0.9rem;
-    }
-
-    .btn-print {
-        background: #10b981;
+    [data-theme="dark"] .empty-state h3 {
         color: white;
-        padding: 10px 24px;
-        border: none;
-        border-radius: 40px;
-        font-weight: 600;
-        margin-top: 20px;
-        width: 100%;
-        transition: all 0.3s ease;
     }
 
-        .btn-print:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
+    .empty-state p {
+        color: var(--gray-500);
+        margin-bottom: 25px;
+    }
 
+    /* ====== LOADING ====== */
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--gray-200);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* ====== RESPONSIVE ====== */
     @@media (max-width: 1024px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .stats-grid
 
-        .filter-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     }
 
     @@media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
+        .stats-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-amounts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .number-pad {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .amount-display .value {
+        font-size: 2.5rem;
+    }
+
+    }
+    /* Amount Input Styling */
+    .input-group {
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+        .input-group:focus-within {
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
         }
 
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
+    .input-group-text {
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-right: none;
+        border-radius: 16px 0 0 16px !important;
+        padding-left: 20px;
+        padding-right: 15px;
+    }
+
+    [data-theme="dark"] .input-group-text {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: white;
+    }
+
+    #amountInput {
+        border: 2px solid var(--gray-200);
+        border-left: none;
+        border-radius: 0 16px 16px 0 !important;
+        height: 60px;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        padding-right: 20px;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] #amountInput {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+        color: white;
+    }
+
+    #amountInput:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: var(--primary);
+    }
+
+    .quick-amounts {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .quick-amount-btn {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 12px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    [data-theme="dark"] .quick-amount-btn {
+        background: var(--gray-200);
+        color: var(--primary);
+    }
+
+    .quick-amount-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-colored);
+    }
+
+    .alert {
+        border-radius: 16px;
+        padding: 15px 20px;
+        border: none;
+    }
+
+    .alert-info {
+        background: #e0f2fe;
+        color: #0369a1;
+        border-left: 4px solid #0284c7;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border-left: 4px solid #f59e0b;
+    }
+
+    [data-theme="dark"] .alert-info {
+        background: #1e293b;
+        color: #7dd3fc;
+    }
+
+    [data-theme="dark"] .alert-warning {
+        background: #1e293b;
+        color: #fcd34d;
     }
 </style>
 
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<!-- Page Header -->
 <div class="page-header">
-    <h2><i class="bi bi-credit-card-fill me-2"></i>ការបង់ប្រាក់</h2>
-    <p class="text-muted">គ្រប់គ្រងការបង់ប្រាក់របស់សិស្ស</p>
+    <h2>
+        <i class="bi bi-credit-card-fill"></i>
+        ការបង់ប្រាក់
+    </h2>
+    <p>គ្រប់គ្រងការបង់ប្រាក់របស់សិស្ស និងតាមដានប្រវត្តិបង់ប្រាក់</p>
 </div>
 
 <!-- Stats Cards -->
@@ -596,8 +1332,8 @@
 <div class="filter-section">
     <div class="filter-grid">
         <div class="filter-item">
-            <label>ជំនាញ</label>
-            <select id="filterMajor">
+            <label><i class="bi bi-bookmark me-1"></i> ជំនាញ</label>
+            <select id="filterMajor" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="Information Technology">Information Technology</option>
                 <option value="Business Administration">Business Administration</option>
@@ -608,8 +1344,8 @@
         </div>
 
         <div class="filter-item">
-            <label>ឆ្នាំសិក្សា</label>
-            <select id="filterYear">
+            <label><i class="bi bi-calendar3 me-1"></i> ឆ្នាំសិក្សា</label>
+            <select id="filterYear" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="1">ឆ្នាំទី១</option>
                 <option value="2">ឆ្នាំទី២</option>
@@ -619,37 +1355,37 @@
         </div>
 
         <div class="filter-item">
-            <label>ស្ថានភាព</label>
-            <select id="filterStatus">
+            <label><i class="bi bi-credit-card me-1"></i> វិធីបង់</label>
+            <select id="filterMethod" class="form-select">
                 <option value="">ទាំងអស់</option>
-                <option value="paid">បង់រួច</option>
-                <option value="pending">មិនទាន់បង់</option>
-                <option value="overdue">ហួសកំណត់</option>
+                <option value="cash">សាច់ប្រាក់</option>
+                <option value="aba">ABA Pay</option>
+                <option value="wing">Wing</option>
             </select>
         </div>
 
         <div class="filter-item">
-            <label>ស្វែងរក</label>
-            <input type="text" id="searchInput" placeholder="ឈ្មោះ ឬលេខសម្គាល់...">
+            <label><i class="bi bi-search me-1"></i> ស្វែងរក</label>
+            <input type="text" id="searchInput" placeholder="ឈ្មោះ លេខសម្គាល់...">
         </div>
     </div>
 
-    <div class="mt-3 d-flex gap-2">
-        <button class="btn-filter" onclick="applyFilter()">
-            <i class="bi bi-search"></i>
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn-filter" onclick="loadPayments()">
+            <i class="bi bi-funnel-fill"></i>
             អនុវត្តតម្រង
         </button>
-        <button class="btn-filter" onclick="resetFilter()" style="background: #64748b;">
-            <i class="bi bi-arrow-counterclockwise"></i>
-            កំណត់ឡើងវិញ
+        <button class="btn-export" onclick="exportPayments()">
+            <i class="bi bi-file-earmark-excel"></i>
+            នាំចេញ Excel
         </button>
     </div>
 </div>
 
-<!-- Add Payment Button -->
-<div class="d-flex justify-content-between align-items-center mb-3">
+<!-- Action Buttons -->
+<div class="action-bar">
     <button class="btn-add" onclick="openAddPaymentModal()">
-        <i class="bi bi-plus-circle"></i>
+        <i class="bi bi-plus-circle-fill"></i>
         កត់ត្រាការបង់ប្រាក់ថ្មី
     </button>
 </div>
@@ -659,268 +1395,547 @@
     <table class="payment-table">
         <thead>
             <tr>
-                <th>លេខវិក្កយបត្រ</th>
+                <th>វិក្កយបត្រ</th>
                 <th>សិស្ស</th>
                 <th>ជំនាញ</th>
                 <th>កាលបរិច្ឆេទ</th>
-                <th>វិធីបង់ប្រាក់</th>
+                <th>វិធីបង់</th>
+                <th>ឆមាស</th>
                 <th>ទឹកប្រាក់</th>
                 <th>ស្ថានភាព</th>
                 <th class="text-center">សកម្មភាព</th>
             </tr>
         </thead>
         <tbody id="paymentTableBody">
-            <!-- Data will be loaded by JavaScript -->
+            <tr>
+                <td colspan="9" class="text-center py-5">
+                    <div class="loading-spinner"></div>
+                    <p class="mt-3 text-muted">កំពុងផ្ទុកទិន្នន័យ...</p>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
 
-<!-- Summary Section -->
-<div class="summary-section">
-    <h5 class="fw-bold mb-3">សង្ខេបការបង់ប្រាក់ប្រចាំខែ</h5>
-    <div id="monthlySummary">
-        <!-- Monthly summary will be loaded here -->
-    </div>
-</div>
-
 <!-- Add Payment Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal fade" id="paymentModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-plus-circle me-2"></i>
+                    <i class="bi bi-plus-circle-fill"></i>
                     កត់ត្រាការបង់ប្រាក់ថ្មី
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="paymentForm">
-                    <div class="form-group">
-                        <label class="form-label">ជ្រើសរើសសិស្ស</label>
-                        <div class="student-select" id="studentSelect">
-                            <!-- Students will be loaded here -->
+                <!-- Step 1: Select Student -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <span class="badge bg-success me-2">១</span>
+                        ជ្រើសរើសសិស្ស
+                    </h6>
+
+                    <!-- Search Student -->
+                    <div class="student-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="studentSearch" placeholder="ស្វែងរកតាមឈ្មោះ ឬលេខសម្គាល់...">
+                    </div>
+
+                    <!-- Student List -->
+                    <div class="student-list" id="studentList">
+                        <!-- Students will be loaded here -->
+                    </div>
+
+                    <!-- Selected Student -->
+                    <div id="selectedStudentCard" class="selected-student-card" style="display: none;">
+                        <div class="selected-avatar" id="selectedAvatar">?</div>
+                        <div class="selected-details">
+                            <h4 id="selectedName"></h4>
+                            <p id="selectedInfo"></p>
+                            <span class="badge" id="selectedAmount">ជំពាក់: $0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Enter Amount - កែប្រែថ្មី -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <span class="badge bg-success me-2">២</span>
+                        បញ្ចូលចំនួនទឹកប្រាក់
+                    </h6>
+
+                    <!-- Amount Display -->
+                    <div class="amount-display">
+                        <div class="label">ចំនួនទឹកប្រាក់ត្រូវបង់</div>
+                        <div class="value">
+                            <span class="currency">$</span>
+                            <span id="amountValue">0.00</span>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">ចំនួនទឹកប្រាក់ ($)</label>
-                                <input type="number" id="amount" class="form-control" placeholder="0.00" step="0.01" required>
-                            </div>
+                    <!-- Amount Input - Typing Method -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-pencil-square me-1"></i>
+                            វាយបញ្ចូលចំនួនទឹកប្រាក់
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-2 border-end-0" style="font-size: 1.2rem; font-weight: 600;">$</span>
+                            <input type="text"
+                                   id="amountInput"
+                                   class="form-control border-2"
+                                   placeholder="0.00"
+                                   value="0.00"
+                                   style="font-size: 1.5rem; font-weight: 600; height: 60px; border-left: none;">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">កាលបរិច្ឆេទបង់ប្រាក់</label>
-                                <input type="date" id="paymentDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required>
-                            </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="bi bi-info-circle me-1"></i>
+                            អាចវាយបញ្ចូលចំនួនទឹកប្រាក់ដោយផ្ទាល់ (ឧទាហរណ៍: 10.50, 25, 100)
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">វិធីបង់ប្រាក់</label>
-                        <div class="payment-methods" id="paymentMethods">
-                            <div class="payment-method selected" onclick="selectPaymentMethod('cash', this)">
-                                <i class="bi bi-cash"></i>
-                                <span>សាច់ប្រាក់</span>
-                            </div>
-                            <div class="payment-method" onclick="selectPaymentMethod('aba', this)">
-                                <i class="bi bi-phone"></i>
-                                <span>ABA Pay</span>
-                            </div>
-                            <div class="payment-method" onclick="selectPaymentMethod('wing', this)">
-                                <i class="bi bi-bank"></i>
-                                <span>Wing</span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="paymentMethod" value="cash">
+                    <!-- Quick Amount Buttons (ជំនួយ) -->
+                    <div class="quick-amounts">
+                        <button type="button" class="quick-amount-btn" data-amount="10">+ $10</button>
+                        <button type="button" class="quick-amount-btn" data-amount="20">+ $20</button>
+                        <button type="button" class="quick-amount-btn" data-amount="50">+ $50</button>
+                        <button type="button" class="quick-amount-btn" data-amount="100">+ $100</button>
+                        <button type="button" class="quick-amount-btn" data-amount="200">+ $200</button>
+                        <button type="button" class="quick-amount-btn" data-amount="500">+ $500</button>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">កំណត់ចំណាំ</label>
-                        <input type="text" id="note" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ (បើមាន)...">
+                    <!-- Due Amount Reminder -->
+                    <div class="alert alert-info mt-3" id="dueReminder" style="display: none;">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <span id="dueMessage"></span>
                     </div>
+                </div>
 
-                    <div class="summary-section">
-                        <div class="summary-row">
-                            <span>ចំនួនទឹកប្រាក់ត្រូវបង់:</span>
-                            <span id="summaryAmount">$0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>សមប្រភេទ:</span>
-                            <span id="summarySemester">ឆមាសទី ១</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>សរុបដែលត្រូវបង់:</span>
-                            <span id="summaryTotal">$0.00</span>
+                <!-- Step 3: Payment Details -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-calendar3"></i>
+                                កាលបរិច្ឆេទបង់ប្រាក់
+                            </label>
+                            <input type="date" id="paymentDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                         </div>
                     </div>
-                </form>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-bookmark"></i>
+                                ឆមាស
+                            </label>
+                            <select id="semester" class="form-select">
+                                <option value="ឆមាសទី១">ឆមាសទី១</option>
+                                <option value="ឆមាសទី២">ឆមាសទី២</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-credit-card"></i>
+                        វិធីបង់ប្រាក់
+                    </label>
+                    <div class="payment-methods">
+                        <div class="payment-method-card selected" onclick="selectPaymentMethod('cash', this)">
+                            <i class="bi bi-cash"></i>
+                            <span>សាច់ប្រាក់</span>
+                        </div>
+                        <div class="payment-method-card" onclick="selectPaymentMethod('aba', this)">
+                            <i class="bi bi-phone"></i>
+                            <span>ABA Pay</span>
+                        </div>
+                        <div class="payment-method-card" onclick="selectPaymentMethod('wing', this)">
+                            <i class="bi bi-bank"></i>
+                            <span>Wing</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="paymentMethod" value="cash">
+                </div>
+
+                <!-- Note -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-chat-dots"></i>
+                        កំណត់ចំណាំ (ស្រេចចិត្ត)
+                    </label>
+                    <input type="text" id="note" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ...">
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
-                <button type="button" class="btn btn-save" onclick="savePayment()">រក្សាទុកការបង់ប្រាក់</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Receipt Modal -->
-<div class="modal fade" id="receiptModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-receipt me-2"></i>
-                    វិក្កយបត្របង់ប្រាក់
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="receiptContent">
-                <!-- Receipt content will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
-                <button type="button" class="btn btn-print" onclick="printReceipt()">
-                    <i class="bi bi-printer me-2"></i>បោះពុម្ព
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+                    បោះបង់
+                </button>
+                <button type="button" class="btn-save" onclick="savePayment()" id="saveBtn">
+                    <i class="bi bi-check-lg"></i>
+                    បញ្ជាក់ការបង់ប្រាក់
                 </button>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
+    // ==================== GLOBAL VARIABLES ====================
     let students = [];
     let payments = [];
     let selectedStudent = null;
     let currentPaymentMethod = 'cash';
-    let currentReceipt = null;
+    let isSaving = false;
 
+    // ==================== DOCUMENT READY ====================
     $(document).ready(function() {
+        console.log("Payment page loaded");
         loadStudents();
         loadPayments();
+
+        // Initialize amount input
+        initializeAmountInput();
+
+        // Student search
+        $('#studentSearch').on('keyup', function() {
+            filterStudentList();
+        });
+
+        // Quick amount buttons
+        $('.quick-amount-btn').click(function() {
+            let amount = $(this).data('amount');
+            let currentAmount = parseFloat($('#amountInput').val()) || 0;
+            let newAmount = currentAmount + amount;
+
+            // Check if exceeds due amount
+            if (selectedStudent && newAmount > selectedStudent.amountDue) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ប្រយ័ត្ន!',
+                    text: `ចំនួនទឹកប្រាក់សរុប ($${newAmount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${selectedStudent.amountDue.toFixed(2)})`,
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+
+            $('#amountInput').val(newAmount.toFixed(2));
+            updateAmountDisplay(newAmount);
+        });
+
+        // Reset modal when closed
+        $('#paymentModal').on('hidden.bs.modal', function() {
+            resetPaymentForm();
+        });
+
+        // Filter change events
+        $('#filterMajor, #filterYear, #filterMethod, #searchInput').on('change keyup', function() {
+            renderPaymentsTable();
+        });
     });
 
+    // ==================== AMOUNT FUNCTIONS ====================
+    function initializeAmountInput() {
+        let amountInput = document.getElementById('amountInput');
+        if (!amountInput) return;
+
+        // Format number on input
+        amountInput.addEventListener('input', function(e) {
+            let value = this.value;
+
+            // Remove any non-numeric characters except dot
+            value = value.replace(/[^\d.]/g, '');
+
+            // Ensure only one decimal point
+            let parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            // Limit decimal places to 2
+            if (parts.length === 2 && parts[1].length > 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+
+            this.value = value;
+
+            // Update amount value
+            let numValue = parseFloat(value) || 0;
+            updateAmountDisplay(numValue);
+        });
+
+        // Handle blur event
+        amountInput.addEventListener('blur', function(e) {
+            let value = this.value;
+            if (value === '' || value === '.') {
+                this.value = '0.00';
+                updateAmountDisplay(0);
+            } else {
+                // Format to 2 decimal places
+                let num = parseFloat(value) || 0;
+                this.value = num.toFixed(2);
+                updateAmountDisplay(num);
+            }
+        });
+
+        // Handle focus - select all text
+        amountInput.addEventListener('focus', function(e) {
+            this.select();
+        });
+    }
+
+    function updateAmountDisplay(amount) {
+        $('#amountValue').text(amount.toFixed(2));
+
+        // Show due reminder if student selected
+        if (selectedStudent) {
+            let dueAmount = selectedStudent.amountDue || 0;
+            if (amount > dueAmount) {
+                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${amount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${dueAmount.toFixed(2)})`);
+                $('#dueReminder').removeClass('alert-info').addClass('alert-warning').show();
+            } else if (amount > 0) {
+                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${(dueAmount - amount).toFixed(2)}`);
+                $('#dueReminder').removeClass('alert-warning').addClass('alert-info').show();
+            } else {
+                $('#dueReminder').hide();
+            }
+        }
+    }
+
+    // ==================== STUDENT FUNCTIONS ====================
     function loadStudents() {
         $.ajax({
             url: '/Student/GetStudents',
             type: 'GET',
-            success: function(data) {
-                students = data;
-                populateStudentSelect();
+            cache: false,
+            success: function(response) {
+                console.log("Students loaded:", response);
+
+                if (response && response.success) {
+                    students = response.data || [];
+                } else if (Array.isArray(response)) {
+                    students = response;
+                } else {
+                    students = [];
+                }
+
+                renderStudentList();
                 updateStats();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading students:', error);
+                showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យសិស្ស');
             }
         });
     }
 
-    function loadPayments() {
-        $.ajax({
-            url: '/Student/GetPayments',
-            type: 'GET',
-            success: function(data) {
-                payments = data;
-                displayPayments();
-                updateStats();
-                generateMonthlySummary();
-            }
-        });
-    }
+    function renderStudentList() {
+        let container = $('#studentList');
+        container.empty();
 
-    function populateStudentSelect() {
-        var select = $('#studentSelect');
-        select.empty();
+        if (!students || students.length === 0) {
+            container.html(`
+                <div class="text-center p-4 text-muted">
+                    <i class="bi bi-people fs-1"></i>
+                    <p class="mt-2">មិនទាន់មានទិន្នន័យសិស្ស</p>
+                </div>
+            `);
+            return;
+        }
 
         students.forEach(s => {
-            var option = `
-                <div class="student-option" onclick="selectStudent('${s.id}')" id="student_${s.id}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${s.name || 'មិនមានឈ្មោះ'}</strong>
-                            <div class="small text-muted">${s.id} | ${s.major || 'N/A'} | ឆ្នាំទី${s.year || '?'}</div>
-                        </div>
-                        <div class="text-end">
-                            <span class="fw-bold text-danger">$<span id="due_${s.id}">${s.amountDue || 0}</span></span>
-                        </div>
+            let avatarHtml = s.photo ?
+                `<img src="${s.photo}" alt="${s.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.name || 'User')}&background=10b981&color=fff'">` :
+                (s.name ? s.name.charAt(0).toUpperCase() : '?');
+
+            let item = `
+                <div class="student-item" onclick="selectStudent('${s.id}')" id="student_${s.id}">
+                    <div class="student-avatar-sm">
+                        ${avatarHtml}
+                    </div>
+                    <div class="student-info flex-grow-1">
+                        <h5>${s.name || 'មិនមានឈ្មោះ'}</h5>
+                        <p>
+                            <i class="bi bi-upc-scan"></i> ${s.id} |
+                            <i class="bi bi-star"></i> ${s.major || 'N/A'} |
+                            <i class="bi bi-calendar3"></i> ឆ្នាំទី${s.year || '?'}
+                        </p>
+                    </div>
+                    <div class="student-amount">
+                        <div class="label">ជំពាក់</div>
+                        <div class="value">$${(s.amountDue || 0).toFixed(2)}</div>
                     </div>
                 </div>
             `;
-            select.append(option);
+            container.append(item);
+        });
+    }
+
+    function filterStudentList() {
+        let searchText = $('#studentSearch').val().toLowerCase();
+
+        $('.student-item').each(function() {
+            let text = $(this).text().toLowerCase();
+            if (text.includes(searchText) || searchText === '') {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
         });
     }
 
     function selectStudent(studentId) {
-        $('.student-option').removeClass('selected');
+        let student = students.find(s => s.id === studentId);
+        if (!student) return;
+
+        selectedStudent = student;
+
+        // Update UI
+        $('.student-item').removeClass('selected');
         $(`#student_${studentId}`).addClass('selected');
-        selectedStudent = students.find(s => s.id === studentId);
 
-        if (selectedStudent) {
-            $('#summaryAmount').text(`$${selectedStudent.amountDue || 0}`);
-            $('#summaryTotal').text(`$${selectedStudent.amountDue || 0}`);
+        // Show selected card
+        let avatarHtml = student.photo ?
+            `<img src="${student.photo}" alt="${student.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(student.name || 'User')}&background=10b981&color=fff'">` :
+            (student.name ? student.name.charAt(0).toUpperCase() : '?');
+
+        $('#selectedAvatar').html(avatarHtml);
+        $('#selectedName').text(student.name || 'មិនមានឈ្មោះ');
+        $('#selectedInfo').text(`${student.major || 'N/A'} | ឆ្នាំទី${student.year || '?'} | ${student.id}`);
+        $('#selectedAmount').text(`ជំពាក់: $${(student.amountDue || 0).toFixed(2)}`);
+
+        $('#selectedStudentCard').fadeIn(300);
+
+        // Update due reminder with current amount
+        let currentAmount = parseFloat($('#amountInput').val()) || 0;
+        if (currentAmount > 0) {
+            if (currentAmount > student.amountDue) {
+                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${currentAmount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${student.amountDue.toFixed(2)})`);
+                $('#dueReminder').removeClass('alert-info').addClass('alert-warning').show();
+            } else {
+                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${(student.amountDue - currentAmount).toFixed(2)}`);
+                $('#dueReminder').removeClass('alert-warning').addClass('alert-info').show();
+            }
         }
+
+        // Scroll to selected student
+        $(`#student_${studentId}`)[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function selectPaymentMethod(method, element) {
-        $('.payment-method').removeClass('selected');
-        $(element).addClass('selected');
-        currentPaymentMethod = method;
-        $('#paymentMethod').val(method);
+    // ==================== PAYMENT FUNCTIONS ====================
+    function loadPayments() {
+        $('#paymentTableBody').html(`
+            <tr>
+                <td colspan="9" class="text-center py-5">
+                    <div class="loading-spinner"></div>
+                    <p class="mt-3 text-muted">កំពុងផ្ទុកទិន្នន័យ...</p>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: '/Student/GetPayments',
+            type: 'GET',
+            cache: false,
+            success: function(response) {
+                console.log("Payments loaded:", response);
+
+                if (response && response.success) {
+                    payments = response.data || [];
+                } else if (Array.isArray(response)) {
+                    payments = response;
+                } else {
+                    payments = [];
+                }
+
+                renderPaymentsTable();
+                updateStats();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading payments:', error);
+                showTableError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
+            }
+        });
     }
 
-    function displayPayments() {
-        var tbody = $('#paymentTableBody');
+    function renderPaymentsTable() {
+        let tbody = $('#paymentTableBody');
         tbody.empty();
 
-        if (payments.length === 0) {
+        if (!payments || payments.length === 0) {
             tbody.html(`
                 <tr>
-                    <td colspan="8" class="text-center py-5">
-                        <i class="bi bi-credit-card" style="font-size: 4rem; color: #cbd5e1;"></i>
-                        <h5 class="mt-3 text-muted">មិនទាន់មានកំណត់ត្រាការបង់ប្រាក់នៅឡើយទេ</h5>
+                    <td colspan="9" class="text-center py-5">
+                        <div class="empty-state">
+                            <i class="bi bi-credit-card"></i>
+                            <h3>មិនទាន់មានកំណត់ត្រាការបង់ប្រាក់</h3>
+                            <p>ចាប់ផ្តើមកត់ត្រាការបង់ប្រាក់ដំបូង</p>
+                            <button class="btn-add" onclick="openAddPaymentModal()">
+                                <i class="bi bi-plus-circle"></i>
+                                កត់ត្រាឥឡូវនេះ
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `);
             return;
         }
 
-        var major = $('#filterMajor').val();
-        var year = $('#filterYear').val();
-        var status = $('#filterStatus').val();
-        var search = $('#searchInput').val().toLowerCase();
+        let major = $('#filterMajor').val();
+        let year = $('#filterYear').val();
+        let method = $('#filterMethod').val();
+        let search = $('#searchInput').val().toLowerCase();
 
-        var filtered = payments.filter(p => {
-            var student = students.find(s => s.id === p.studentId);
+        let filtered = payments.filter(p => {
+            let student = students.find(s => s.id === p.studentId);
             if (!student) return false;
 
-            var matchMajor = !major || student.major === major;
-            var matchYear = !year || student.year === year;
-            var matchStatus = !status ||
-                (status === 'paid' && p.status === 'បង់រួច') ||
-                (status === 'pending' && p.status === 'មិនទាន់បង់') ||
-                (status === 'overdue' && p.status === 'ហួសកំណត់');
-            var matchSearch = !search ||
+            let matchMajor = !major || student.major === major;
+            let matchYear = !year || student.year === year;
+            let matchMethod = !method || p.paymentMethod === method;
+            let matchSearch = !search ||
                 (student.name && student.name.toLowerCase().includes(search)) ||
                 (p.receiptNumber && p.receiptNumber.toLowerCase().includes(search));
 
-            return matchMajor && matchYear && matchStatus && matchSearch;
+            return matchMajor && matchYear && matchMethod && matchSearch;
         });
 
-        filtered.forEach(p => {
-            var student = students.find(s => s.id === p.studentId) || {};
-            var statusClass = p.status === 'បង់រួច' ? 'status-paid' :
-                             p.status === 'មិនទាន់បង់' ? 'status-pending' : 'status-overdue';
+        if (filtered.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="9" class="text-center py-5">
+                        <i class="bi bi-search fs-1 text-muted"></i>
+                        <p class="mt-2">មិនមានកំណត់ត្រាដែលត្រូវនឹងតម្រង</p>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
 
-            var row = `
+        filtered.forEach(p => {
+            let student = students.find(s => s.id === p.studentId) || {};
+            let avatarHtml = student.photo ?
+                `<img src="${student.photo}" alt="${student.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(student.name || 'User')}&background=10b981&color=fff'">` :
+                (student.name ? student.name.charAt(0).toUpperCase() : '?');
+
+            let date = p.paymentDate ? new Date(p.paymentDate) : new Date();
+            let formattedDate = date.toLocaleDateString('km-KH');
+
+            let row = `
                 <tr>
                     <td>
                         <span class="receipt-badge">
-                            <i class="bi bi-upc-scan me-1"></i>${p.receiptNumber || 'N/A'}
+                            <i class="bi bi-upc-scan"></i> ${p.receiptNumber || 'N/A'}
                         </span>
                     </td>
                     <td>
                         <div class="student-info">
                             <div class="student-avatar">
-                                ${student.name ? student.name.charAt(0).toUpperCase() : '?'}
+                                ${avatarHtml}
                             </div>
                             <div>
                                 <div class="fw-bold">${student.name || 'មិនមានឈ្មោះ'}</div>
@@ -929,22 +1944,22 @@
                         </div>
                     </td>
                     <td>${student.major || 'N/A'}</td>
-                    <td>${new Date(p.paymentDate).toLocaleDateString('km-KH')}</td>
+                    <td>${formattedDate}</td>
                     <td>
                         <i class="bi ${p.paymentMethod === 'cash' ? 'bi-cash' : p.paymentMethod === 'aba' ? 'bi-phone' : 'bi-bank'} me-1"></i>
                         ${p.paymentMethod === 'cash' ? 'សាច់ប្រាក់' : p.paymentMethod === 'aba' ? 'ABA Pay' : 'Wing'}
                     </td>
-                    <td class="amount-paid">$${p.amount?.toFixed(2) || '0.00'}</td>
+                    <td>${p.semester || 'ឆមាសទី១'}</td>
+                    <td class="amount-paid">$${(p.amount || 0).toFixed(2)}</td>
                     <td>
-                        <span class="status-badge ${statusClass}">${p.status || 'បង់រួច'}</span>
+                        <span class="status-badge status-paid">បង់រួច</span>
                     </td>
                     <td class="text-center">
-                        <button class="btn-icon" onclick="viewReceipt('${p.receiptNumber}')" title="មើលវិក្កយបត្រ">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="printReceiptDirect('${p.receiptNumber}')" title="បោះពុម្ព">
-                            <i class="bi bi-printer"></i>
-                        </button>
+                        <div class="d-flex gap-1 justify-content-center">
+                            <button class="btn-icon" onclick="deletePayment(${p.id})" title="លុប">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -953,100 +1968,135 @@
     }
 
     function updateStats() {
-        var totalCollected = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-        var totalPaid = payments.length;
-        var totalPending = students.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
+        if (!students || !payments) return;
 
-        $('#totalCollected').text(`$${totalCollected.toFixed(2)}`);
-        $('#totalPending').text(`$${totalPending.toFixed(2)}`);
+        let totalCollected = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        let totalPaid = payments.length;
+        let totalPending = students.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
+
+        $('#totalCollected').text('$' + totalCollected.toFixed(2));
+        $('#totalPending').text('$' + Math.max(0, totalPending).toFixed(2));
         $('#totalPaid').text(totalPaid);
         $('#totalStudents').text(students.length);
     }
 
-    function generateMonthlySummary() {
-        var summary = {};
-        var months = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
-                      'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
-
-        payments.forEach(p => {
-            var date = new Date(p.paymentDate);
-            var monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-            var monthName = months[date.getMonth()];
-
-            if (!summary[monthKey]) {
-                summary[monthKey] = {
-                    month: monthName,
-                    year: date.getFullYear(),
-                    total: 0,
-                    count: 0
-                };
-            }
-            summary[monthKey].total += p.amount || 0;
-            summary[monthKey].count++;
-        });
-
-        var html = '<div class="row">';
-        Object.values(summary).sort((a, b) => b.year - a.year || months.indexOf(b.month) - months.indexOf(a.month))
-            .slice(0, 3).forEach(s => {
-                html += `
-                    <div class="col-md-4">
-                        <div class="card border-0 bg-light p-3 rounded-3">
-                            <h6 class="fw-bold mb-2">${s.month} ${s.year}</h6>
-                            <div class="d-flex justify-content-between">
-                                <span>សរុប:</span>
-                                <span class="fw-bold text-success">$${s.total.toFixed(2)}</span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>ចំនួនដង:</span>
-                                <span class="fw-bold">${s.count}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        html += '</div>';
-        $('#monthlySummary').html(html);
-    }
-
+    // ==================== MODAL FUNCTIONS ====================
     function openAddPaymentModal() {
-        selectedStudent = null;
-        $('.student-option').removeClass('selected');
-        $('#amount').val('');
-        $('#paymentDate').val(new Date().toISOString().split('T')[0]);
-        $('#note').val('');
-        $('#summaryAmount').text('$0.00');
-        $('#summaryTotal').text('$0.00');
+        if (!students || students.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'គ្មានទិន្នន័យសិស្ស',
+                text: 'សូមបន្ថែមសិស្សជាមុនសិន',
+                confirmButtonColor: '#10b981'
+            });
+            return;
+        }
+
+        resetPaymentForm();
         $('#paymentModal').modal('show');
+
+        // Focus on search input
+        setTimeout(function() {
+            $('#studentSearch').focus();
+        }, 500);
     }
 
+    function resetPaymentForm() {
+        selectedStudent = null;
+        currentPaymentMethod = 'cash';
+
+        $('#amountInput').val('0.00');
+        $('#amountValue').text('0.00');
+        $('.student-item').removeClass('selected');
+        $('#selectedStudentCard').hide();
+        $('#dueReminder').hide();
+        $('#studentSearch').val('');
+        $('.student-item').show();
+        $('#note').val('');
+        $('#paymentDate').val(new Date().toISOString().split('T')[0]);
+        $('#semester').val('ឆមាសទី១');
+
+        $('.payment-method-card').removeClass('selected');
+        $('.payment-method-card:first').addClass('selected');
+        $('#paymentMethod').val('cash');
+    }
+
+    function selectPaymentMethod(method, element) {
+        $('.payment-method-card').removeClass('selected');
+        $(element).addClass('selected');
+        currentPaymentMethod = method;
+        $('#paymentMethod').val(method);
+    }
+
+    // ==================== SAVE PAYMENT ====================
     function savePayment() {
+        if (isSaving) return;
+
         if (!selectedStudent) {
             Swal.fire({
                 icon: 'warning',
-                title: 'សូមជ្រើសរើសសិស្ស',
+                title: 'ជ្រើសរើសសិស្ស',
+                text: 'សូមជ្រើសរើសសិស្សមុនពេលរក្សាទុក',
                 confirmButtonColor: '#10b981'
             });
             return;
         }
 
-        var amount = parseFloat($('#amount').val());
-        if (!amount || amount <= 0) {
+        let amount = parseFloat($('#amountInput').val()) || 0;
+
+        if (amount <= 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'សូមបញ្ចូលចំនួនទឹកប្រាក់',
+                title: 'បញ្ចូលចំនួនទឹកប្រាក់',
+                text: 'សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ',
                 confirmButtonColor: '#10b981'
             });
             return;
         }
 
-        var paymentData = {
+        if (amount > (selectedStudent.amountDue || 0)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'ចំនួនទឹកប្រាក់លើស',
+                text: `សិស្សនេះជំពាក់តែ $${(selectedStudent.amountDue || 0).toFixed(2)} ប៉ុណ្ណោះ`,
+                confirmButtonColor: '#10b981'
+            });
+            return;
+        }
+
+        let token = $('input[name="__RequestVerificationToken"]').val();
+        if (!token) {
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'មិនអាចរកឃើញ Token សុវត្ថិភាព'
+            });
+            return;
+        }
+
+        let paymentData = {
             studentId: selectedStudent.id,
+            studentName: selectedStudent.name,
             amount: amount,
             paymentDate: $('#paymentDate').val(),
             paymentMethod: currentPaymentMethod,
-            note: $('#note').val(),
-            status: 'បង់រួច'
+            semester: $('#semester').val(),
+            academicYear: '2025-2026',
+            note: $('#note').val() || ''
         };
+
+        console.log("Saving payment:", paymentData);
+
+        isSaving = true;
+        $('#paymentModal').modal('hide');
+
+        Swal.fire({
+            title: 'កំពុងរក្សាទុក...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         $.ajax({
             url: '/Student/SavePayment',
@@ -1054,144 +2104,143 @@
             contentType: 'application/json',
             data: JSON.stringify(paymentData),
             headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                'RequestVerificationToken': token
             },
             success: function(response) {
-                if (response.success) {
-                    $('#paymentModal').modal('hide');
+                isSaving = false;
+                console.log("Save response:", response);
+
+                if (response && response.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'ជោគជ័យ!',
-                        text: response.message,
+                        text: response.message || 'កត់ត្រាការបង់ប្រាក់ដោយជោគជ័យ',
                         timer: 2000,
                         showConfirmButton: false
                     });
                     loadPayments();
+                    loadStudents();
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'កំហុស',
-                        text: response.message
+                        text: response.message || 'មានបញ្ហាក្នុងការរក្សាទុក'
                     });
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                isSaving = false;
+                console.error("Save error:", error);
+                console.error("Response:", xhr.responseText);
+
+                let errorMsg = 'មានបញ្ហាបច្ចេកទេស';
+                try {
+                    let res = JSON.parse(xhr.responseText);
+                    errorMsg = res.message || errorMsg;
+                } catch(e) {
+                    errorMsg = xhr.responseText || errorMsg;
+                }
+
                 Swal.fire({
                     icon: 'error',
                     title: 'កំហុស',
-                    text: 'មានបញ្ហាបច្ចេកទេស'
+                    text: errorMsg
                 });
             }
         });
     }
 
-    function viewReceipt(receiptNumber) {
-        var payment = payments.find(p => p.receiptNumber === receiptNumber);
-        var student = students.find(s => s.id === payment.studentId);
+    // ==================== DELETE PAYMENT ====================
+    function deletePayment(id) {
+        Swal.fire({
+            title: 'លុបកំណត់ត្រា?',
+            text: 'តើអ្នកពិតជាចង់លុបកំណត់ត្រានេះមែនទេ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'បាទ, លុប',
+            cancelButtonText: 'បោះបង់',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let token = $('input[name="__RequestVerificationToken"]').val();
 
-        currentReceipt = { payment, student };
+                Swal.fire({
+                    title: 'កំពុងដំណើរការ...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-        var receiptHtml = `
-            <div class="receipt">
-                <div class="receipt-header">
-                    <h3>HR UNIVERSITY</h3>
-                    <p>វិក្កយបត្របង់ប្រាក់</p>
-                </div>
-
-                <div class="receipt-info">
-                    <div class="receipt-row">
-                        <span>លេខវិក្កយបត្រ:</span>
-                        <span class="fw-bold">${payment.receiptNumber}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>ថ្ងៃ-ខែ-ឆ្នាំ:</span>
-                        <span>${new Date(payment.paymentDate).toLocaleDateString('km-KH')}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>ឈ្មោះសិស្ស:</span>
-                        <span>${student?.name || 'N/A'}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>លេខសម្គាល់:</span>
-                        <span>${payment.studentId}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>ជំនាញ:</span>
-                        <span>${student?.major || 'N/A'}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>វិធីបង់ប្រាក់:</span>
-                        <span>${payment.paymentMethod === 'cash' ? 'សាច់ប្រាក់' : payment.paymentMethod === 'aba' ? 'ABA Pay' : 'Wing'}</span>
-                    </div>
-                    <div class="receipt-row">
-                        <span>កំណត់ចំណាំ:</span>
-                        <span>${payment.note || 'គ្មាន'}</span>
-                    </div>
-                    <div class="receipt-row total">
-                        <span>ចំនួនទឹកប្រាក់:</span>
-                        <span>$${payment.amount?.toFixed(2)}</span>
-                    </div>
-                </div>
-
-                <div class="receipt-footer">
-                    <p>សូមអរគុណសម្រាប់ការបង់ប្រាក់</p>
-                    <small>វិក្កយបត្រនេះត្រូវបានបង្កើតដោយប្រព័ន្ធ</small>
-                </div>
-            </div>
-        `;
-
-        $('#receiptContent').html(receiptHtml);
-        $('#receiptModal').modal('show');
-    }
-
-    function printReceipt() {
-        var printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>វិក្កយបត្របង់ប្រាក់</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                    <style>
-                        body { padding: 40px; font-family: 'Khmer OS', 'Kantumruy Pro', sans-serif; }
-                        .receipt { max-width: 500px; margin: 0 auto; }
-                        .receipt-header { text-align: center; margin-bottom: 30px; }
-                        .receipt-header h3 { color: #10b981; font-weight: 800; }
-                        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }
-                        .receipt-row.total { font-weight: 800; font-size: 1.2rem; color: #10b981; }
-                        .receipt-footer { text-align: center; margin-top: 30px; color: #666; }
-                        @@media print {
-                            .no-print { display: none; }
+                $.ajax({
+                    url: '/Student/DeletePayment',
+                    type: 'POST',
+                    data: { id: id },
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function(response) {
+                        if (response && response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ជោគជ័យ!',
+                                text: response.message || 'លុបកំណត់ត្រាដោយជោគជ័យ',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            loadPayments();
+                            loadStudents();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'កំហុស',
+                                text: response.message || 'មានបញ្ហាក្នុងការលុប'
+                            });
                         }
-                    </style>
-                </head>
-                <body>
-                    ${$('#receiptContent').html()}
-                    <div class="text-center mt-4 no-print">
-                        <button class="btn btn-primary" onclick="window.print()">បោះពុម្ព</button>
-                        <button class="btn btn-secondary" onclick="window.close()">បិទ</button>
-                    </div>
-                </body>
-            </html>
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'កំហុស',
+                            text: 'មានបញ្ហាបច្ចេកទេស: ' + error
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function exportPayments() {
+        window.location.href = '/Student/ExportPayments';
+    }
+
+    function showError(message) {
+        $('#studentList').html(`
+            <div class="text-center p-4 text-danger">
+                <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                <p class="mt-2">${message}</p>
+                <button class="btn btn-sm btn-primary mt-2" onclick="loadStudents()">
+                    <i class="bi bi-arrow-clockwise"></i> ព្យាយាមម្តងទៀត
+                </button>
+            </div>
         `);
-        printWindow.document.close();
     }
 
-    function printReceiptDirect(receiptNumber) {
-        viewReceipt(receiptNumber);
-        setTimeout(() => {
-            printReceipt();
-        }, 500);
-    }
-
-    function applyFilter() {
-        displayPayments();
-    }
-
-    function resetFilter() {
-        $('#filterMajor').val('');
-        $('#filterYear').val('');
-        $('#filterStatus').val('');
-        $('#searchInput').val('');
-        displayPayments();
+    function showTableError(message) {
+        $('#paymentTableBody').html(`
+            <tr>
+                <td colspan="9" class="text-center py-5">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-danger">${message}</h5>
+                    <button class="btn-filter mt-3" onclick="loadPayments()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        ព្យាយាមម្តងទៀត
+                    </button>
+                </td>
+            </tr>
+        `);
     }
 </script>

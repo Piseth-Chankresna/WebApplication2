@@ -85,6 +85,15 @@
             scrollbar-width: thin;
         }
 
+            .sidebar-scroll-area::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .sidebar-scroll-area::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 4px;
+            }
+
         .sidebar .nav-link {
             color: var(--text-muted);
             padding: 10px 20px;
@@ -471,7 +480,7 @@
             function loadUserData() {
                 const savedName = localStorage.getItem('userFullName') || 'Admin User';
                 const savedPhoto = localStorage.getItem('userProfilePic');
-                $('#navUsername').text(savedName);
+                $('#navUsername, #welcomeName').text(savedName);
                 $('#inputFullName').val(savedName);
                 const avatar = savedPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(savedName)}&background=random&color=fff`;
                 $('#navbarProfileImg, #previewImg, #profileInfoImg').attr('src', avatar);
@@ -482,21 +491,24 @@
             function loadInitialPage() {
                 var path = window.location.pathname;
                 var menuItem = $('.ajax-link[data-url="' + path + '"]');
-                var title = menuItem.text().trim() || 'Home Overview';
 
-                if (path !== '/' && path !== '/Home/Index') {
+                if (path !== '/' && path !== '/Home/Index' && menuItem.length > 0) {
+                    var title = menuItem.text().trim();
                     menuItem.addClass('active');
                     $("#page-title").text(title);
 
                     $.ajax({
                         url: path,
                         type: 'GET',
-                        cache: true,
+                        cache: false,
+                        headers: {
+                            'Cache-Control': 'no-cache'
+                        },
                         success: function (res) {
                             $("#display-area").html(res);
                         },
                         error: function() {
-                            $("#display-area").html('<div class="alert alert-danger rounded-4">Error: មិនអាចទាញយកទំព័របានទេ។</div>');
+                            window.location.href = path; // Fallback to normal navigation
                         }
                     });
                 }
@@ -517,17 +529,42 @@
                 $(this).addClass("active");
                 $("#page-title").text(title);
 
-                $("#display-area").html('<div class="text-center p-5"><div class="spinner-grow text-primary"></div><p class="mt-2 text-muted">កំពុងទាញយកទិន្នន័យ...</p></div>');
+                $("#display-area").html(`
+                    <div class="text-center p-5">
+                        <div class="spinner-grow text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">កំពុងទាញយកទិន្នន័យ...</p>
+                    </div>
+                `);
+
+                // Add timestamp to prevent caching
+                var timestamp = new Date().getTime();
+                if (url.indexOf('?') === -1) {
+                    url = url + '?_=' + timestamp;
+                } else {
+                    url = url + '&_=' + timestamp;
+                }
 
                 $.ajax({
                     url: url,
                     type: 'GET',
-                    cache: true,
+                    cache: false,
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    },
                     success: function (res) {
                         $("#display-area").html(res).hide().fadeIn(400);
                     },
-                    error: function() {
-                        $("#display-area").html('<div class="alert alert-danger rounded-4">Error: មិនអាចទាញយកទិន្នន័យបានទេ។</div>');
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                        $("#display-area").html(`
+                            <div class="alert alert-danger rounded-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Error: មិនអាចទាញយកទិន្នន័យបានទេ។
+                                <br><small>${xhr.status} - ${error}</small>
+                            </div>
+                        `);
                     }
                 });
             });
@@ -535,7 +572,7 @@
             // Handle browser back/forward buttons
             window.addEventListener('popstate', function(event) {
                 if (event.state) {
-                    var url = event.state.url;
+                    var url = event.state.url.split('?')[0];
                     var title = event.state.title;
 
                     $(".ajax-link").removeClass("active");
@@ -545,7 +582,7 @@
                     $.ajax({
                         url: url,
                         type: 'GET',
-                        cache: true,
+                        cache: false,
                         success: function (res) {
                             $("#display-area").html(res);
                         }

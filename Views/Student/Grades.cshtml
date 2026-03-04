@@ -622,48 +622,81 @@
         loadData();
     });
 
-        function loadData() {
+           function loadData() {
         // Load students
         $.ajax({
             url: '/Student/GetStudents',
             type: 'GET',
             cache: false,
-            success: function(data) {
-                students = data;
+            success: function(response) {
+                console.log("Students response:", response);
+
+                // ពិនិត្យមើលទម្រង់ទិន្នន័យ
+                if (response && response.success) {
+                    // ទម្រង់ថ្មី: { success: true, data: [...] }
+                    students = response.data || [];
+                } else if (Array.isArray(response)) {
+                    // ទម្រង់ចាស់: [...]
+                    students = response;
+                } else {
+                    console.error("Unexpected students data format:", response);
+                    students = [];
+                }
+
+                loadGrades();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading students:", error);
+                students = [];
                 loadGrades();
             }
         });
     }
 
-        function loadGrades() {
+
+            function loadGrades() {
         $.ajax({
             url: '/Student/GetGrades',
             type: 'GET',
             cache: false,
-            success: function(data) {
-                grades = data;
+            success: function(response) {
+                console.log("Grades response:", response);
+
+                // ពិនិត្យមើលទម្រង់ទិន្នន័យ
+                if (response && response.success) {
+                    // ទម្រង់ថ្មី: { success: true, data: [...] }
+                    grades = response.data || [];
+                } else if (Array.isArray(response)) {
+                    // ទម្រង់ចាស់: [...]
+                    grades = response;
+                } else {
+                    console.error("Unexpected grades data format:", response);
+                    grades = [];
+                }
+
                 displayGrades();
                 updateStats();
                 updateDistribution();
             },
-            error: function() {
-                console.error("Error loading grades");
+            error: function(xhr, status, error) {
+                console.error("Error loading grades:", error);
                 grades = [];
                 displayGrades();
             }
         });
     }
 
-    function displayGrades() {
+        function displayGrades() {
         var tbody = $('#gradesTableBody');
         tbody.empty();
 
-        if (students.length === 0) {
+        // ពិនិត្យមើលថា students ជា Array មែនទេ
+        if (!Array.isArray(students) || students.length === 0) {
             tbody.html(`
                 <tr>
                     <td colspan="8" class="text-center py-5">
                         <i class="bi bi-bar-chart" style="font-size: 4rem; color: #cbd5e1;"></i>
-                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យពិន្ទុនៅឡើយទេ</h5>
+                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យសិស្សនៅឡើយទេ</h5>
                     </td>
                 </tr>
             `);
@@ -675,7 +708,8 @@
         var shift = $('#filterShift').val();
         var search = $('#searchInput').val().toLowerCase();
 
-        var filteredStudents = students.filter(s => {
+        // ពិនិត្យមើលថា students ជា Array មុនពេលប្រើ filter
+        var filteredStudents = Array.isArray(students) ? students.filter(s => {
             var matchMajor = !major || s.major === major;
             var matchYear = !year || s.year === year;
             var matchShift = !shift || s.shift === shift;
@@ -684,12 +718,18 @@
                 (s.id && s.id.toLowerCase().includes(search));
 
             return matchMajor && matchYear && matchShift && matchSearch;
-        });
+        }) : [];
 
         currentFilteredData = filteredStudents;
 
         filteredStudents.forEach(s => {
-            var grade = grades.find(g => g.studentId === s.id) || {
+            // ពិនិត្យមើលថា grades ជា Array មុនពេលប្រើ find
+            var grade = null;
+            if (Array.isArray(grades)) {
+                grade = grades.find(g => g.studentId === s.id);
+            }
+
+            grade = grade || {
                 attendance: 0,
                 assignment: 0,
                 midTerm: 0,
@@ -883,14 +923,22 @@
         });
     }
 
-    function updateStats() {
+        function updateStats() {
+        // ពិនិត្យមើលថា currentFilteredData ជា Array
+        if (!Array.isArray(currentFilteredData)) {
+            currentFilteredData = [];
+        }
+
         var total = currentFilteredData.length;
         var passed = 0;
         var totalScore = 0;
         var gradeCounts = {A:0, B:0, C:0, D:0, F:0};
 
+        // ពិនិត្យមើលថា grades ជា Array
+        var gradesArray = Array.isArray(grades) ? grades : [];
+
         currentFilteredData.forEach(s => {
-            var grade = grades.find(g => g.studentId === s.id);
+            var grade = gradesArray.find(g => g.studentId === s.id);
             if (grade) {
                 var total = (grade.attendance || 0) + (grade.assignment || 0) +
                            (grade.midTerm || 0) + (grade.finalExam || 0);
@@ -916,14 +964,22 @@
         $('#gradeC').text(gradeCounts.C);
     }
 
-    function updateDistribution() {
+        function updateDistribution() {
+        // ពិនិត្យមើលថា currentFilteredData ជា Array
+        if (!Array.isArray(currentFilteredData)) {
+            currentFilteredData = [];
+        }
+
         var total = currentFilteredData.length;
         if (total === 0) return;
 
         var counts = {A:0, B:0, C:0, D:0, F:0};
 
+        // ពិនិត្យមើលថា grades ជា Array
+        var gradesArray = Array.isArray(grades) ? grades : [];
+
         currentFilteredData.forEach(s => {
-            var grade = grades.find(g => g.studentId === s.id);
+            var grade = gradesArray.find(g => g.studentId === s.id);
             if (grade) {
                 var totalScore = (grade.attendance || 0) + (grade.assignment || 0) +
                                 (grade.midTerm || 0) + (grade.finalExam || 0);
@@ -943,22 +999,10 @@
         var grades = ['A', 'B', 'C', 'D', 'F'];
 
         grades.forEach((g, i) => {
-            var percentage = (counts[g] / total * 100).toFixed(1);
+            var percentage = total > 0 ? (counts[g] / total * 100).toFixed(1) : 0;
             if (percentage > 0) {
                 bar.append(`<div class="bar-segment" style="width: ${percentage}%; background: ${colors[i]};">${percentage}%</div>`);
             }
         });
-    }
-
-    function applyFilter() {
-        displayGrades();
-    }
-
-    function resetFilter() {
-        $('#filterMajor').val('');
-        $('#filterYear').val('');
-        $('#filterShift').val('');
-        $('#searchInput').val('');
-        displayGrades();
     }
 </script>

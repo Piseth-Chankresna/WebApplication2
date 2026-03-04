@@ -3,6 +3,7 @@ wwwroot\favicon.ico
 wwwroot\images\aba_logo.png
 wwwroot\images\aba_logo.png.png
 wwwroot\images\acleda_logo.png
+wwwroot\images\default-avatar.png
 wwwroot\images\hru-buidling.jpg
 wwwroot\images\hru-logo-png.png
 wwwroot\images\kh.jpg

@@ -1,5 +1,4 @@
-﻿@model IEnumerable<WebApplication2.Models.Student>
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "អាហារូបករណ៍";
@@ -12,12 +11,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #f97316;
             margin-bottom: 8px;
         }
+
+            .page-header h2 i {
+                background: linear-gradient(135deg, #f97316, #ea580c);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .stats-grid {
         display: grid;
@@ -170,7 +173,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 6px;
+        height: 4px;
         background: linear-gradient(90deg, #f97316, #ea580c);
     }
 
@@ -182,24 +185,29 @@
     }
 
     .student-avatar-large {
-        width: 70px;
-        height: 70px;
+        width: 60px;
+        height: 60px;
         background: linear-gradient(135deg, #f97316, #ea580c);
-        border-radius: 20px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 800;
-        font-size: 1.8rem;
-        box-shadow: 0 10px 20px rgba(249,115,22,0.2);
+        font-size: 1.5rem;
+        overflow: hidden;
     }
+
+        .student-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
     .student-info h4 {
         font-weight: 700;
         color: #1e293b;
         margin-bottom: 4px;
-        font-size: 1.2rem;
     }
 
     [data-theme="dark"] .student-info h4 {
@@ -210,9 +218,6 @@
         color: #64748b;
         margin: 0;
         font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 4px;
     }
 
     .scholarship-badge {
@@ -348,16 +353,6 @@
         transform: translateY(-2px);
     }
 
-    .btn-edit {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        border: none;
-    }
-
-        .btn-edit:hover {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        }
-
     .summary-section {
         background: white;
         border-radius: 24px;
@@ -418,23 +413,8 @@
         font-size: 0.9rem;
     }
 
-    /* Modal Styles */
-    .modal-content {
+    .edit-modal .modal-content {
         border-radius: 24px;
-        border: none;
-        overflow: hidden;
-    }
-
-    [data-theme="dark"] .modal-content {
-        background: #1e293b;
-        color: white;
-    }
-
-    .modal-header {
-        background: linear-gradient(135deg, #f97316, #ea580c);
-        color: white;
-        padding: 20px 24px;
-        border: none;
     }
 
     .scholarship-options {
@@ -512,6 +492,11 @@
     }
 </style>
 
+<!-- AntiForgeryToken Form -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="page-header">
     <h2><i class="bi bi-gift-fill me-2"></i>អាហារូបករណ៍</h2>
     <p class="text-muted">គ្រប់គ្រងអាហារូបករណ៍របស់សិស្ស</p>
@@ -546,7 +531,7 @@
     <div class="filter-grid">
         <div class="filter-item">
             <label>ជំនាញ</label>
-            <select id="filterMajor">
+            <select id="filterMajor" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="Information Technology">Information Technology</option>
                 <option value="Business Administration">Business Administration</option>
@@ -558,7 +543,7 @@
 
         <div class="filter-item">
             <label>ឆ្នាំសិក្សា</label>
-            <select id="filterYear">
+            <select id="filterYear" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="1">ឆ្នាំទី១</option>
                 <option value="2">ឆ្នាំទី២</option>
@@ -569,7 +554,7 @@
 
         <div class="filter-item">
             <label>កម្រិតអាហារូបករណ៍</label>
-            <select id="filterScholarship">
+            <select id="filterLevel" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="100%">100%</option>
                 <option value="75%">75%</option>
@@ -588,7 +573,7 @@
     <div class="mt-3 d-flex gap-2">
         <button class="btn-filter" onclick="applyFilter()">
             <i class="bi bi-search"></i>
-            អនុវត្តតម្រង
+            ស្វែងរក
         </button>
         <button class="btn-filter" onclick="resetFilter()" style="background: #64748b;">
             <i class="bi bi-arrow-counterclockwise"></i>
@@ -615,15 +600,15 @@
 </div>
 
 <!-- Edit Scholarship Modal -->
-<div class="modal fade" id="scholarshipModal" tabindex="-1">
+<div class="modal fade edit-modal" id="scholarshipModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background: linear-gradient(135deg, #f97316, #ea580c);">
                 <h5 class="modal-title">
                     <i class="bi bi-pencil-square me-2"></i>
                     កែប្រែអាហារូបករណ៍
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="scholarshipForm">
@@ -661,23 +646,19 @@
                         </div>
                         <input type="hidden" id="scholarshipValue">
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label fw-bold">កំណត់ចំណាំ</label>
-                        <input type="text" id="scholarshipNote" class="form-control" placeholder="បញ្ចូលកំណត់ចំណាំ (បើមាន)...">
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
-                <button type="button" class="btn" style="background: #f97316; color: white;" onclick="saveScholarship()">រក្សាទុក</button>
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">បោះបង់</button>
+                <button type="button" class="btn-save" onclick="saveScholarship()">រក្សាទុក</button>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
-    let students = [];
+    let allStudents = [];
     let filteredStudents = [];
 
     $(document).ready(function() {
@@ -688,11 +669,26 @@
         $.ajax({
             url: '/Student/GetStudents',
             type: 'GET',
-            success: function(data) {
-                students = data;
-                applyFilter();
+            cache: false,
+            success: function(response) {
+                console.log("Students response:", response);
+
+                if (response && response.success) {
+                    allStudents = response.data || [];
+                } else if (Array.isArray(response)) {
+                    allStudents = response;
+                } else {
+                    allStudents = [];
+                }
+
+                filteredStudents = [...allStudents];
+                displayScholarshipCards();
                 updateStats();
                 generateSummary();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading students:', error);
+                showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
             }
         });
     }
@@ -701,7 +697,7 @@
         var grid = $('#scholarshipGrid');
         grid.empty();
 
-        if (filteredStudents.length === 0) {
+        if (!Array.isArray(filteredStudents) || filteredStudents.length === 0) {
             grid.html(`
                 <div class="text-center py-5" style="grid-column: 1 / -1;">
                     <i class="bi bi-gift" style="font-size: 4rem; color: #cbd5e1;"></i>
@@ -722,11 +718,15 @@
             var scholarshipAmount = (totalDue * scholarshipPercent / 100);
             var finalAmount = totalDue - scholarshipAmount;
 
+            var avatarHtml = s.photo ?
+                `<img src="${s.photo}" alt="${s.name}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                (s.name ? s.name.charAt(0).toUpperCase() : '?');
+
             var card = `
                 <div class="scholarship-card">
                     <div class="card-header">
                         <div class="student-avatar-large">
-                            ${s.name ? s.name.charAt(0).toUpperCase() : '?'}
+                            ${avatarHtml}
                         </div>
                         <div class="student-info">
                             <h4>${s.name || 'មិនមានឈ្មោះ'}</h4>
@@ -763,13 +763,9 @@
                     </div>
 
                     <div class="card-actions">
-                        <button class="btn-action btn-edit" onclick="openEditModal('${s.id}')">
+                        <button class="btn-action" onclick="editScholarship('${s.id}')">
                             <i class="bi bi-pencil-square"></i>
                             កែប្រែ
-                        </button>
-                        <button class="btn-action" onclick="viewDetails('${s.id}')">
-                            <i class="bi bi-eye"></i>
-                            មើល
                         </button>
                     </div>
                 </div>
@@ -779,18 +775,20 @@
     }
 
     function updateStats() {
-        var total = students.length;
-        var withScholarship = students.filter(s => {
+        if (!Array.isArray(allStudents)) return;
+
+        var total = allStudents.length;
+        var withScholarship = allStudents.filter(s => {
             var percent = parseInt(s.scholarship) || 0;
             return percent > 0;
         }).length;
 
         var avgScholarship = withScholarship > 0
-            ? students.filter(s => parseInt(s.scholarship) > 0)
+            ? allStudents.filter(s => parseInt(s.scholarship) > 0)
                 .reduce((sum, s) => sum + (parseInt(s.scholarship) || 0), 0) / withScholarship
             : 0;
 
-        var totalAmount = students.reduce((sum, s) => {
+        var totalAmount = allStudents.reduce((sum, s) => {
             var percent = parseInt(s.scholarship) || 0;
             var amount = (s.amountDue || 0) * percent / 100;
             return sum + amount;
@@ -803,6 +801,8 @@
     }
 
     function generateSummary() {
+        if (!Array.isArray(allStudents)) return;
+
         var levels = {
             '100%': { count: 0, total: 0 },
             '75%': { count: 0, total: 0 },
@@ -811,7 +811,7 @@
             '0%': { count: 0, total: 0 }
         };
 
-        students.forEach(s => {
+        allStudents.forEach(s => {
             var percent = s.scholarship || '0%';
             if (levels[percent]) {
                 levels[percent].count++;
@@ -837,20 +837,25 @@
         $('#scholarshipSummary').html(html);
     }
 
-    function openEditModal(studentId) {
-        var student = students.find(s => s.id === studentId);
+    function editScholarship(studentId) {
+        var student = allStudents.find(s => s.id === studentId);
         if (!student) return;
 
         $('#studentId').val(student.id);
         $('#studentName').text(student.name || 'មិនមានឈ្មោះ');
         $('#studentInfo').text(`${student.major || 'N/A'} | ឆ្នាំទី${student.year || '?'}`);
-        $('#studentInitials').text(student.name ? student.name.charAt(0).toUpperCase() : '?');
+
+        var initial = student.name ? student.name.charAt(0).toUpperCase() : '?';
+        if (student.photo) {
+            $('#studentInitials').html(`<img src="${student.photo}" style="width:100%; height:100%; object-fit:cover;">`);
+        } else {
+            $('#studentInitials').text(initial);
+        }
 
         // Select current scholarship
         $('.scholarship-option').removeClass('selected');
         $(`.scholarship-option:contains('${student.scholarship || '0%'}')`).addClass('selected');
         $('#scholarshipValue').val(student.scholarship || '0%');
-        $('#scholarshipNote').val(student.scholarshipNote || '');
 
         $('#scholarshipModal').modal('show');
     }
@@ -864,108 +869,52 @@
     function saveScholarship() {
         var studentId = $('#studentId').val();
         var scholarship = $('#scholarshipValue').val();
-        var note = $('#scholarshipNote').val();
+        var token = $('input[name="__RequestVerificationToken"]').val();
 
-        var student = students.find(s => s.id === studentId);
-        if (student) {
-            student.scholarship = scholarship;
-            student.scholarshipNote = note;
+        $('#scholarshipModal').modal('hide');
 
-            // Here you would typically save to the server
-            // For now, we'll just update the UI
-            $('#scholarshipModal').modal('hide');
+        // Show loading
+        $('body').append('<div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;"><div style="background:white; padding:20px; border-radius:10px;"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">កំពុងរក្សាទុក...</p></div></div>');
 
-            Swal.fire({
-                icon: 'success',
-                title: 'ជោគជ័យ!',
-                text: 'បានកែប្រែអាហារូបករណ៍ដោយជោគជ័យ',
-                timer: 2000,
-                showConfirmButton: false
-            });
+        $.ajax({
+            url: '/Student/UpdateScholarship',
+            type: 'POST',
+            data: { id: studentId, scholarship: scholarship },
+            headers: {
+                'RequestVerificationToken': token
+            },
+            success: function(response) {
+                $('#loading').remove();
 
-            applyFilter();
-            updateStats();
-            generateSummary();
-        }
-    }
-
-    function viewDetails(studentId) {
-        var student = students.find(s => s.id === studentId);
-        if (!student) return;
-
-        var scholarshipPercent = parseInt(student.scholarship) || 0;
-        var totalDue = student.amountDue || 0;
-        var scholarshipAmount = totalDue * scholarshipPercent / 100;
-        var finalAmount = totalDue - scholarshipAmount;
-
-        Swal.fire({
-            title: 'ព័ត៌មានអាហារូបករណ៍',
-            html: `
-                <div class="text-start">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="student-avatar-large" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                            ${student.name ? student.name.charAt(0).toUpperCase() : '?'}
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1">${student.name}</h5>
-                            <p class="text-muted mb-0">${student.id}</p>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="p-3 bg-light rounded-3">
-                                <small class="text-muted d-block">កម្រិតអាហារូបករណ៍</small>
-                                <strong class="fs-4" style="color: #f97316;">${student.scholarship || '0%'}</strong>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 bg-light rounded-3">
-                                <small class="text-muted d-block">ថ្លៃសិក្សា</small>
-                                <strong class="fs-4">$${totalDue.toFixed(2)}</strong>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 bg-light rounded-3">
-                                <small class="text-muted d-block">ទទួលបាន</small>
-                                <strong class="fs-4 text-success">-$${scholarshipAmount.toFixed(2)}</strong>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 bg-light rounded-3">
-                                <small class="text-muted d-block">ត្រូវបង់</small>
-                                <strong class="fs-4 text-danger">$${finalAmount.toFixed(2)}</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${student.scholarshipNote ? `
-                        <div class="mt-3 p-3 bg-light rounded-3">
-                            <small class="text-muted d-block">កំណត់ចំណាំ</small>
-                            <p class="mb-0">${student.scholarshipNote}</p>
-                        </div>
-                    ` : ''}
-                </div>
-            `,
-            confirmButtonColor: '#f97316'
+                if (response && response.success) {
+                    alert('កែប្រែអាហារូបករណ៍ដោយជោគជ័យ!');
+                    loadStudents(); // Reload data
+                } else {
+                    alert(response.message || 'មានបញ្ហាក្នុងការរក្សាទុក');
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#loading').remove();
+                alert('មានបញ្ហាបច្ចេកទេស: ' + error);
+            }
         });
     }
 
     function applyFilter() {
         var major = $('#filterMajor').val();
         var year = $('#filterYear').val();
-        var scholarship = $('#filterScholarship').val();
+        var level = $('#filterLevel').val();
         var search = $('#searchInput').val().toLowerCase();
 
-        filteredStudents = students.filter(s => {
+        filteredStudents = allStudents.filter(s => {
             var matchMajor = !major || s.major === major;
             var matchYear = !year || s.year === year;
-            var matchScholarship = !scholarship || s.scholarship === scholarship;
+            var matchLevel = !level || s.scholarship === level;
             var matchSearch = !search ||
                 (s.name && s.name.toLowerCase().includes(search)) ||
                 (s.id && s.id.toLowerCase().includes(search));
 
-            return matchMajor && matchYear && matchScholarship && matchSearch;
+            return matchMajor && matchYear && matchLevel && matchSearch;
         });
 
         displayScholarshipCards();
@@ -974,9 +923,21 @@
     function resetFilter() {
         $('#filterMajor').val('');
         $('#filterYear').val('');
-        $('#filterScholarship').val('');
+        $('#filterLevel').val('');
         $('#searchInput').val('');
-        filteredStudents = students;
+        filteredStudents = [...allStudents];
         displayScholarshipCards();
+    }
+
+    function showError(message) {
+        $('#scholarshipGrid').html(`
+            <div class="text-center py-5" style="grid-column: 1 / -1;">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <h5 class="mt-3 text-danger">${message}</h5>
+                <button class="btn btn-primary mt-3" onclick="loadStudents()">
+                    <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាមម្តងទៀត
+                </button>
+            </div>
+        `);
     }
 </script>

@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "របាយការណ៍";
+}
+
+<!-- បញ្ចូល Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="page-header">
+    <h2><i class="bi bi-graph-up me-2"></i>របាយការណ៍ និងវិភាគទិន្នន័យ</h2>
+    <p class="text-muted">មើលរបាយការណ៍ និងវិភាគទិន្នន័យសិស្ស</p>
+</div>
+
+<!-- កាតស្ថិតិ -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@ViewBag.TotalStudents</div>
+            <div class="stat-label">សិស្សសរុប</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@ViewBag.TotalClasses</div>
+            <div class="stat-label">ថ្នាក់សរុប</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">$@ViewBag.TotalPayments?.ToString("N0")</div>
+            <div class="stat-label">បង់ប្រាក់សរុប</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@ViewBag.AvgAttendance?.ToString("F1")%</div>
+            <div class="stat-label">វត្តមានមធ្យម</div>
+        </div>
+    </div>
+</div>
+
+<!-- ក្រាហ្វ ២ ជួរឈរ -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5 class="mb-3">សិស្សតាមជំនាញ</h5>
+            <canvas id="majorChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5 class="mb-3">សិស្សតាមឆ្នាំសិក្សា</h5>
+            <canvas id="yearChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ក្រាហ្វបន្ទាត់ -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="chart-card">
+            <h5 class="mb-3">វត្តមានប្រចាំខែ</h5>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ក្រាហ្វបង់ប្រាក់ -->
+<div class="row">
+    <div class="col-12">
+        <div class="chart-card">
+            <h5 class="mb-3">ការបង់ប្រាក់ប្រចាំខែ</h5>
+            <canvas id="paymentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ទិន្នន័យពី ViewBag
+
+        var studentsByMajor = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.StudentsByMajor));
+        var studentsByYear = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.StudentsByYear));
+
+        // ក្រាហ្វ ១: សិស្សតាមជំនាញ
+        new Chart(document.getElementById('majorChart'), {
+            type: 'bar',
+            data: {
+                labels: studentsByMajor.map(m => m.major),
+                datasets: [{
+                    label: 'ចំនួនសិស្ស',
+                    data: studentsByMajor.map(m => m.count),
+                    backgroundColor: '#10b981'
+                }]
+            }
+        });
+
+        // ក្រាហ្វ ២: សិស្សតាមឆ្នាំ
+        new Chart(document.getElementById('yearChart'), {
+            type: 'pie',
+            data: {
+                labels: studentsByYear.map(y => 'ឆ្នាំទី' + y.year),
+                datasets: [{
+                    data: studentsByYear.map(y => y.count),
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+                }]
+            }
+        });
+
+        // ផ្ទុកទិន្នន័យវត្តមាន
+        $.get('/Report/GetAttendanceTrends', function(data) {
+            new Chart(document.getElementById('attendanceChart'), {
+                type: 'line',
+                data: {
+                    labels: data.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'វត្តមាន',
+                        data: data.map(d => d.present),
+                        borderColor: '#10b981'
+                    }, {
+                        label: 'មកយឺត',
+                        data: data.map(d => d.late),
+                        borderColor: '#f59e0b'
+                    }, {
+                        label: 'អវត្តមាន',
+                        data: data.map(d => d.absent),
+                        borderColor: '#ef4444'
+                    }]
+                }
+            });
+        });
+
+        // ផ្ទុកទិន្នន័យបង់ប្រាក់
+        $.get('/Report/GetPaymentSummary', function(data) {
+            new Chart(document.getElementById('paymentChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => `${d.month}/${d.year}`),
+                    datasets: [{
+                        label: 'ទឹកប្រាក់ ($)',
+                        data: data.map(d => d.total),
+                        backgroundColor: '#3b82f6'
+                    }]
+                }
+            });
+        });
+    </script>
+}
