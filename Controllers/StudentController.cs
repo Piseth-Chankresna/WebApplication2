@@ -97,36 +97,36 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AttendanceList(DateTime? startDate, DateTime? endDate)
+        public Task<IActionResult> AttendanceList(DateTime? startDate, DateTime? endDate)
         {
             try
             {
                 ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
                 ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
 
-                return View();
+                return Task.FromResult<IActionResult>(View());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading AttendanceList page");
                 TempData["Error"] = "មានបញ្ហាក្នុងការផ្ទុកទំព័រ";
-                return RedirectToAction("Index");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index"));
             }
         }
 
-        public async Task<IActionResult> Payment()
+        public Task<IActionResult> Payment()
         {
-            return View();
+            return Task.FromResult<IActionResult>(View());
         }
 
-        public async Task<IActionResult> Scholarship()
+        public Task<IActionResult> Scholarship()
         {
-            return View();
+            return Task.FromResult<IActionResult>(View());
         }
 
-        public async Task<IActionResult> Reports()
+        public Task<IActionResult> Reports()
         {
-            return View();
+            return Task.FromResult<IActionResult>(View());
         }
 
         public IActionResult StudentCenter()
@@ -279,7 +279,7 @@ namespace WebApplication2.Controllers
                 var student = await _context.Students.FindAsync(updatedStudent.Id);
                 if (student == null)
                 {
-                    return ErrorResponse("រកមិនឃើញសិស្ស", 404);
+                    return Json(new { success = false, message = "រកមិនឃើញសិស្ស" });
                 }
 
                 // Update fields
@@ -295,11 +295,14 @@ namespace WebApplication2.Controllers
                 student.Scholarship = updatedStudent.Scholarship;
                 student.Shift = updatedStudent.Shift;
                 student.Status = updatedStudent.Status;
+                student.Batch = updatedStudent.Batch;
+                student.AcademicYear = updatedStudent.AcademicYear;
+                student.AmountDue = updatedStudent.AmountDue;
 
                 // Handle new photo
                 if (NewPhoto != null && NewPhoto.Length > 0)
                 {
-                    // Delete old photo
+                    // Delete old photo if exists
                     if (!string.IsNullOrEmpty(student.Photo))
                     {
                         var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot" + student.Photo);
@@ -309,6 +312,7 @@ namespace WebApplication2.Controllers
                         }
                     }
 
+                    // Save new photo
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/students");
                     if (!Directory.Exists(uploadsFolder))
                     {
@@ -336,17 +340,11 @@ namespace WebApplication2.Controllers
                     $"កែប្រែសិស្ស: {student.Name} (ID: {student.Id})"
                 );
 
-                return Json(new
-                {
-                    success = true,
-                    message = "កែប្រែព័ត៌មានសិស្សដោយជោគជ័យ!",
-                    redirectUrl = "/Student/Index"
-                });
+                return Json(new { success = true, message = "កែប្រែព័ត៌មានសិស្សដោយជោគជ័យ!", redirectUrl = "/Student/Index" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating student {StudentId}", updatedStudent.Id);
-                return ErrorResponse("មានបញ្ហា: " + ex.Message, 500);
+                return Json(new { success = false, message = "មានបញ្ហា: " + ex.Message });
             }
         }
 

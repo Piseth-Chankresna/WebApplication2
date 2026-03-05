@@ -1,126 +1,1015 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+﻿@{
+    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+    Layout = isAjax ? null : "_Layout";
+    ViewData["Title"] = "របាយការណ៍ និងស្ថិតិ";
+}
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- SheetJS for Excel Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Moment.js for date formatting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<style>
+    /* ====== VARIABLES ====== */
+    :root {
+        --primary-50: #eef2ff;
+        --primary-100: #e0e7ff;
+        --primary-200: #c7d2fe;
+        --primary-300: #a5b4fc;
+        --primary-400: #818cf8;
+        --primary-500: #6366f1;
+        --primary-600: #4f46e5;
+        --primary-700: #4338ca;
+
+        --secondary-500: #0ea5e9;
+
+        --success-50: #f0fdf4;
+        --success-100: #dcfce7;
+        --success-500: #22c55e;
+        --success-600: #16a34a;
+
+        --warning-50: #fffbeb;
+        --warning-100: #fef3c7;
+        --warning-500: #f59e0b;
+        --warning-600: #d97706;
+
+        --danger-50: #fef2f2;
+        --danger-100: #fee2e2;
+        --danger-500: #ef4444;
+        --danger-600: #dc2626;
+
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+
+        --radius-sm: 12px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+    }
+
+    [data-theme="dark"] {
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+
+        --gray-50: #18181b;
+        --gray-100: #27272a;
+        --gray-200: #3f3f46;
+        --gray-300: #52525b;
+        --gray-400: #71717a;
+        --gray-500: #a1a1aa;
+        --gray-600: #d4d4d8;
+        --gray-700: #e4e4e7;
+        --gray-800: #f4f4f5;
+        --gray-900: #fafafa;
+
+        --primary-50: #1e1b4b;
+    }
+
+    body {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+    }
+
+    .reports-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Header */
+    .header-section {
+        background: var(--bg-primary);
+        border-radius: var(--radius-xl);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-title h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .live-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--danger-50);
+        color: var(--danger-600);
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .live-indicator .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--danger-500);
+        border-radius: 50%;
+        animation: pulse 1.5s ease infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .last-updated {
+        background: var(--gray-100);
+        padding: 8px 16px;
+        border-radius: 40px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .kpi-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-300);
+    }
+
+    .kpi-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--primary-50);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-600);
+        font-size: 1.5rem;
+    }
+
+    .kpi-content {
+        flex: 1;
+    }
+
+    .kpi-content h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+
+    .kpi-content p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    .kpi-change {
+        text-align: right;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .trend-up { color: var(--success-600); }
+    .trend-down { color: var(--danger-600); }
+
+    /* Filter Bar */
+    .filter-bar {
+        background: var(--bg-primary);
+        border-radius: var(--radius-xl);
+        padding: 20px 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--gray-100);
+        padding: 8px 16px;
+        border-radius: 40px;
+    }
+
+    .filter-item i {
+        color: var(--primary-500);
+    }
+
+    .filter-item select,
+    .filter-item input {
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        padding: 6px 0;
+        outline: none;
+    }
+
+    .date-range {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--gray-100);
+        padding: 5px;
+        border-radius: 40px;
+    }
+
+    .date-input {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        background: var(--bg-primary);
+        border-radius: 30px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .date-input input {
+        border: none;
+        background: transparent;
+        color: var(--text-primary);
+        width: 130px;
+        outline: none;
+    }
+
+    .btn-apply {
+        background: linear-gradient(135deg, var(--primary-600), var(--secondary-500));
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-apply:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-export {
+        background: var(--bg-primary);
+        color: var(--primary-600);
+        border: 1px solid var(--gray-300);
+        padding: 10px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-export:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-400);
+    }
+
+    /* Chart Grid */
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .chart-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-xl);
+        padding: 25px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .chart-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chart-header h3 i {
+        color: var(--primary-600);
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+
+    /* Tables Grid */
+    .tables-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .table-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-xl);
+        padding: 25px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .table-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-count {
+        background: var(--primary-50);
+        color: var(--primary-700);
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .modern-table th {
+        text-align: left;
+        padding: 12px 8px;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .modern-table td {
+        padding: 12px 8px;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--text-primary);
+    }
+
+    .modern-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .student-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .student-avatar-sm {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        overflow: hidden;
+    }
+
+    .student-avatar-sm img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .rank-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+
+    .rank-1 { background: #fbbf24; color: #78350f; }
+    .rank-2 { background: #94a3b8; color: #1e293b; }
+    .rank-3 { background: #b45309; color: #fef3c7; }
+
+    .grade-badge-modern {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .grade-a { background: var(--success-100); color: var(--success-600); }
+    .grade-b { background: var(--primary-100); color: var(--primary-700); }
+    .grade-c { background: var(--warning-100); color: var(--warning-600); }
+    .grade-d { background: #ffe4e6; color: #f43f5e; }
+    .grade-f { background: var(--danger-100); color: var(--danger-600); }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--gray-200);
+        border-top-color: var(--primary-500);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @@media (max-width: 1200px) {
+        .kpi-grid, .chart-grid, .tables-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .kpi-grid, .chart-grid, .tables-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-bar {
+            flex-direction: column;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .date-range {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .date-input {
+            width: 100%;
+        }
+
+        .date-input input {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="reports-container">
+    <!-- Header -->
+    <div class="header-section">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <i class="bi bi-bar-chart-steps"></i>
+                    របាយការណ៍ & វិភាគទិន្នន័យ
+                </h1>
+                <p>
+                    <span class="live-indicator">
+                        <span class="dot"></span>
+                        Live Data
+                    </span>
+                    <span class="last-updated" id="lastUpdated">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        ធ្វើអោយថ្មី: ទើបតែប៉ុន្មានវិនាទីមុន
+                    </span>
+                </p>
+            </div>
+            <div>
+                <button class="btn-export" onclick="exportCurrentReport()">
+                    <i class="bi bi-file-earmark-excel"></i>
+                    នាំចេញ Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="kpi-content">
+                <h4 id="totalStudents">0</h4>
+                <p>សិស្សសរុប</p>
+            </div>
+            <div class="kpi-change trend-up" id="studentChange">+0%</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-cash-stack"></i></div>
+            <div class="kpi-content">
+                <h4 id="totalPayments">$0</h4>
+                <p>បង់ប្រាក់សរុប</p>
+            </div>
+            <div class="kpi-change trend-up" id="paymentChange">+0%</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="kpi-content">
+                <h4 id="avgAttendance">0%</h4>
+                <p>វត្តមានមធ្យម</p>
+            </div>
+            <div class="kpi-change trend-up" id="attendanceChange">+0%</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-mortarboard"></i></div>
+            <div class="kpi-content">
+                <h4 id="passRate">0%</h4>
+                <p>អត្រាប្រឡងជាប់</p>
+            </div>
+            <div class="kpi-change trend-up" id="passChange">+0%</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <div class="filter-item">
+                <i class="bi bi-bar-chart"></i>
+                <select id="reportType">
+                    <option value="all">ទាំងអស់</option>
+                    <option value="students">សិស្ស</option>
+                    <option value="payments">ការបង់ប្រាក់</option>
+                    <option value="attendance">វត្តមាន</option>
+                    <option value="grades">ពិន្ទុ</option>
+                </select>
+            </div>
+
+            <div class="date-range">
+                <div class="date-input">
+                    <i class="bi bi-calendar3"></i>
+                    <input type="date" id="startDate" value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")">
+                </div>
+                <span style="color: var(--text-muted);">ទៅ</span>
+                <div class="date-input">
+                    <i class="bi bi-calendar3"></i>
+                    <input type="date" id="endDate" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-apply" onclick="applyFilter()">
+                <i class="bi bi-search"></i> អនុវត្ត
+            </button>
+            <button class="btn-export" onclick="resetFilter()">
+                <i class="bi bi-arrow-counterclockwise"></i> កំណត់ឡើងវិញ
+            </button>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="chart-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="bi bi-pie-chart-fill"></i> សិស្សតាមជំនាញ</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="majorChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="bi bi-bar-chart-fill"></i> សិស្សតាមឆ្នាំសិក្សា</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="yearChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="bi bi-graph-up-arrow"></i> ការបង់ប្រាក់ប្រចាំខែ</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="bi bi-bar-chart-steps"></i> ការចែកចាយនិទ្ទេស</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Grid -->
+    <div class="tables-grid">
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="bi bi-trophy-fill" style="color: #fbbf24;"></i> សិស្សពូកែទាំង ៥</h3>
+                <span class="badge-count" id="topCount">0 នាក់</span>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="modern-table">
+                    <thead>
+                        <tr><th>ល.រ</th><th>សិស្ស</th><th>ពិន្ទុ</th><th>និទ្ទេស</th></tr>
+                    </thead>
+                    <tbody id="topStudentsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="bi bi-exclamation-triangle-fill" style="color: #ef4444;"></i> ត្រូវការជំនួយ</h3>
+                <span class="badge-count" id="strugglingCount">0 នាក់</span>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="modern-table">
+                    <thead>
+                        <tr><th>ល.រ</th><th>សិស្ស</th><th>ពិន្ទុ</th><th>ស្ថានភាព</th></tr>
+                    </thead>
+                    <tbody id="strugglingStudentsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let majorChart, yearChart, paymentChart, gradeChart;
+    let refreshInterval;
+
     $(document).ready(function() {
-        // Check if Chart.js is loaded
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js not loaded');
-            return;
-        }
-
-        // Today's Attendance Chart
-        var todayCtx = document.getElementById('todayAttendanceChart');
-        if (todayCtx) {
-            new Chart(todayCtx.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['វត្តមាន', 'មកយឺត', 'អវត្តមាន'],
-                    datasets: [{
-                        data: [
-                            @(Model.TodayAttendance?.ContainsKey("P") == true ? Model.TodayAttendance["P"] : 0),
-                            @(Model.TodayAttendance?.ContainsKey("L") == true ? Model.TodayAttendance["L"] : 0),
-                            @(Model.TodayAttendance?.ContainsKey("A") == true ? Model.TodayAttendance["A"] : 0)
-                        ],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Weekly Attendance Chart
-        var weeklyCtx = document.getElementById('weeklyAttendanceChart');
-        if (weeklyCtx) {
-            var weeklyData = @Html.Raw(Json.Serialize(Model.WeeklyAttendance ?? new List<object>()));
-
-            new Chart(weeklyCtx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: weeklyData.map(d => {
-                        var date = new Date(d.date);
-                        return date.toLocaleDateString('km-KH', { weekday: 'short', day: 'numeric' });
-                    }),
-                    datasets: [{
-                        label: 'វត្តមាន',
-                        data: weeklyData.map(d => d.present),
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16,185,129,0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'មកយឺត',
-                        data: weeklyData.map(d => d.late),
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245,158,11,0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'អវត្តមាន',
-                        data: weeklyData.map(d => d.absent),
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239,68,68,0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Monthly Payment Chart
-        var paymentCtx = document.getElementById('monthlyPaymentChart');
-        if (paymentCtx) {
-            var paymentData = @Html.Raw(Json.Serialize(Model.MonthlyPayments ?? new List<object>()));
-            var months = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
-                          'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
-
-            new Chart(paymentCtx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: paymentData.map(d => months[d.month - 1]),
-                    datasets: [{
-                        label: 'ទឹកប្រាក់ ($)',
-                        data: paymentData.map(d => d.total),
-                        backgroundColor: '#10b981',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        loadAllData();
+        startAutoRefresh();
     });
+
+    function startAutoRefresh() {
+        refreshInterval = setInterval(() => refreshData(), 30000);
+    }
+
+    function loadAllData() {
+        loadKPI();
+        loadAllCharts();
+        loadTopStudents();
+        loadStrugglingStudents();
+        updateLastUpdated();
+    }
+
+    function refreshData() {
+        $('#lastUpdated').html('<i class="bi bi-arrow-clockwise"></i> កំពុងធ្វើអោយថ្មី...');
+        loadAllData();
+    }
+
+    function updateLastUpdated() {
+        let now = new Date();
+        let timeStr = now.toLocaleTimeString('km-KH');
+        $('#lastUpdated').html(`<i class="bi bi-arrow-clockwise"></i> ធ្វើអោយថ្មី: ${timeStr}`);
+    }
+
+    function loadKPI() {
+        $.ajax({
+            url: '/Report/GetKPI',
+            success: function(res) {
+                if (res.success) {
+                    $('#totalStudents').text(res.data.totalStudents);
+                    $('#totalPayments').text('$' + res.data.totalPayments.toLocaleString());
+                    $('#avgAttendance').text(res.data.avgAttendance + '%');
+                    $('#passRate').text(res.data.passRate + '%');
+                    $('#studentChange').text(res.data.studentChange);
+                    $('#paymentChange').text(res.data.paymentChange);
+                    $('#attendanceChange').text(res.data.attendanceChange);
+                    $('#passChange').text(res.data.passChange);
+                }
+            }
+        });
+    }
+
+    function loadAllCharts() {
+        loadMajorChart();
+        loadYearChart();
+        loadPaymentChart();
+        loadGradeChart();
+    }
+
+    function loadMajorChart() {
+        $.ajax({
+            url: '/Report/GetStudentsByMajor',
+            success: function(res) {
+                if (res.success) renderMajorChart(res.data);
+            }
+        });
+    }
+
+    function renderMajorChart(data) {
+        const ctx = document.getElementById('majorChart').getContext('2d');
+        if (majorChart) majorChart.destroy();
+
+        majorChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(d => d.major),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6'],
+                    borderWidth: 0,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') } }
+                }
+            }
+        });
+    }
+
+    function loadYearChart() {
+        $.ajax({
+            url: '/Report/GetStudentsByYear',
+            success: function(res) {
+                if (res.success) renderYearChart(res.data);
+            }
+        });
+    }
+
+    function renderYearChart(data) {
+        const ctx = document.getElementById('yearChart').getContext('2d');
+        if (yearChart) yearChart.destroy();
+
+        yearChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.year),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: '#6366f1',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function loadPaymentChart() {
+        $.ajax({
+            url: '/Report/GetMonthlyPayments?months=6',
+            success: function(res) {
+                if (res.success) renderPaymentChart(res.data);
+            }
+        });
+    }
+
+    function renderPaymentChart(data) {
+        const ctx = document.getElementById('paymentChart').getContext('2d');
+        if (paymentChart) paymentChart.destroy();
+
+        paymentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.month),
+                datasets: [{
+                    data: data.map(d => d.total),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16,185,129,0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#10b981'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) } }
+                },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function loadGradeChart() {
+        $.ajax({
+            url: '/Report/GetGradeDistribution',
+            success: function(res) {
+                if (res.success) renderGradeChart(res.data);
+            }
+        });
+    }
+
+    function renderGradeChart(data) {
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        if (gradeChart) gradeChart.destroy();
+
+        gradeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['A', 'B', 'C', 'D', 'E', 'F'],
+                datasets: [{
+                    data: [data.a, data.b, data.c, data.d, data.e, data.f],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444', '#6b7280'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function loadTopStudents() {
+        $.ajax({
+            url: '/Report/GetTopStudents',
+            success: function(res) {
+                if (!res.success) return;
+                let tbody = $('#topStudentsBody');
+                tbody.empty();
+                $('#topCount').text(res.data.length + ' នាក់');
+
+                res.data.forEach((s, i) => {
+                    let gradeClass = s.averageGrade >= 90 ? 'grade-a' : s.averageGrade >= 80 ? 'grade-b' : s.averageGrade >= 70 ? 'grade-c' : s.averageGrade >= 60 ? 'grade-d' : 'grade-f';
+                    let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                    let avatarHtml = s.studentPhoto ? `<img src="${s.studentPhoto}" alt="${s.studentName}">` : (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
+
+                    tbody.append(`
+                        <tr>
+                            <td><span class="rank-badge ${rankClass}">#${i+1}</span></td>
+                            <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName}</div></td>
+                            <td class="fw-bold">${s.averageGrade.toFixed(1)}</td>
+                            <td><span class="grade-badge-modern ${gradeClass}">${getGradeLetter(s.averageGrade)}</span></td>
+                        </tr>
+                    `);
+                });
+            }
+        });
+    }
+
+    function loadStrugglingStudents() {
+        $.ajax({
+            url: '/Report/GetStrugglingStudents',
+            success: function(res) {
+                if (!res.success) return;
+                let tbody = $('#strugglingStudentsBody');
+                tbody.empty();
+                $('#strugglingCount').text(res.data.length + ' នាក់');
+
+                res.data.forEach((s, i) => {
+                    let avatarHtml = s.studentPhoto ? `<img src="${s.studentPhoto}" alt="${s.studentName}">` : (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
+                    tbody.append(`
+                        <tr>
+                            <td>${i+1}</td>
+                            <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName}</div></td>
+                            <td class="fw-bold text-danger">${s.averageGrade.toFixed(1)}</td>
+                            <td><span class="grade-badge-modern grade-f">ត្រូវការជំនួយ</span></td>
+                        </tr>
+                    `);
+                });
+            }
+        });
+    }
+
+    function getGradeLetter(score) {
+        if (score >= 90) return 'A';
+        if (score >= 80) return 'B';
+        if (score >= 70) return 'C';
+        if (score >= 60) return 'D';
+        if (score >= 50) return 'E';
+        return 'F';
+    }
+
+    function applyFilter() {
+        loadAllCharts();
+    }
+
+    function resetFilter() {
+        $('#reportType').val('all');
+        $('#startDate').val(moment().subtract(1, 'month').format('YYYY-MM-DD'));
+        $('#endDate').val(moment().format('YYYY-MM-DD'));
+        applyFilter();
+    }
+
+    function exportCurrentReport() {
+        let type = $('#reportType').val();
+        let start = $('#startDate').val();
+        let end = $('#endDate').val();
+
+        if (type === 'payments') window.location.href = `/Report/ExportPaymentReport?startDate=${start}&endDate=${end}`;
+        else if (type === 'attendance') window.location.href = `/Report/ExportAttendanceReport?startDate=${start}&endDate=${end}`;
+        else if (type === 'grades') window.location.href = '/Report/ExportGradeReport';
+        else window.location.href = '/Report/ExportStudentReport';
+    }
+
+    window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
 </script>

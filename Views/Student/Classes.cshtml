@@ -1,5 +1,4 @@
-﻿@model IEnumerable<WebApplication2.Models.StudentClass>
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "គ្រប់គ្រងថ្នាក់";
@@ -12,12 +11,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #8b5cf6;
             margin-bottom: 8px;
         }
+
+            .page-header h2 i {
+                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .stats-grid {
         display: grid;
@@ -151,9 +154,12 @@
             font-weight: 600;
             font-size: 0.85rem;
             border-bottom: 2px solid #e2e8f0;
+            background: #f8fafc;
         }
 
     [data-theme="dark"] .class-table th {
+        background: #0f172a;
+        color: #cbd5e1;
         border-bottom-color: #334155;
     }
 
@@ -320,17 +326,14 @@
         box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
     }
 
-    .btn-modal {
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
     .btn-modal-primary {
         background: linear-gradient(135deg, #8b5cf6, #7c3aed);
         color: white;
+        padding: 12px 24px;
         border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
 
         .btn-modal-primary:hover {
@@ -341,7 +344,11 @@
     .btn-modal-secondary {
         background: #f1f5f9;
         color: #475569;
+        padding: 12px 24px;
         border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
 
     [data-theme="dark"] .btn-modal-secondary {
@@ -377,6 +384,11 @@
         }
     }
 </style>
+
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
 
 <div class="page-header">
     <h2><i class="bi bi-door-open-fill me-2"></i>គ្រប់គ្រងថ្នាក់</h2>
@@ -435,14 +447,19 @@
                 </tr>
             </thead>
             <tbody id="classTableBody">
-                <!-- Data will be loaded by JavaScript -->
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <!-- Create/Edit Modal -->
-<div class="modal fade" id="classModal" tabindex="-1">
+<div class="modal fade" id="classModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -454,7 +471,6 @@
             </div>
             <div class="modal-body">
                 <form id="classForm">
-                    @Html.AntiForgeryToken()
                     <input type="hidden" id="classId" value="0">
 
                     <div class="form-group">
@@ -489,10 +505,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-modal-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn-modal-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-lg me-2"></i>បោះបង់
                 </button>
-                <button type="button" class="btn btn-modal-primary" onclick="saveClass()">
+                <button type="button" class="btn-modal-primary" onclick="saveClass()">
                     <i class="bi bi-check-lg me-2"></i>រក្សាទុក
                 </button>
             </div>
@@ -502,18 +518,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-        let classes = [];
-        let token = '';
+    let classes = [];
+    let token = '';
 
     $(document).ready(function() {
-        // Get anti-forgery token
         token = $('input[name="__RequestVerificationToken"]').val();
-        console.log('AntiForgeryToken loaded:', token ? 'Yes' : 'No');
-
         loadClasses();
     });
 
-        ffunction loadClasses() {
+    function loadClasses() {
         $('#classTableBody').html(`
             <tr>
                 <td colspan="7" class="text-center py-5">
@@ -528,20 +541,13 @@
             type: 'GET',
             cache: false,
             success: function(response) {
-                console.log("Classes response:", response);
-
-                // ពិនិត្យមើលទម្រង់ទិន្នន័យ
                 if (response && response.success) {
-                    // ទម្រង់ថ្មី: { success: true, data: [...] }
                     classes = response.data || [];
                 } else if (Array.isArray(response)) {
-                    // ទម្រង់ចាស់: [...]
                     classes = response;
                 } else {
-                    console.error("Unexpected classes data format:", response);
                     classes = [];
                 }
-
                 displayClasses(classes);
                 updateStats(classes);
             },
@@ -552,7 +558,6 @@
                         <td colspan="7" class="text-center py-5">
                             <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
                             <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
-                            <p class="text-muted">${xhr.status} - ${error}</p>
                             <button class="btn btn-primary mt-3" onclick="loadClasses()">
                                 <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាមម្តងទៀត
                             </button>
@@ -563,11 +568,10 @@
         });
     }
 
-        function displayClasses(data) {
+    function displayClasses(data) {
         var tbody = $('#classTableBody');
         tbody.empty();
 
-        // ពិនិត្យមើលថា data ជា Array មែនទេ
         if (!Array.isArray(data) || data.length === 0) {
             tbody.html(`
                 <tr>
@@ -615,11 +619,8 @@
         });
     }
 
-        function updateStats(data) {
-        // ពិនិត្យមើលថា data ជា Array
-        if (!Array.isArray(data)) {
-            data = [];
-        }
+    function updateStats(data) {
+        if (!Array.isArray(data)) data = [];
 
         $('#totalClasses').text(data.length);
 
@@ -637,10 +638,7 @@
     $('#searchInput').on('keyup', function() {
         var searchText = $(this).val().toLowerCase();
 
-        // ពិនិត្យមើលថា classes ជា Array
-        if (!Array.isArray(classes)) {
-            classes = [];
-        }
+        if (!Array.isArray(classes)) classes = [];
 
         var filtered = classes.filter(c =>
             (c.className && c.className.toLowerCase().includes(searchText)) ||
@@ -651,7 +649,6 @@
         displayClasses(filtered);
     });
 
-    // Modal functions
     function openCreateModal() {
         $('#modalTitleText').text('បន្ថែមថ្នាក់ថ្មី');
         $('#classId').val('0');
@@ -660,11 +657,6 @@
         $('#teacherName').val('');
         $('#room').val('');
         $('#time').val('');
-
-        // Remove modal backdrop manually if any
-        $('.modal-backdrop').remove();
-        $('body').removeClass('modal-open');
-
         $('#classModal').modal('show');
     }
 
@@ -678,11 +670,6 @@
             $('#teacherName').val(classObj.teacherName);
             $('#room').val(classObj.room);
             $('#time').val(classObj.time);
-
-            // Remove modal backdrop manually if any
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open');
-
             $('#classModal').modal('show');
         }
     }
@@ -701,137 +688,42 @@
 
         // Validate
         if (!classData.classCode) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'សូមបញ្ចូលលេខកូដថ្នាក់',
-                confirmButtonColor: '#8b5cf6'
-            });
-            return;
+            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលលេខកូដថ្នាក់' }); return;
         }
         if (!classData.className) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'សូមបញ្ចូលឈ្មោះថ្នាក់',
-                confirmButtonColor: '#8b5cf6'
-            });
-            return;
+            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះថ្នាក់' }); return;
         }
         if (!classData.teacherName) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'សូមបញ្ចូលឈ្មោះគ្រូ',
-                confirmButtonColor: '#8b5cf6'
-            });
-            return;
+            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះគ្រូ' }); return;
         }
         if (!classData.room) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'សូមបញ្ចូលបន្ទប់',
-                confirmButtonColor: '#8b5cf6'
-            });
-            return;
+            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលបន្ទប់' }); return;
         }
         if (!classData.time) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'សូមបញ្ចូលម៉ោងសិក្សា',
-                confirmButtonColor: '#8b5cf6'
-            });
-            return;
+            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលម៉ោងសិក្សា' }); return;
         }
-
-        // Check if token exists
-        if (!token) {
-            token = $('input[name="__RequestVerificationToken"]').val();
-            if (!token) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'កំហុស',
-                    text: 'មិនអាចរកឃើញ AntiForgeryToken',
-                    confirmButtonColor: '#8b5cf6'
-                });
-                return;
-            }
-        }
-
-        // Show loading
-        Swal.fire({
-            title: 'កំពុងរក្សាទុក...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
 
         var url = id == '0' ? '/Student/CreateClass' : '/Student/UpdateClass';
+
+        Swal.fire({ title: 'កំពុងរក្សាទុក...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         $.ajax({
             url: url,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(classData),
-            headers: {
-                'RequestVerificationToken': token
-            },
+            headers: { 'RequestVerificationToken': token },
             success: function(response) {
-                if (response.success) {
-                    // Close modal first
+                if (response && response.success) {
                     $('#classModal').modal('hide');
-
-                    // Remove modal backdrop
-                    $('.modal-backdrop').remove();
-                    $('body').removeClass('modal-open');
-
-                    // Show success message after modal is closed
-                    setTimeout(function() {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'ជោគជ័យ!',
-                            text: response.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }, 300);
-
-                    // Reload data
-                    setTimeout(function() {
-                        loadClasses();
-                    }, 500);
+                    Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
+                    loadClasses();
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'កំហុស',
-                        text: response.message,
-                        confirmButtonColor: '#8b5cf6'
-                    });
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-                console.error('Status:', xhr.status);
-                console.error('Response:', xhr.responseText);
-
-                let errorMsg = 'មានបញ្ហាបច្ចេកទេស';
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.message) {
-                        errorMsg = response.message;
-                    } else if (response.title) {
-                        errorMsg = response.title;
-                    }
-                } catch(e) {
-                    if (xhr.responseText) {
-                        errorMsg = xhr.responseText;
-                    }
-                }
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'កំហុស (Status: ' + xhr.status + ')',
-                    text: errorMsg,
-                    confirmButtonColor: '#8b5cf6'
-                });
+                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស: ' + error });
             }
         });
     }
@@ -843,7 +735,6 @@
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#64748b',
             confirmButtonText: 'បាទ/ចាស លុប',
             cancelButtonText: 'បោះបង់'
         }).then((result) => {
@@ -852,42 +743,20 @@
                     url: '/Student/DeleteClass',
                     type: 'POST',
                     data: { id: id },
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
+                    headers: { 'RequestVerificationToken': token },
                     success: function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'ជោគជ័យ!',
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
+                        if (response && response.success) {
+                            Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
                             loadClasses();
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'កំហុស',
-                                text: response.message
-                            });
+                            Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
                         }
                     },
                     error: function(xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'កំហុស',
-                            text: 'មានបញ្ហាបច្ចេកទេស'
-                        });
+                        Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស' });
                     }
                 });
             }
         });
     }
-
-    // Clean up modal when hidden
-    $('#classModal').on('hidden.bs.modal', function () {
-        $('.modal-backdrop').remove();
-        $('body').removeClass('modal-open');
-    });
 </script>

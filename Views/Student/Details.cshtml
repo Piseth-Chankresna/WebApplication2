@@ -12,12 +12,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #3b82f6;
             margin-bottom: 8px;
         }
+
+            .page-header h2 i {
+                background: linear-gradient(135deg, #3b82f6, #2563eb);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .profile-container {
         max-width: 1000px;
@@ -73,6 +77,7 @@
         display: flex;
         align-items: center;
         gap: 40px;
+        flex-wrap: wrap;
     }
 
     .profile-avatar-large {
@@ -82,7 +87,21 @@
         border: 5px solid rgba(255,255,255,0.3);
         object-fit: cover;
         box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 4rem;
+        font-weight: 700;
+        overflow: hidden;
     }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
     .profile-title h3 {
         font-size: 2rem;
@@ -296,14 +315,18 @@
     }
 </style>
 
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="page-header">
     <h2><i class="bi bi-eye-fill me-2"></i>ព័ត៌មានលម្អិតសិស្ស</h2>
     <p class="text-muted">មើលព័ត៌មានលម្អិតរបស់សិស្ស</p>
 </div>
 
 <a href="/Student/Index" class="btn-back ajax-link" data-url="/Student/Index">
-    <i class="bi bi-arrow-left"></i>
-    ត្រឡប់ទៅបញ្ជីសិស្ស
+    <i class="bi bi-arrow-left"></i> ត្រឡប់ទៅបញ្ជីសិស្ស
 </a>
 
 <div class="profile-container">
@@ -311,13 +334,20 @@
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="profile-header-content">
-                <img src="@(Model.Photo ?? $"https://ui-avatars.com/api/?name={Model.Name}&background=3b82f6&color=fff&size=150")"
-                     class="profile-avatar-large" alt="Student Photo">
+                <div class="profile-avatar-large">
+                    @if (!string.IsNullOrEmpty(Model.Photo))
+                    {
+                        <img src="@Model.Photo" alt="@Model.Name" onerror="this.src='https://ui-avatars.com/api/?name=@(Model.Name ?? "User")&background=3b82f6&color=fff&size=150'">
+                    }
+                    else
+                    {
+                        <span>@(Model.Name?.Length > 0 ? Model.Name.Substring(0, 1).ToUpper() : "?")</span>
+                    }
+                </div>
                 <div class="profile-title">
                     <h3>@Model.Name</h3>
                     <div class="badge">
-                        <i class="bi bi-upc-scan"></i>
-                        លេខសម្គាល់: @Model.Id
+                        <i class="bi bi-upc-scan"></i> លេខសម្គាល់: @Model.Id
                     </div>
                     <div class="profile-stats">
                         <div class="stat-item">
@@ -341,8 +371,7 @@
         <div class="profile-body">
             <!-- Personal Information -->
             <div class="section-title">
-                <i class="bi bi-person"></i>
-                <span>ព័ត៌មានផ្ទាល់ខ្លួន</span>
+                <i class="bi bi-person"></i> ព័ត៌មានផ្ទាល់ខ្លួន
             </div>
 
             <div class="info-grid">
@@ -380,8 +409,7 @@
 
             <!-- Academic Information -->
             <div class="section-title">
-                <i class="bi bi-mortarboard"></i>
-                <span>ព័ត៌មានសិក្សា</span>
+                <i class="bi bi-mortarboard"></i> ព័ត៌មានសិក្សា
             </div>
 
             <div class="info-grid">
@@ -419,26 +447,21 @@
 
             <!-- Quick Actions -->
             <div class="section-title">
-                <i class="bi bi-lightning"></i>
-                <span>សកម្មភាពរហ័ស</span>
+                <i class="bi bi-lightning"></i> សកម្មភាពរហ័ស
             </div>
 
             <div class="quick-actions">
                 <a href="/Student/Edit/@Model.Id" class="action-btn ajax-link" data-url="/Student/Edit/@Model.Id">
-                    <i class="bi bi-pencil-square"></i>
-                    <span>កែប្រែព័ត៌មាន</span>
+                    <i class="bi bi-pencil-square"></i> <span>កែប្រែព័ត៌មាន</span>
                 </a>
-                <a href="/Student/Attendance" class="action-btn">
-                    <i class="bi bi-calendar-check"></i>
-                    <span>វត្តមាន</span>
+                <a href="/Student/CheckAttendance?studentId=@Model.Id" class="action-btn ajax-link" data-url="/Student/CheckAttendance?studentId=@Model.Id">
+                    <i class="bi bi-calendar-check"></i> <span>វត្តមាន</span>
                 </a>
-                <a href="/Student/Grades" class="action-btn">
-                    <i class="bi bi-bar-chart"></i>
-                    <span>ពិន្ទុ</span>
+                <a href="/Student/Grades?studentId=@Model.Id" class="action-btn ajax-link" data-url="/Student/Grades?studentId=@Model.Id">
+                    <i class="bi bi-bar-chart"></i> <span>ពិន្ទុ</span>
                 </a>
-                <a href="/Student/Payment" class="action-btn">
-                    <i class="bi bi-credit-card"></i>
-                    <span>ការបង់ប្រាក់</span>
+                <a href="/Student/Payment?studentId=@Model.Id" class="action-btn ajax-link" data-url="/Student/Payment?studentId=@Model.Id">
+                    <i class="bi bi-credit-card"></i> <span>ការបង់ប្រាក់</span>
                 </a>
             </div>
         </div>

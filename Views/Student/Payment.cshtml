@@ -71,18 +71,15 @@
     }
 
     @@keyframes slideDown {
-        from
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
 
-    {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .page-header h2 {
@@ -145,18 +142,15 @@
         }
 
     @@keyframes fadeInUp {
-        from
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
 
-    {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     [data-theme="dark"] .stat-card {
@@ -207,16 +201,13 @@
     }
 
     @@keyframes fadeIn {
-        from
+        from {
+            opacity: 0;
+        }
 
-    {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-
+        to {
+            opacity: 1;
+        }
     }
 
     [data-theme="dark"] .filter-section {
@@ -363,18 +354,15 @@
     }
 
     @@keyframes slideUp {
-        from
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
 
-    {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     [data-theme="dark"] .table-container {
@@ -791,18 +779,15 @@
     }
 
     @@keyframes pulse {
-        0%
+        0% {
+            transform: scale(0.95);
+            opacity: 0;
+        }
 
-    {
-        transform: scale(0.95);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
 
     [data-theme="dark"] .selected-student-card {
@@ -1128,55 +1113,46 @@
     }
 
     @@keyframes spin {
-        to
-
-    {
-        transform: rotate(360deg);
-    }
-
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* ====== RESPONSIVE ====== */
     @@media (max-width: 1024px) {
-        .stats-grid
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
 
-    {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .filter-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @@media (max-width: 768px) {
-        .stats-grid
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
 
-    {
-        grid-template-columns: 1fr;
-    }
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .filter-grid {
-        grid-template-columns: 1fr;
-    }
+        .payment-methods {
+            grid-template-columns: 1fr;
+        }
 
-    .payment-methods {
-        grid-template-columns: 1fr;
-    }
+        .quick-amounts {
+            grid-template-columns: repeat(2, 1fr);
+        }
 
-    .quick-amounts {
-        grid-template-columns: repeat(2, 1fr);
-    }
+        .number-pad {
+            grid-template-columns: repeat(3, 1fr);
+        }
 
-    .number-pad {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .amount-display .value {
-        font-size: 2.5rem;
-    }
-
+        .amount-display .value {
+            font-size: 2.5rem;
+        }
     }
     /* Amount Input Styling */
     .input-group {

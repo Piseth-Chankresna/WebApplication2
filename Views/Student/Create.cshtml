@@ -1,8 +1,7 @@
-﻿@model WebApplication2.Models.Student
-@{
+﻿@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "បង្កើតសិស្សថ្មី";
+    ViewData["Title"] = "បន្ថែមសិស្សថ្មី";
 }
 
 <style>
@@ -12,11 +11,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #10b981, #059669);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #10b981;
             margin-bottom: 8px;
         }
+
+            .page-header h2 i {
+                background: linear-gradient(135deg, #10b981, #059669);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .form-container {
         max-width: 900px;
@@ -260,10 +264,6 @@
         background: #e2e8f0;
     }
 
-    [data-theme="dark"] .btn-secondary:hover {
-        background: #1e293b;
-    }
-
     .alert {
         padding: 16px;
         border-radius: 16px;
@@ -306,18 +306,15 @@
     }
 </style>
 
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="page-header">
-    <h2><i class="bi bi-person-plus-fill me-2"></i>បង្កើតសិស្សថ្មី</h2>
+    <h2><i class="bi bi-person-plus-fill me-2"></i>បន្ថែមសិស្សថ្មី</h2>
     <p class="text-muted">បំពេញព័ត៌មានខាងក្រោមដើម្បីបង្កើតសិស្សថ្មី</p>
 </div>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        @TempData["Error"]
-    </div>
-}
 
 <div class="form-container">
     <div class="form-card">
@@ -327,18 +324,16 @@
             <p>សូមបំពេញព័ត៌មានអោយបានត្រឹមត្រូវ</p>
         </div>
 
-        <form asp-action="Create" method="post" id="createForm" enctype="multipart/form-data">
+        <form id="createForm" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
-            <!-- កែប្រែ Photo Upload -->
+            <!-- Photo Upload -->
             <div class="photo-upload" onclick="$('#photoInput').click()">
                 <img id="photoPreview" class="photo-preview" src="#" alt="Preview">
                 <i class="bi bi-camera"></i>
                 <p>ចុចដើម្បីបញ្ចូលរូបថត</p>
                 <small class="text-muted">គាំទ្រ JPG, PNG (រូបថត 3x4)</small>
             </div>
-
-            <!-- ប្តូរ name="Photo" ជំនួសអោយ name="Photo" -->
             <input type="file" id="photoInput" name="Photo" accept="image/*" style="display: none;">
 
             <!-- Personal Information -->
@@ -352,7 +347,7 @@
                     <label class="form-label"><i class="bi bi-person"></i> ឈ្មោះពេញ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-person"></i>
-                        <input type="text" name="Name" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" required>
+                        <input type="text" name="Name" id="studentName" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" required>
                     </div>
                 </div>
 
@@ -360,7 +355,7 @@
                     <label class="form-label"><i class="bi bi-gender-ambiguous"></i> ភេទ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-gender-ambiguous"></i>
-                        <select name="Gender" class="form-control" required>
+                        <select name="Gender" id="studentGender" class="form-control" required>
                             <option value="">ជ្រើសរើសភេទ</option>
                             <option value="ប្រុស">ប្រុស</option>
                             <option value="ស្រី">ស្រី</option>
@@ -375,7 +370,7 @@
                     <label class="form-label"><i class="bi bi-calendar"></i> ថ្ងៃខែឆ្នាំកំណើត</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar"></i>
-                        <input type="date" name="Dob" class="form-control" required>
+                        <input type="date" name="Dob" id="studentDob" class="form-control" required>
                     </div>
                 </div>
 
@@ -383,7 +378,7 @@
                     <label class="form-label"><i class="bi bi-geo-alt"></i> ទីកន្លែងកំណើត</label>
                     <div class="input-wrapper">
                         <i class="bi bi-geo-alt"></i>
-                        <input type="text" name="Pob" class="form-control" placeholder="ឧ. ភ្នំពេញ" required>
+                        <input type="text" name="Pob" id="studentPob" class="form-control" placeholder="ឧ. ភ្នំពេញ" required>
                     </div>
                 </div>
             </div>
@@ -392,7 +387,7 @@
                 <label class="form-label"><i class="bi bi-phone"></i> លេខទូរស័ព្ទ</label>
                 <div class="input-wrapper">
                     <i class="bi bi-phone"></i>
-                    <input type="tel" name="Phone" class="form-control" placeholder="ឧ. 012 345 678" required>
+                    <input type="tel" name="Phone" id="studentPhone" class="form-control" placeholder="ឧ. 012 345 678" required>
                 </div>
             </div>
 
@@ -407,7 +402,7 @@
                     <label class="form-label"><i class="bi bi-book"></i> កម្រិតសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-book"></i>
-                        <select name="Degree" class="form-control" required>
+                        <select name="Degree" id="studentDegree" class="form-control" required>
                             <option value="">ជ្រើសរើសកម្រិត</option>
                             <option value="បរិញ្ញាបត្ររង">បរិញ្ញាបត្ររង</option>
                             <option value="បរិញ្ញាបត្រ">បរិញ្ញាបត្រ</option>
@@ -421,7 +416,7 @@
                     <label class="form-label"><i class="bi bi-star"></i> ជំនាញ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-star"></i>
-                        <select name="Major" class="form-control" required>
+                        <select name="Major" id="studentMajor" class="form-control" required>
                             <option value="">ជ្រើសរើសជំនាញ</option>
                             <option value="Information Technology">Information Technology</option>
                             <option value="Business Administration">Business Administration</option>
@@ -439,7 +434,7 @@
                     <label class="form-label"><i class="bi bi-calendar3"></i> ឆ្នាំសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar3"></i>
-                        <select name="Year" class="form-control" required>
+                        <select name="Year" id="studentYear" class="form-control" required>
                             <option value="">ជ្រើសរើសឆ្នាំ</option>
                             <option value="1">ឆ្នាំទី១</option>
                             <option value="2">ឆ្នាំទី២</option>
@@ -454,7 +449,7 @@
                     <label class="form-label"><i class="bi bi-door-open"></i> បន្ទប់</label>
                     <div class="input-wrapper">
                         <i class="bi bi-door-open"></i>
-                        <input type="text" name="Room" class="form-control" placeholder="ឧ. A101" required>
+                        <input type="text" name="Room" id="studentRoom" class="form-control" placeholder="ឧ. A101" required>
                     </div>
                 </div>
             </div>
@@ -464,7 +459,7 @@
                     <label class="form-label"><i class="bi bi-clock"></i> វេនសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-clock"></i>
-                        <select name="Shift" class="form-control" required>
+                        <select name="Shift" id="studentShift" class="form-control" required>
                             <option value="">ជ្រើសរើសវេន</option>
                             <option value="ព្រឹក">ព្រឹក (៧:០០-១១:០០)</option>
                             <option value="រសៀល">រសៀល (១:០០-៥:០០)</option>
@@ -479,7 +474,7 @@
                     <label class="form-label"><i class="bi bi-gift"></i> អាហារូបករណ៍</label>
                     <div class="input-wrapper">
                         <i class="bi bi-gift"></i>
-                        <select name="Scholarship" class="form-control">
+                        <select name="Scholarship" id="studentScholarship" class="form-control">
                             <option value="0%">0% (បង់ថ្លៃពេញ)</option>
                             <option value="25%">25%</option>
                             <option value="50%">50%</option>
@@ -502,7 +497,7 @@
                     <label class="form-label"><i class="bi bi-tag"></i> លេខសម្គាល់ (បើមាន)</label>
                     <div class="input-wrapper">
                         <i class="bi bi-tag"></i>
-                        <input type="text" name="Batch" class="form-control" placeholder="ឧ. BATCH-2025">
+                        <input type="text" name="Batch" id="studentBatch" class="form-control" placeholder="ឧ. BATCH-2025">
                     </div>
                 </div>
 
@@ -510,7 +505,7 @@
                     <label class="form-label"><i class="bi bi-calendar-week"></i> ឆ្នាំសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar-week"></i>
-                        <input type="text" name="AcademicYear" class="form-control" value="2025-2026" placeholder="ឧ. 2025-2026">
+                        <input type="text" name="AcademicYear" id="studentAcademicYear" class="form-control" value="2025-2026">
                     </div>
                 </div>
             </div>
@@ -519,24 +514,23 @@
                 <label class="form-label"><i class="bi bi-currency-dollar"></i> ថ្លៃសិក្សាត្រូវបង់ ($)</label>
                 <div class="input-wrapper">
                     <i class="bi bi-currency-dollar"></i>
-                    <input type="number" name="AmountDue" class="form-control" value="0" step="0.01">
+                    <input type="number" name="AmountDue" id="studentAmountDue" class="form-control" value="0" step="0.01">
                 </div>
             </div>
 
             <div class="form-actions">
                 <a href="/Student/Index" class="btn btn-secondary ajax-link" data-url="/Student/Index">
-                    <i class="bi bi-x-lg"></i>
-                    បោះបង់
+                    <i class="bi bi-x-lg"></i> បោះបង់
                 </a>
                 <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <i class="bi bi-check-lg"></i>
-                    បង្កើតសិស្ស
+                    <i class="bi bi-check-lg"></i> រក្សាទុក
                 </button>
             </div>
         </form>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Preview photo before upload
     $('#photoInput').change(function(e) {
@@ -551,14 +545,64 @@
         }
     });
 
-    // Form submit with loading
-    $('#createForm').on('submit', function() {
-        var btn = $('#submitBtn');
-        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>កំពុងរក្សាទុក...');
-    });
+    // Form submit
+    $('#createForm').submit(function(e) {
+        e.preventDefault();
 
-    // Auto-hide alerts
-    setTimeout(function() {
-        $('.alert').fadeOut();
-    }, 5000);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        // Validate required fields
+        if (!$('#studentName').val()) {
+            Swal.fire('កំហុស', 'សូមបញ្ចូលឈ្មោះសិស្ស', 'error');
+            return;
+        }
+
+        var formData = new FormData(this);
+
+        // Show loading
+        Swal.fire({
+            title: 'កំពុងរក្សាទុក...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '/Student/Create',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'RequestVerificationToken': token
+            },
+            success: function(response) {
+                if (response && response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/Student/Index';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: response.message || 'មានបញ្ហាក្នុងការរក្សាទុក'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'កំហុស',
+                    text: 'មានបញ្ហាបច្ចេកទេស: ' + error
+                });
+            }
+        });
+    });
 </script>

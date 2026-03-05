@@ -12,12 +12,16 @@
 
         .page-header h2 {
             font-weight: 800;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #f59e0b;
             margin-bottom: 8px;
         }
+
+            .page-header h2 i {
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
     .form-container {
         max-width: 900px;
@@ -182,7 +186,7 @@
         align-items: center;
         gap: 30px;
         margin-bottom: 30px;
-        padding: 20px;
+        padding: 25px;
         background: #f8fafc;
         border-radius: 20px;
         border: 1px solid #e2e8f0;
@@ -194,19 +198,33 @@
     }
 
     .current-photo {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid white;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+        overflow: hidden;
     }
+
+        .current-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
     .photo-upload {
         flex: 1;
         border: 2px dashed #e2e8f0;
         border-radius: 16px;
-        padding: 20px;
+        padding: 25px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -222,15 +240,20 @@
     }
 
     .photo-upload i {
-        font-size: 2rem;
+        font-size: 2.5rem;
         color: #94a3b8;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .photo-upload p {
         color: #64748b;
         margin: 0;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+    }
+
+    .photo-upload small {
+        color: #94a3b8;
+        font-size: 0.8rem;
     }
 
     .form-actions {
@@ -328,8 +351,18 @@
             flex-direction: column;
             text-align: center;
         }
+
+        .current-photo {
+            width: 150px;
+            height: 150px;
+        }
     }
 </style>
+
+<!-- AntiForgeryToken -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
 
 <div class="page-header">
     <h2><i class="bi bi-pencil-square me-2"></i>កែប្រែព័ត៌មានសិស្ស</h2>
@@ -366,18 +399,28 @@
             <p>សូមកែប្រែព័ត៌មានខាងក្រោម</p>
         </div>
 
-        <form asp-action="Edit" method="post" id="editForm">
+        <form asp-action="Update" asp-controller="Student" method="post" id="editForm" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Photo" />
+            <input type="hidden" id="existingPhoto" name="ExistingPhoto" value="@Model.Photo" />
 
             <!-- Photo Section -->
             <div class="photo-section">
-                <img src="@(Model.Photo ?? $"https://ui-avatars.com/api/?name={Model.Name}&background=f59e0b&color=fff&size=100")"
-                     class="current-photo" id="photoPreview" alt="Student Photo">
+                <div class="current-photo" id="photoPreviewContainer">
+                    @if (!string.IsNullOrEmpty(Model.Photo))
+                    {
+                        <img src="@Model.Photo" alt="@Model.Name" id="previewImg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=@(Model.Name ?? "User")&background=f59e0b&color=fff&size=120'">
+                    }
+                    else
+                    {
+                        <span id="previewInitial">@(Model.Name?.Length > 0 ? Model.Name.Substring(0, 1).ToUpper() : "?")</span>
+                        <img src="" alt="" id="previewImg" style="display: none;">
+                    }
+                </div>
                 <div class="photo-upload" onclick="$('#photoInput').click()">
                     <i class="bi bi-camera"></i>
                     <p>ចុចដើម្បីផ្លាស់ប្តូររូបថត</p>
+                    <small>គាំទ្រ JPG, PNG</small>
                 </div>
                 <input type="file" id="photoInput" name="NewPhoto" accept="image/*" style="display: none;">
             </div>
@@ -581,39 +624,91 @@
 
             <div class="form-actions">
                 <a href="/Student/Index" class="btn btn-secondary ajax-link" data-url="/Student/Index">
-                    <i class="bi bi-x-lg"></i>
-                    បោះបង់
+                    <i class="bi bi-x-lg"></i> បោះបង់
                 </a>
                 <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <i class="bi bi-check-lg"></i>
-                    រក្សាទុកការកែប្រែ
+                    <i class="bi bi-check-lg"></i> រក្សាទុកការកែប្រែ
                 </button>
             </div>
         </form>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Preview photo before upload
-    $('#photoInput').change(function(e) {
-        var file = e.target.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#photoPreview').attr('src', e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+    $(document).ready(function() {
+        // Preview photo before upload
+        $('#photoInput').change(function(e) {
+            var file = e.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#previewImg').attr('src', e.target.result).show();
+                    $('#previewInitial').hide();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-    // Form submit with loading
-    $('#editForm').on('submit', function() {
-        var btn = $('#submitBtn');
-        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>កំពុងរក្សាទុក...');
-    });
+        // Form submit
+        $('#editForm').submit(function(e) {
+            e.preventDefault();
 
-    // Auto-hide alerts
-    setTimeout(function() {
-        $('.alert').fadeOut();
-    }, 5000);
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            // Validate required fields
+            if (!$('#Name').val()) {
+                Swal.fire('កំហុស', 'សូមបញ្ចូលឈ្មោះសិស្ស', 'error');
+                return;
+            }
+
+            var formData = new FormData(this);
+
+            // Show loading
+            Swal.fire({
+                title: 'កំពុងរក្សាទុក...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '/Student/Update',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                success: function(response) {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ជោគជ័យ!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '/Student/Index';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'កំហុស',
+                            text: response.message || 'មានបញ្ហាក្នុងការរក្សាទុក'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: 'មានបញ្ហាបច្ចេកទេស: ' + error
+                    });
+                }
+            });
+        });
+    });
 </script>
