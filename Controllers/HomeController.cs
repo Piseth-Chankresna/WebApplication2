@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Models;
@@ -7,6 +8,7 @@ using WebApplication2.Services;
 
 namespace WebApplication2.Controllers
 {
+    [Authorize]
     public class HomeController(ILogger<HomeController> logger, ApplicationDbContext context, ActivityLogService activityLogService) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;

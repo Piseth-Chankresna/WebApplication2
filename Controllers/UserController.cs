@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.Json;
 using WebApplication2.Data;
 using WebApplication2.Models;
@@ -8,6 +11,7 @@ using WebApplication2.Services;
 
 namespace WebApplication2.Controllers
 {
+    [Authorize]
     public class UserController(ApplicationDbContext context, ActivityLogService activityLogService) : Controller
     {
         private readonly ApplicationDbContext _context = context;
@@ -300,6 +304,27 @@ namespace WebApplication2.Controllers
             return View(user);
         }
 
+        // ==================== CURRENT USER PROFILE ====================
+        public async Task<IActionResult> MyProfile()
+        {
+            // Get current logged-in user ID
+            var userIdClaim = User.FindFirst("UserId");
+            if (userIdClaim == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var currentUserId = int.Parse(userIdClaim.Value);
+            var user = await _context.UserAccounts.FindAsync(currentUserId);
+            
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View("Profile", user);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfile([FromForm] UserAccount updatedUser, IFormFile? ProfileImage)
@@ -350,6 +375,181 @@ namespace WebApplication2.Controllers
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // ==================== UPDATE CURRENT USER PROFILE ====================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCurrentUserProfile([FromForm] ProfileUpdateModel updatedUser, IFormFile? ProfileImage)
+        {
+            try
+            {
+                Console.WriteLine($"=== UPDATE PROFILE DEBUG ===");
+                Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+                Console.WriteLine($"UserId claim: {User.FindFirst("UserId")?.Value}");
+                Console.WriteLine($"User Name claim: {User.FindFirst(ClaimTypes.Name)?.Value}");
+                Console.WriteLine($"User Email claim: {User.FindFirst(ClaimTypes.Email)?.Value}");
+                Console.WriteLine($"UpdatedUser.Id: {updatedUser?.Id}");
+                Console.WriteLine($"UpdatedUser.FullName: {updatedUser?.FullName}");
+                Console.WriteLine($"UpdatedUser.Email: {updatedUser?.Email}");
+                Console.WriteLine($"ProfileImage: {ProfileImage?.FileName} ({ProfileImage?.Length} bytes)");
+
+                // Check model state
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    Console.WriteLine($"Model validation errors: {string.Join(", ", errors)}");
+                    foreach (var state in ModelState)
+                    {
+                        Console.WriteLine($"Key: {state.Key}, Value: {string.Join(", ", state.Value.Errors.Select(e => e.ErrorMessage))}");
+                    }
+                    return Json(new { success = false, message = "Model validation failed: " + string.Join(", ", errors) });
+                }
+
+                // Get current logged-in user ID
+                var userIdClaim = User.FindFirst("UserId");
+                if (userIdClaim == null)
+                {
+                    Console.WriteLine("ERROR: UserId claim is null");
+                    return Json(new { success = false, message = "មិនអាចរកឃើញព័ត៌មានអ្នកប្រើប្រាស់" });
+                }
+
+                var currentUserId = int.Parse(userIdClaim.Value);
+                Console.WriteLine($"CurrentUserId: {currentUserId}");
+                
+                var user = await _context.UserAccounts.FindAsync(currentUserId);
+                
+                if (user == null)
+                {
+                    Console.WriteLine($"ERROR: User not found for ID {currentUserId}");
+                    return Json(new { success = false, message = "រកមិនឃើញអ្នកប្រើប្រាស់" });
+                }
+
+                Console.WriteLine($"Found user: {user.FullName} (Email: {user.Email})");
+
+                // Update user info
+                user.FullName = updatedUser.FullName;
+                user.Email = updatedUser.Email;
+
+                // Handle profile image upload
+                if (ProfileImage != null && ProfileImage.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ProfileImage.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ProfileImage.CopyToAsync(stream);
+                    }
+
+                    // Delete old profile image if exists
+                    if (!string.IsNullOrEmpty(user.ProfileImage))
+                    {
+                        var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.ProfileImage.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    user.ProfileImage = "/uploads/" + fileName;
+                }
+
+                Console.WriteLine("Attempting to save changes to database...");
+                
+                // Try to save with detailed error information
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Database save successful!");
+
+                    // Re-issue authentication cookie with updated claims
+                    var claims = new List<Claim>
+                    {
+                        new(ClaimTypes.Name, user.FullName),
+                        new(ClaimTypes.Email, user.Email),
+                        new("UserId", user.Id.ToString()),
+                        new("ProfileImage", user.ProfileImage ?? "")
+                    };
+
+                    // Add role permissions
+                    var permissions = await _context.RolePermissions
+                        .Where(rp => rp.RoleName == user.Role)
+                        .ToListAsync();
+
+                    foreach (var perm in permissions)
+                    {
+                        if (!string.IsNullOrEmpty(perm.ModuleName))
+                        {
+                            claims.Add(new Claim($"Permission_{perm.ModuleName}_View", perm.CanView.ToString()));
+                            claims.Add(new Claim($"Permission_{perm.ModuleName}_Create", perm.CanCreate.ToString()));
+                            claims.Add(new Claim($"Permission_{perm.ModuleName}_Edit", perm.CanEdit.ToString()));
+                            claims.Add(new Claim($"Permission_{perm.ModuleName}_Delete", perm.CanDelete.ToString()));
+                            claims.Add(new Claim($"Permission_{perm.ModuleName}_Export", perm.CanExport.ToString()));
+                        }
+                    }
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTime.UtcNow.AddDays(30) // 30 days
+                    };
+
+                    // Sign out and sign in with new claims
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+
+                    Console.WriteLine("Authentication cookie updated with new user data");
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    Console.WriteLine($"Database Update Error: {dbEx.Message}");
+                    if (dbEx.InnerException != null)
+                    {
+                        Console.WriteLine($"Inner Exception: {dbEx.InnerException.Message}");
+                    }
+                    return Json(new { success = false, message = $"Database error: {dbEx.Message}" });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"General Error: {ex.Message}");
+                    return Json(new { success = false, message = $"Error: {ex.Message}" });
+                }
+
+                // Log activity
+                await _activityLogService.LogAsync(
+                    user.Id,
+                    user.FullName ?? "Unknown",
+                    "កែប្រែប្រវត្តិរូប",
+                    $"អ្នកប្រើប្រាស់កែប្រែប្រវត្តិរូបផ្ទាល់ខ្លួន"
+                );
+
+                return Json(new { 
+                    success = true, 
+                    message = "កែប្រែប្រវត្តិរូបដោយជោគជ័យ",
+                    profileImage = user.ProfileImage,
+                    fullName = user.FullName
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Outer Exception: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
                 return Json(new { success = false, message = ex.Message });
             }
         }

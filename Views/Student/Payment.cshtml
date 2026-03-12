@@ -1,7 +1,7 @@
-﻿@{
-    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-    Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "ការបង់ប្រាក់";
+@{
+bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+Layout = isAjax ? null : "_Layout";
+ViewData["Title"] = "ការបង់ប្រាក់";
 }
 
 <style>
@@ -31,7 +31,7 @@
         --shadow-colored: 0 10px 20px -5px rgba(16, 185, 129, 0.3);
     }
 
-    [data-theme="dark"] {
+    [data-bs-theme="dark"] {
         --primary: #34d399;
         --primary-dark: #10b981;
         --primary-light: #1e293b;
@@ -50,7 +50,6 @@
         --gray-900: #f8fafc;
     }
 
-    /* ====== BASE STYLES ====== */
     * {
         margin: 0;
         padding: 0;
@@ -153,7 +152,7 @@
         }
     }
 
-    [data-theme="dark"] .stat-card {
+    [data-bs-theme="dark"] .stat-card {
         background: var(--gray-100);
         border-color: var(--gray-200);
     }
@@ -180,7 +179,7 @@
         margin-bottom: 4px;
     }
 
-    [data-theme="dark"] .stat-value {
+    [data-bs-theme="dark"] .stat-value {
         color: white;
     }
 
@@ -210,7 +209,7 @@
         }
     }
 
-    [data-theme="dark"] .filter-section {
+    [data-bs-theme="dark"] .filter-section {
         background: var(--gray-100);
         border-color: var(--gray-200);
     }
@@ -233,7 +232,7 @@
             font-size: 0.9rem;
         }
 
-    [data-theme="dark"] .filter-item label {
+    [data-bs-theme="dark"] .filter-item label {
         color: var(--gray-400);
     }
 
@@ -247,8 +246,8 @@
         transition: all 0.2s ease;
     }
 
-    [data-theme="dark"] .filter-item select,
-    [data-theme="dark"] .filter-item input {
+    [data-bs-theme="dark"] .filter-item select,
+    [data-bs-theme="dark"] .filter-item input {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: white;
@@ -280,10 +279,6 @@
             box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-filter:active {
-            transform: translateY(0);
-        }
-
     .btn-export {
         background: white;
         color: var(--primary);
@@ -297,7 +292,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-export {
+    [data-bs-theme="dark"] .btn-export {
         background: var(--gray-200);
         color: var(--primary);
         border-color: var(--primary);
@@ -310,12 +305,14 @@
         box-shadow: var(--shadow-colored);
     }
 
-    /* ====== ACTION BUTTONS ====== */
+    /* ====== ACTION BAR ====== */
     .action-bar {
         display: flex;
-        gap: 15px;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 25px;
         flex-wrap: wrap;
+        gap: 15px;
     }
 
     .btn-add {
@@ -342,6 +339,78 @@
             font-size: 1.2rem;
         }
 
+    /* ====== REFRESH BUTTON ====== */
+    .btn-refresh {
+        background: var(--bg-primary);
+        color: var(--primary-600);
+        border: 1px solid var(--gray-300);
+        padding: 14px 32px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        background: white;
+    }
+
+    [data-bs-theme="dark"] .btn-refresh {
+        background: var(--gray-100);
+        color: var(--primary);
+        border-color: var(--gray-300);
+    }
+
+    .btn-refresh:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-400);
+        transform: translateY(-2px);
+    }
+
+    .btn-refresh i {
+        transition: transform 0.5s ease;
+    }
+
+    .btn-refresh:hover i {
+        transform: rotate(180deg);
+    }
+
+    .btn-refresh:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ====== LAST UPDATED ====== */
+    .last-updated {
+        background: var(--gray-100);
+        padding: 8px 16px;
+        border-radius: 40px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    [data-bs-theme="dark"] .last-updated {
+        background: var(--gray-200);
+        color: var(--gray-400);
+    }
+
+    .spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        100%
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
     /* ====== TABLE STYLES ====== */
     .table-container {
         background: white;
@@ -365,7 +434,7 @@
         }
     }
 
-    [data-theme="dark"] .table-container {
+    [data-bs-theme="dark"] .table-container {
         background: var(--gray-100);
         border-color: var(--gray-200);
     }
@@ -388,7 +457,7 @@
             background: var(--gray-100);
         }
 
-    [data-theme="dark"] .payment-table th {
+    [data-bs-theme="dark"] .payment-table th {
         background: var(--gray-200);
         color: var(--gray-400);
         border-bottom-color: var(--gray-300);
@@ -400,7 +469,7 @@
         color: var(--gray-900);
     }
 
-    [data-theme="dark"] .payment-table td {
+    [data-bs-theme="dark"] .payment-table td {
         color: white;
         border-bottom-color: var(--gray-300);
     }
@@ -415,7 +484,7 @@
             box-shadow: var(--shadow);
         }
 
-    [data-theme="dark"] .payment-table tbody tr:hover {
+    [data-bs-theme="dark"] .payment-table tbody tr:hover {
         background: var(--gray-200);
     }
 
@@ -457,7 +526,7 @@
         border: 1px solid var(--primary);
     }
 
-    [data-theme="dark"] .receipt-badge {
+    [data-bs-theme="dark"] .receipt-badge {
         background: var(--gray-200);
         color: var(--primary);
     }
@@ -488,7 +557,7 @@
         border: 1px solid var(--primary);
     }
 
-    [data-theme="dark"] .status-paid {
+    [data-bs-theme="dark"] .status-paid {
         background: var(--gray-200);
     }
 
@@ -507,7 +576,7 @@
         text-decoration: none;
     }
 
-    [data-theme="dark"] .btn-icon {
+    [data-bs-theme="dark"] .btn-icon {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: var(--gray-400);
@@ -528,7 +597,7 @@
         box-shadow: var(--shadow-xl);
     }
 
-    [data-theme="dark"] .modal-content {
+    [data-bs-theme="dark"] .modal-content {
         background: var(--gray-100);
         color: white;
     }
@@ -567,7 +636,7 @@
         border-top: 2px solid var(--gray-200);
     }
 
-    [data-theme="dark"] .modal-footer {
+    [data-bs-theme="dark"] .modal-footer {
         border-top-color: var(--gray-300);
     }
 
@@ -584,7 +653,7 @@
         font-size: 0.95rem;
     }
 
-    [data-theme="dark"] .form-label {
+    [data-bs-theme="dark"] .form-label {
         color: var(--gray-400);
     }
 
@@ -604,8 +673,8 @@
         transition: all 0.2s ease;
     }
 
-    [data-theme="dark"] .form-control,
-    [data-theme="dark"] .form-select {
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: white;
@@ -644,7 +713,7 @@
             transition: all 0.2s ease;
         }
 
-    [data-theme="dark"] .student-search input {
+    [data-bs-theme="dark"] .student-search input {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: white;
@@ -665,7 +734,7 @@
         margin-bottom: 15px;
     }
 
-    [data-theme="dark"] .student-list {
+    [data-bs-theme="dark"] .student-list {
         border-color: var(--gray-300);
     }
 
@@ -678,7 +747,7 @@
         border-radius: 4px;
     }
 
-    [data-theme="dark"] .student-list::-webkit-scrollbar-thumb {
+    [data-bs-theme="dark"] .student-list::-webkit-scrollbar-thumb {
         background: var(--gray-400);
     }
 
@@ -699,7 +768,7 @@
             transform: translateX(5px);
         }
 
-    [data-theme="dark"] .student-item:hover {
+    [data-bs-theme="dark"] .student-item:hover {
         background: var(--gray-200);
     }
 
@@ -708,7 +777,7 @@
         border-color: var(--primary);
     }
 
-    [data-theme="dark"] .student-item.selected {
+    [data-bs-theme="dark"] .student-item.selected {
         background: var(--gray-200);
     }
 
@@ -738,7 +807,7 @@
         color: var(--gray-900);
     }
 
-    [data-theme="dark"] .student-info h5 {
+    [data-bs-theme="dark"] .student-info h5 {
         color: white;
     }
 
@@ -790,7 +859,7 @@
         }
     }
 
-    [data-theme="dark"] .selected-student-card {
+    [data-bs-theme="dark"] .selected-student-card {
         background: var(--gray-200);
     }
 
@@ -821,7 +890,7 @@
         color: var(--gray-900);
     }
 
-    [data-theme="dark"] .selected-details h4 {
+    [data-bs-theme="dark"] .selected-details h4 {
         color: white;
     }
 
@@ -849,7 +918,7 @@
         border: 2px dashed var(--primary);
     }
 
-    [data-theme="dark"] .amount-display {
+    [data-bs-theme="dark"] .amount-display {
         background: var(--gray-200);
     }
 
@@ -895,7 +964,7 @@
         gap: 5px;
     }
 
-    [data-theme="dark"] .quick-amount-btn {
+    [data-bs-theme="dark"] .quick-amount-btn {
         background: var(--gray-200);
     }
 
@@ -920,7 +989,7 @@
         margin-bottom: 20px;
     }
 
-    [data-theme="dark"] .number-pad {
+    [data-bs-theme="dark"] .number-pad {
         background: var(--gray-200);
     }
 
@@ -937,7 +1006,7 @@
         box-shadow: var(--shadow);
     }
 
-    [data-theme="dark"] .num-btn {
+    [data-bs-theme="dark"] .num-btn {
         background: var(--gray-300);
         color: white;
     }
@@ -979,7 +1048,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .payment-method-card {
+    [data-bs-theme="dark"] .payment-method-card {
         background: var(--gray-200);
         border-color: var(--gray-300);
     }
@@ -995,7 +1064,7 @@
         background: var(--primary-light);
     }
 
-    [data-theme="dark"] .payment-method-card.selected {
+    [data-bs-theme="dark"] .payment-method-card.selected {
         background: var(--gray-300);
     }
 
@@ -1010,7 +1079,7 @@
         color: var(--gray-900);
     }
 
-    [data-theme="dark"] .payment-method-card span {
+    [data-bs-theme="dark"] .payment-method-card span {
         color: white;
     }
 
@@ -1038,14 +1107,6 @@
             box-shadow: 0 20px 30px -5px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-save:active {
-            transform: translateY(0);
-        }
-
-        .btn-save i {
-            font-size: 1.2rem;
-        }
-
     .btn-cancel {
         background: white;
         color: var(--gray-700);
@@ -1063,7 +1124,7 @@
         gap: 10px;
     }
 
-    [data-theme="dark"] .btn-cancel {
+    [data-bs-theme="dark"] .btn-cancel {
         background: var(--gray-200);
         color: white;
         border-color: var(--gray-300);
@@ -1092,7 +1153,7 @@
             margin-bottom: 10px;
         }
 
-    [data-theme="dark"] .empty-state h3 {
+    [data-bs-theme="dark"] .empty-state h3 {
         color: white;
     }
 
@@ -1110,12 +1171,6 @@
         border-top-color: var(--primary);
         border-radius: 50%;
         animation: spin 1s linear infinite;
-    }
-
-    @@keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
     }
 
     /* ====== RESPONSIVE ====== */
@@ -1153,8 +1208,23 @@
         .amount-display .value {
             font-size: 2.5rem;
         }
+
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-add, .btn-refresh {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .last-updated {
+            text-align: center;
+            justify-content: center;
+        }
     }
-    /* Amount Input Styling */
+
     .input-group {
         box-shadow: var(--shadow-sm);
         transition: all 0.3s ease;
@@ -1173,7 +1243,7 @@
         padding-right: 15px;
     }
 
-    [data-theme="dark"] .input-group-text {
+    [data-bs-theme="dark"] .input-group-text {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: white;
@@ -1190,7 +1260,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] #amountInput {
+    [data-bs-theme="dark"] #amountInput {
         background: var(--gray-200);
         border-color: var(--gray-300);
         color: white;
@@ -1225,7 +1295,7 @@
         gap: 5px;
     }
 
-    [data-theme="dark"] .quick-amount-btn {
+    [data-bs-theme="dark"] .quick-amount-btn {
         background: var(--gray-200);
         color: var(--primary);
     }
@@ -1255,12 +1325,12 @@
         border-left: 4px solid #f59e0b;
     }
 
-    [data-theme="dark"] .alert-info {
+    [data-bs-theme="dark"] .alert-info {
         background: #1e293b;
         color: #7dd3fc;
     }
 
-    [data-theme="dark"] .alert-warning {
+    [data-bs-theme="dark"] .alert-warning {
         background: #1e293b;
         color: #fcd34d;
     }
@@ -1358,12 +1428,22 @@
     </div>
 </div>
 
-<!-- Action Buttons -->
+<!-- Action Buttons with Refresh -->
 <div class="action-bar">
-    <button class="btn-add" onclick="openAddPaymentModal()">
-        <i class="bi bi-plus-circle-fill"></i>
-        កត់ត្រាការបង់ប្រាក់ថ្មី
-    </button>
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn-add" onclick="openAddPaymentModal()">
+            <i class="bi bi-plus-circle-fill"></i>
+            កត់ត្រាការបង់ប្រាក់ថ្មី
+        </button>
+        <button class="btn-refresh" onclick="refreshPaymentData()" id="refreshBtn">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+    </div>
+    <div class="last-updated" id="lastUpdated">
+        <i class="bi bi-clock-history"></i>
+        <span id="lastUpdatedTime">ទាញយកទិន្នន័យនៅ: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
 </div>
 
 <!-- Payments Table -->
@@ -1434,7 +1514,7 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Enter Amount - កែប្រែថ្មី -->
+                <!-- Step 2: Enter Amount -->
                 <div class="mb-4">
                     <h6 class="fw-bold mb-3">
                         <span class="badge bg-success me-2">២</span>
@@ -1471,7 +1551,7 @@
                         </div>
                     </div>
 
-                    <!-- Quick Amount Buttons (ជំនួយ) -->
+                    <!-- Quick Amount Buttons -->
                     <div class="quick-amounts">
                         <button type="button" class="quick-amount-btn" data-amount="10">+ $10</button>
                         <button type="button" class="quick-amount-btn" data-amount="20">+ $20</button>
@@ -1561,16 +1641,29 @@
 
 <script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
+    // ==================== SAFE NUMBER FORMATTING ====================
+    function safeToFixed(value, decimals = 2) {
+        if (value === null || value === undefined || isNaN(value)) {
+            return '0.00';
+        }
+        return Number(value).toFixed(decimals);
+    }
+
     // ==================== GLOBAL VARIABLES ====================
     let students = [];
     let payments = [];
     let selectedStudent = null;
     let currentPaymentMethod = 'cash';
     let isSaving = false;
+    let isRefreshing = false;
 
     // ==================== DOCUMENT READY ====================
     $(document).ready(function() {
         console.log("Payment page loaded");
+
+        // Set initial timestamp
+        updateLastUpdatedTime();
+
         loadStudents();
         loadPayments();
 
@@ -1589,17 +1682,17 @@
             let newAmount = currentAmount + amount;
 
             // Check if exceeds due amount
-            if (selectedStudent && newAmount > selectedStudent.amountDue) {
+            if (selectedStudent && newAmount > (selectedStudent.amountDue || 0)) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'ប្រយ័ត្ន!',
-                    text: `ចំនួនទឹកប្រាក់សរុប ($${newAmount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${selectedStudent.amountDue.toFixed(2)})`,
+                    text: `ចំនួនទឹកប្រាក់សរុប ($${safeToFixed(newAmount)}) លើសពីចំនួនដែលត្រូវបង់ ($${safeToFixed(selectedStudent.amountDue)})`,
                     confirmButtonColor: '#10b981'
                 });
                 return;
             }
 
-            $('#amountInput').val(newAmount.toFixed(2));
+            $('#amountInput').val(safeToFixed(newAmount));
             updateAmountDisplay(newAmount);
         });
 
@@ -1614,67 +1707,140 @@
         });
     });
 
+    // ==================== UPDATE TIMESTAMP ====================
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeStr = now.toLocaleDateString('km-KH', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        $('#lastUpdatedTime').text(`ទាញយកទិន្នន័យនៅ: ${timeStr}`);
+    }
+
+    // ==================== REFRESH FUNCTION ====================
+    function refreshPaymentData() {
+        if (isRefreshing) return;
+        isRefreshing = true;
+
+        const refreshBtn = $('#refreshBtn');
+        const originalHtml = refreshBtn.html();
+
+        // Show loading state
+        refreshBtn.html('<i class="bi bi-arrow-clockwise spinning"></i> កំពុងទាញយក...');
+        refreshBtn.prop('disabled', true);
+
+        // Add spinning animation if not exists
+        if (!$('#spinStyle').length) {
+            $('<style id="spinStyle">.spinning { animation: spin 1s linear infinite; } @@keyframes spin { 100% { transform: rotate(360deg); } }</style>').appendTo('head');
+        }
+
+        // Show loading overlay
+        Swal.fire({
+            title: 'កំពុងទាញយកទិន្នន័យ...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Load all data
+        Promise.all([
+            loadStudents(false),
+            loadPayments(false)
+        ]).then(() => {
+            // Update timestamp
+            updateLastUpdatedTime();
+
+            // Close loading
+            Swal.close();
+
+            // Show success
+            Swal.fire({
+                icon: 'success',
+                title: 'ទាញយកទិន្នន័យរួចរាល់!',
+                text: 'បញ្ជីការបង់ប្រាក់ត្រូវបានធ្វើអោយថ្មី',
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+
+            // Reset button
+            refreshBtn.html(originalHtml);
+            refreshBtn.prop('disabled', false);
+            isRefreshing = false;
+        }).catch(error => {
+            console.error('Error refreshing data:', error);
+
+            Swal.close();
+
+            Swal.fire({
+                icon: 'error',
+                title: 'មានបញ្ហា',
+                text: 'សូមព្យាយាមម្តងទៀត',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+
+            refreshBtn.html(originalHtml);
+            refreshBtn.prop('disabled', false);
+            isRefreshing = false;
+        });
+    }
+
     // ==================== AMOUNT FUNCTIONS ====================
     function initializeAmountInput() {
         let amountInput = document.getElementById('amountInput');
         if (!amountInput) return;
 
-        // Format number on input
         amountInput.addEventListener('input', function(e) {
             let value = this.value;
-
-            // Remove any non-numeric characters except dot
             value = value.replace(/[^\d.]/g, '');
-
-            // Ensure only one decimal point
             let parts = value.split('.');
             if (parts.length > 2) {
                 value = parts[0] + '.' + parts.slice(1).join('');
             }
-
-            // Limit decimal places to 2
             if (parts.length === 2 && parts[1].length > 2) {
                 value = parts[0] + '.' + parts[1].substring(0, 2);
             }
-
             this.value = value;
-
-            // Update amount value
             let numValue = parseFloat(value) || 0;
             updateAmountDisplay(numValue);
         });
 
-        // Handle blur event
         amountInput.addEventListener('blur', function(e) {
             let value = this.value;
             if (value === '' || value === '.') {
                 this.value = '0.00';
                 updateAmountDisplay(0);
             } else {
-                // Format to 2 decimal places
                 let num = parseFloat(value) || 0;
-                this.value = num.toFixed(2);
+                this.value = safeToFixed(num);
                 updateAmountDisplay(num);
             }
         });
 
-        // Handle focus - select all text
         amountInput.addEventListener('focus', function(e) {
             this.select();
         });
     }
 
     function updateAmountDisplay(amount) {
-        $('#amountValue').text(amount.toFixed(2));
+        $('#amountValue').text(safeToFixed(amount));
 
-        // Show due reminder if student selected
         if (selectedStudent) {
             let dueAmount = selectedStudent.amountDue || 0;
             if (amount > dueAmount) {
-                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${amount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${dueAmount.toFixed(2)})`);
+                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${safeToFixed(amount)}) លើសពីចំនួនដែលត្រូវបង់ ($${safeToFixed(dueAmount)})`);
                 $('#dueReminder').removeClass('alert-info').addClass('alert-warning').show();
             } else if (amount > 0) {
-                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${(dueAmount - amount).toFixed(2)}`);
+                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${safeToFixed(dueAmount - amount)}`);
                 $('#dueReminder').removeClass('alert-warning').addClass('alert-info').show();
             } else {
                 $('#dueReminder').hide();
@@ -1683,29 +1849,37 @@
     }
 
     // ==================== STUDENT FUNCTIONS ====================
-    function loadStudents() {
-        $.ajax({
-            url: '/Student/GetStudents',
-            type: 'GET',
-            cache: false,
-            success: function(response) {
-                console.log("Students loaded:", response);
+    function loadStudents(updateTimestamp = true) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Student/GetStudents',
+                type: 'GET',
+                cache: false,
+                success: function(response) {
+                    console.log("Students loaded:", response);
 
-                if (response && response.success) {
-                    students = response.data || [];
-                } else if (Array.isArray(response)) {
-                    students = response;
-                } else {
-                    students = [];
+                    if (response && response.success) {
+                        students = response.data || [];
+                    } else if (Array.isArray(response)) {
+                        students = response;
+                    } else {
+                        students = [];
+                    }
+
+                    renderStudentList();
+                    updateStats();
+
+                    if (updateTimestamp) {
+                        updateLastUpdatedTime();
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading students:', error);
+                    showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យសិស្ស');
+                    resolve();
                 }
-
-                renderStudentList();
-                updateStats();
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading students:', error);
-                showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យសិស្ស');
-            }
+            });
         });
     }
 
@@ -1728,6 +1902,8 @@
                 `<img src="${s.photo}" alt="${s.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.name || 'User')}&background=10b981&color=fff'">` :
                 (s.name ? s.name.charAt(0).toUpperCase() : '?');
 
+            let amountDue = s.amountDue || 0;
+
             let item = `
                 <div class="student-item" onclick="selectStudent('${s.id}')" id="student_${s.id}">
                     <div class="student-avatar-sm">
@@ -1743,7 +1919,7 @@
                     </div>
                     <div class="student-amount">
                         <div class="label">ជំពាក់</div>
-                        <div class="value">$${(s.amountDue || 0).toFixed(2)}</div>
+                        <div class="value">$${safeToFixed(amountDue)}</div>
                     </div>
                 </div>
             `;
@@ -1753,7 +1929,6 @@
 
     function filterStudentList() {
         let searchText = $('#studentSearch').val().toLowerCase();
-
         $('.student-item').each(function() {
             let text = $(this).text().toLowerCase();
             if (text.includes(searchText) || searchText === '') {
@@ -1770,11 +1945,9 @@
 
         selectedStudent = student;
 
-        // Update UI
         $('.student-item').removeClass('selected');
         $(`#student_${studentId}`).addClass('selected');
 
-        // Show selected card
         let avatarHtml = student.photo ?
             `<img src="${student.photo}" alt="${student.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(student.name || 'User')}&background=10b981&color=fff'">` :
             (student.name ? student.name.charAt(0).toUpperCase() : '?');
@@ -1782,59 +1955,66 @@
         $('#selectedAvatar').html(avatarHtml);
         $('#selectedName').text(student.name || 'មិនមានឈ្មោះ');
         $('#selectedInfo').text(`${student.major || 'N/A'} | ឆ្នាំទី${student.year || '?'} | ${student.id}`);
-        $('#selectedAmount').text(`ជំពាក់: $${(student.amountDue || 0).toFixed(2)}`);
+        $('#selectedAmount').text(`ជំពាក់: $${safeToFixed(student.amountDue || 0)}`);
 
         $('#selectedStudentCard').fadeIn(300);
 
-        // Update due reminder with current amount
         let currentAmount = parseFloat($('#amountInput').val()) || 0;
         if (currentAmount > 0) {
-            if (currentAmount > student.amountDue) {
-                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${currentAmount.toFixed(2)}) លើសពីចំនួនដែលត្រូវបង់ ($${student.amountDue.toFixed(2)})`);
+            let dueAmount = student.amountDue || 0;
+            if (currentAmount > dueAmount) {
+                $('#dueMessage').html(`<strong>ប្រយ័ត្ន!</strong> ចំនួនទឹកប្រាក់ ($${safeToFixed(currentAmount)}) លើសពីចំនួនដែលត្រូវបង់ ($${safeToFixed(dueAmount)})`);
                 $('#dueReminder').removeClass('alert-info').addClass('alert-warning').show();
             } else {
-                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${(student.amountDue - currentAmount).toFixed(2)}`);
+                $('#dueMessage').html(`<strong>នៅសល់ត្រូវបង់:</strong> $${safeToFixed(dueAmount - currentAmount)}`);
                 $('#dueReminder').removeClass('alert-warning').addClass('alert-info').show();
             }
         }
 
-        // Scroll to selected student
         $(`#student_${studentId}`)[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // ==================== PAYMENT FUNCTIONS ====================
-    function loadPayments() {
-        $('#paymentTableBody').html(`
-            <tr>
-                <td colspan="9" class="text-center py-5">
-                    <div class="loading-spinner"></div>
-                    <p class="mt-3 text-muted">កំពុងផ្ទុកទិន្នន័យ...</p>
-                </td>
-            </tr>
-        `);
+    function loadPayments(updateTimestamp = true) {
+        return new Promise((resolve, reject) => {
+            $('#paymentTableBody').html(`
+                <tr>
+                    <td colspan="9" class="text-center py-5">
+                        <div class="loading-spinner"></div>
+                        <p class="mt-3 text-muted">កំពុងផ្ទុកទិន្នន័យ...</p>
+                    </td>
+                </tr>
+            `);
 
-        $.ajax({
-            url: '/Student/GetPayments',
-            type: 'GET',
-            cache: false,
-            success: function(response) {
-                console.log("Payments loaded:", response);
+            $.ajax({
+                url: '/Student/GetPayments',
+                type: 'GET',
+                cache: false,
+                success: function(response) {
+                    console.log("Payments loaded:", response);
 
-                if (response && response.success) {
-                    payments = response.data || [];
-                } else if (Array.isArray(response)) {
-                    payments = response;
-                } else {
-                    payments = [];
+                    if (response && response.success) {
+                        payments = response.data || [];
+                    } else if (Array.isArray(response)) {
+                        payments = response;
+                    } else {
+                        payments = [];
+                    }
+
+                    renderPaymentsTable();
+                    updateStats();
+
+                    if (updateTimestamp) {
+                        updateLastUpdatedTime();
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading payments:', error);
+                    showTableError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
+                    resolve();
                 }
-
-                renderPaymentsTable();
-                updateStats();
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading payments:', error);
-                showTableError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
-            }
+            });
         });
     }
 
@@ -1900,6 +2080,7 @@
 
             let date = p.paymentDate ? new Date(p.paymentDate) : new Date();
             let formattedDate = date.toLocaleDateString('km-KH');
+            let amount = p.amount || 0;
 
             let row = `
                 <tr>
@@ -1926,7 +2107,7 @@
                         ${p.paymentMethod === 'cash' ? 'សាច់ប្រាក់' : p.paymentMethod === 'aba' ? 'ABA Pay' : 'Wing'}
                     </td>
                     <td>${p.semester || 'ឆមាសទី១'}</td>
-                    <td class="amount-paid">$${(p.amount || 0).toFixed(2)}</td>
+                    <td class="amount-paid">$${safeToFixed(amount)}</td>
                     <td>
                         <span class="status-badge status-paid">បង់រួច</span>
                     </td>
@@ -1950,10 +2131,10 @@
         let totalPaid = payments.length;
         let totalPending = students.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
 
-        $('#totalCollected').text('$' + totalCollected.toFixed(2));
-        $('#totalPending').text('$' + Math.max(0, totalPending).toFixed(2));
+        $('#totalCollected').text('$' + safeToFixed(totalCollected));
+        $('#totalPending').text('$' + safeToFixed(Math.max(0, totalPending)));
         $('#totalPaid').text(totalPaid);
-        $('#totalStudents').text(students.length);
+        $('#totalStudents').text(students.length || 0);
     }
 
     // ==================== MODAL FUNCTIONS ====================
@@ -1971,7 +2152,6 @@
         resetPaymentForm();
         $('#paymentModal').modal('show');
 
-        // Focus on search input
         setTimeout(function() {
             $('#studentSearch').focus();
         }, 500);
@@ -2030,11 +2210,12 @@
             return;
         }
 
-        if (amount > (selectedStudent.amountDue || 0)) {
+        let dueAmount = selectedStudent.amountDue || 0;
+        if (amount > dueAmount) {
             Swal.fire({
                 icon: 'warning',
                 title: 'ចំនួនទឹកប្រាក់លើស',
-                text: `សិស្សនេះជំពាក់តែ $${(selectedStudent.amountDue || 0).toFixed(2)} ប៉ុណ្ណោះ`,
+                text: `សិស្សនេះជំពាក់តែ $${safeToFixed(dueAmount)} ប៉ុណ្ណោះ`,
                 confirmButtonColor: '#10b981'
             });
             return;
@@ -2094,8 +2275,9 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    loadPayments();
-                    loadStudents();
+
+                    // Refresh data after save
+                    refreshPaymentData();
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -2166,8 +2348,9 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             });
-                            loadPayments();
-                            loadStudents();
+
+                            // Refresh data after delete
+                            refreshPaymentData();
                         } else {
                             Swal.fire({
                                 icon: 'error',

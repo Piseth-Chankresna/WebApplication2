@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Services;
+using WebApplication2.Middleware; // បន្ថែមនេះ
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +20,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Always use secure cookies for HTTPS
+        options.Cookie.SameSite = SameSiteMode.None; // Allow cross-site for development
     });
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
-
-// បន្ថែម HttpContextAccessor និង ActivityLogService
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ActivityLogService>();
 
@@ -45,6 +44,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// ប្រើ Custom Authorization Middleware របស់យើង
+app.UseCustomAuthorization();
 
 app.MapControllerRoute(
     name: "default",

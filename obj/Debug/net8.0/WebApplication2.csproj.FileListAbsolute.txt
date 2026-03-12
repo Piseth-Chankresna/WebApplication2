@@ -449,10 +449,10 @@ D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\staticwebassets.development.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\swae.build.ex.cache
-D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebAppli.0DB3FC1A.Up2Date
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.dll
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\refint\WebApplication2.dll
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.pdb
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.genruntimeconfig.cache
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\ref\WebApplication2.dll
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

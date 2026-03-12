@@ -1,4 +1,4 @@
-﻿@{
+@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "បញ្ជីវត្តមាន";
@@ -32,7 +32,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .filter-section {
+    [data-bs-theme="dark"] .filter-section {
         background: #1e293b;
         border-color: #334155;
     }
@@ -56,7 +56,7 @@
             font-size: 0.9rem;
         }
 
-    [data-theme="dark"] .filter-item label {
+    [data-bs-theme="dark"] .filter-item label {
         color: #cbd5e1;
     }
 
@@ -69,8 +69,8 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .filter-item select,
-    [data-theme="dark"] .filter-item input {
+    [data-bs-theme="dark"] .filter-item select,
+    [data-bs-theme="dark"] .filter-item input {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -121,7 +121,7 @@
         overflow-x: auto;
     }
 
-    [data-theme="dark"] .table-container {
+    [data-bs-theme="dark"] .table-container {
         background: #1e293b;
         border-color: #334155;
     }
@@ -142,7 +142,7 @@
             background: #f8fafc;
         }
 
-    [data-theme="dark"] .attendance-table th {
+    [data-bs-theme="dark"] .attendance-table th {
         background: #0f172a;
         color: #cbd5e1;
         border-bottom-color: #334155;
@@ -154,7 +154,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .attendance-table td {
+    [data-bs-theme="dark"] .attendance-table td {
         color: white;
         border-bottom-color: #334155;
     }
@@ -164,7 +164,7 @@
         cursor: pointer;
     }
 
-    [data-theme="dark"] .attendance-table tbody tr:hover {
+    [data-bs-theme="dark"] .attendance-table tbody tr:hover {
         background: #0f172a;
     }
 
@@ -232,7 +232,7 @@
         text-decoration: none;
     }
 
-    [data-theme="dark"] .btn-icon {
+    [data-bs-theme="dark"] .btn-icon {
         background: #0f172a;
         border-color: #334155;
         color: #cbd5e1;
@@ -261,7 +261,7 @@
         gap: 15px;
     }
 
-    [data-theme="dark"] .summary-card {
+    [data-bs-theme="dark"] .summary-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -321,7 +321,7 @@
             transition: all 0.2s ease;
         }
 
-    [data-theme="dark"] .pagination .btn-page {
+    [data-bs-theme="dark"] .pagination .btn-page {
         background: #1e293b;
         color: white;
         border-color: #334155;
@@ -353,7 +353,7 @@
         overflow: hidden;
     }
 
-    [data-theme="dark"] .modal-content {
+    [data-bs-theme="dark"] .modal-content {
         background: #1e293b;
         color: white;
     }
@@ -378,7 +378,7 @@
         border-top: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .modal-footer {
+    [data-bs-theme="dark"] .modal-footer {
         border-top-color: #334155;
     }
 
@@ -393,7 +393,7 @@
         margin-bottom: 8px;
     }
 
-    [data-theme="dark"] .form-label {
+    [data-bs-theme="dark"] .form-label {
         color: #cbd5e1;
     }
 
@@ -407,8 +407,8 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .form-control,
-    [data-theme="dark"] .form-select {
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -446,7 +446,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-cancel {
+    [data-bs-theme="dark"] .btn-cancel {
         background: #0f172a;
         color: #cbd5e1;
         border-color: #334155;

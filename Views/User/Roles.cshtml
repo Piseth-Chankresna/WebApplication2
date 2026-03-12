@@ -1,4 +1,4 @@
-﻿@{
+@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "Role & Permissions";
@@ -34,7 +34,7 @@
         cursor: pointer;
     }
 
-    [data-theme="dark"] .role-card {
+    [data-bs-theme="dark"] .role-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -78,7 +78,7 @@
         margin-bottom: 8px;
     }
 
-    [data-theme="dark"] .role-card h3 {
+    [data-bs-theme="dark"] .role-card h3 {
         color: white;
     }
 
@@ -103,7 +103,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-view {
+    [data-bs-theme="dark"] .btn-view {
         background: #0f172a;
         border-color: #334155;
         color: #cbd5e1;
@@ -124,7 +124,7 @@
         margin-top: 24px;
     }
 
-    [data-theme="dark"] .matrix-container {
+    [data-bs-theme="dark"] .matrix-container {
         background: #1e293b;
         border-color: #334155;
     }
@@ -144,7 +144,7 @@
             margin: 0;
         }
 
-    [data-theme="dark"] .matrix-header h3 {
+    [data-bs-theme="dark"] .matrix-header h3 {
         color: white;
     }
 
@@ -170,7 +170,7 @@
         margin-right: 16px;
     }
 
-    [data-theme="dark"] .btn-back {
+    [data-bs-theme="dark"] .btn-back {
         background: #0f172a;
         color: #cbd5e1;
         border-color: #334155;
@@ -212,7 +212,7 @@
             border-bottom: 2px solid #e2e8f0;
         }
 
-    [data-theme="dark"] .permissions-table th {
+    [data-bs-theme="dark"] .permissions-table th {
         border-bottom-color: #334155;
     }
 
@@ -222,7 +222,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .permissions-table td {
+    [data-bs-theme="dark"] .permissions-table td {
         border-bottom-color: #334155;
         color: white;
     }
@@ -231,7 +231,7 @@
         background: #f8fafc;
     }
 
-    [data-theme="dark"] .permissions-table tbody tr:hover {
+    [data-bs-theme="dark"] .permissions-table tbody tr:hover {
         background: #0f172a;
     }
 
@@ -251,7 +251,7 @@
         justify-content: center;
     }
 
-    [data-theme="dark"] .permission-check {
+    [data-bs-theme="dark"] .permission-check {
         background: #0f172a;
         border-color: #475569;
     }

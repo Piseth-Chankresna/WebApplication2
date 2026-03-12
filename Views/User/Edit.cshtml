@@ -1,4 +1,4 @@
-﻿@model WebApplication2.Models.UserAccount
+@model WebApplication2.Models.UserAccount
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
@@ -31,7 +31,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .edit-card {
+    [data-bs-theme="dark"] .edit-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -61,7 +61,7 @@
         margin-bottom: 8px;
     }
 
-    [data-theme="dark"] .form-label {
+    [data-bs-theme="dark"] .form-label {
         color: #cbd5e1;
     }
 
@@ -93,8 +93,8 @@
             font-size: 0.95rem;
         }
 
-    [data-theme="dark"] .input-wrapper input,
-    [data-theme="dark"] .input-wrapper select {
+    [data-bs-theme="dark"] .input-wrapper input,
+    [data-bs-theme="dark"] .input-wrapper select {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -117,7 +117,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .switch-wrapper {
+    [data-bs-theme="dark"] .switch-wrapper {
         background: #0f172a;
         border-color: #334155;
     }
@@ -127,7 +127,7 @@
         color: #475569;
     }
 
-    [data-theme="dark"] .switch-wrapper span {
+    [data-bs-theme="dark"] .switch-wrapper span {
         color: #cbd5e1;
     }
 
@@ -214,7 +214,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .btn-secondary {
+    [data-bs-theme="dark"] .btn-secondary {
         background: #0f172a;
         color: #cbd5e1;
         border-color: #334155;
