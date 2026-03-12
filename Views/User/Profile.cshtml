@@ -1,4 +1,4 @@
-﻿@model WebApplication2.Models.UserAccount
+@model WebApplication2.Models.UserAccount
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
@@ -19,7 +19,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .profile-card {
+    [data-bs-theme="dark"] .profile-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -72,7 +72,7 @@
             margin-bottom: 5px;
         }
 
-    [data-theme="dark"] .profile-info h3 {
+    [data-bs-theme="dark"] .profile-info h3 {
         color: white;
     }
 
@@ -98,7 +98,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .info-item {
+    [data-bs-theme="dark"] .info-item {
         background: #0f172a;
         border-color: #334155;
     }
@@ -118,7 +118,7 @@
         font-size: 1.1rem;
     }
 
-    [data-theme="dark"] .info-item .value {
+    [data-bs-theme="dark"] .info-item .value {
         color: white;
     }
 
@@ -128,7 +128,7 @@
         border-top: 2px dashed #e2e8f0;
     }
 
-    [data-theme="dark"] .edit-form {
+    [data-bs-theme="dark"] .edit-form {
         border-top-color: #334155;
     }
 
@@ -138,7 +138,7 @@
         margin-bottom: 20px;
     }
 
-    [data-theme="dark"] .edit-form h5 {
+    [data-bs-theme="dark"] .edit-form h5 {
         color: white;
     }
 
@@ -148,7 +148,7 @@
         margin-bottom: 8px;
     }
 
-    [data-theme="dark"] .form-label {
+    [data-bs-theme="dark"] .form-label {
         color: #cbd5e1;
     }
 
@@ -162,7 +162,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .form-control {
+    [data-bs-theme="dark"] .form-control {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -201,7 +201,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-cancel {
+    [data-bs-theme="dark"] .btn-cancel {
         background: #0f172a;
         color: #cbd5e1;
         border-color: #334155;
@@ -308,7 +308,7 @@
                 formData.append('ProfileImage', file);
 
                 $.ajax({
-                    url: '/User/UpdateProfile',
+                    url: '/User/UpdateCurrentUserProfile',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -343,14 +343,18 @@
     $('#profileForm').submit(function(e) {
         e.preventDefault();
 
+        var formData = $(this).serialize();
+        console.log('Form data being sent:', formData);
+
         $.ajax({
-            url: '/User/UpdateProfile',
+            url: '/User/UpdateCurrentUserProfile',
             type: 'POST',
-            data: $(this).serialize(),
+            data: formData,
             headers: {
                 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
             },
             success: function(response) {
+                console.log('Server response:', response);
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -368,6 +372,14 @@
                         text: response.message
                     });
                 }
+            },
+            error: function(xhr, status, error) {
+                console.log('AJAX Error:', xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'កំហុស',
+                    text: 'មានបញ្ហាក្នុងការទំនាក់ទំនង: ' + error
+                });
             }
         });
     });

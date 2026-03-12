@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.Models;
@@ -7,6 +8,7 @@ using WebApplication2.Services;
 
 namespace WebApplication2.Controllers
 {
+    [Authorize]
     public class StudentController(ApplicationDbContext context, ActivityLogService activityLogService, ILogger<StudentController> logger) : BaseController
     {
         private readonly ApplicationDbContext _context = context;

@@ -1,4 +1,4 @@
-﻿@model WebApplication2.Models.UserAccount
+@model WebApplication2.Models.UserAccount
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
@@ -37,7 +37,7 @@
         --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
 
-    [data-theme="dark"] {
+    [data-bs-theme="dark"] {
         --primary: #60a5fa;
         --primary-light: #93c5fd;
         --primary-soft: #1e293b;
@@ -97,7 +97,7 @@
         border: 1px solid var(--border-light);
     }
 
-    [data-theme="dark"] .form-card {
+    [data-bs-theme="dark"] .form-card {
         background: var(--gray-800);
         border-color: var(--gray-700);
     }
@@ -166,8 +166,8 @@
         transition: all 0.2s ease;
     }
 
-    [data-theme="dark"] .input-wrapper input,
-    [data-theme="dark"] .input-wrapper select {
+    [data-bs-theme="dark"] .input-wrapper input,
+    [data-bs-theme="dark"] .input-wrapper select {
         background: var(--gray-900);
         border-color: var(--gray-700);
         color: white;
@@ -202,7 +202,7 @@
         border: 1px solid var(--border-light);
     }
 
-    [data-theme="dark"] .password-strength {
+    [data-bs-theme="dark"] .password-strength {
         background: var(--gray-800);
     }
 
@@ -244,7 +244,7 @@
         border: 1px solid var(--border-light);
     }
 
-    [data-theme="dark"] .switch-wrapper {
+    [data-bs-theme="dark"] .switch-wrapper {
         background: var(--gray-800);
     }
 
@@ -343,7 +343,7 @@
         border: 1px solid var(--border-light);
     }
 
-    [data-theme="dark"] .btn-secondary {
+    [data-bs-theme="dark"] .btn-secondary {
         background: var(--gray-800);
         color: var(--gray-300);
         border-color: var(--gray-700);

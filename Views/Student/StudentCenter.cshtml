@@ -1,4 +1,4 @@
-﻿@{
+@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "Student Center";
@@ -45,7 +45,7 @@
         --radius-xl: 32px;
     }
 
-    [data-theme="dark"] {
+    [data-bs-theme="dark"] {
         --bg-primary: #0f172a;
         --bg-secondary: #1e293b;
         --text-primary: #f1f5f9;

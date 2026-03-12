@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebApplication2.Models.ActivityLog>
+@model IEnumerable<WebApplication2.Models.ActivityLog>
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
@@ -26,7 +26,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .log-container {
+    [data-bs-theme="dark"] .log-container {
         background: #1e293b;
         border-color: #334155;
     }
@@ -45,7 +45,7 @@
             border-bottom: 2px solid #e2e8f0;
         }
 
-    [data-theme="dark"] .log-table th {
+    [data-bs-theme="dark"] .log-table th {
         border-bottom-color: #334155;
     }
 
@@ -55,7 +55,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .log-table td {
+    [data-bs-theme="dark"] .log-table td {
         color: white;
         border-bottom-color: #334155;
     }
@@ -64,7 +64,7 @@
         background: #f8fafc;
     }
 
-    [data-theme="dark"] .log-table tbody tr:hover {
+    [data-bs-theme="dark"] .log-table tbody tr:hover {
         background: #0f172a;
     }
 
@@ -122,7 +122,7 @@
             color: #1e293b;
         }
 
-    [data-theme="dark"] .search-box input {
+    [data-bs-theme="dark"] .search-box input {
         background: #0f172a;
         border-color: #334155;
         color: white;

@@ -1,7 +1,7 @@
-﻿@{
-    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-    Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "របាយការណ៍ និងស្ថិតិ";
+@{
+bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+Layout = isAjax ? null : "_Layout";
+ViewData["Title"] = "របាយការណ៍ និងស្ថិតិ";
 }
 
 <!-- Chart.js -->
@@ -68,7 +68,7 @@
         --radius-xl: 32px;
     }
 
-    [data-theme="dark"] {
+    [data-bs-theme="dark"] {
         --bg-primary: #0f172a;
         --bg-secondary: #1e293b;
         --text-primary: #f1f5f9;
@@ -128,29 +128,20 @@
         margin-bottom: 10px;
     }
 
-    .live-indicator {
+    .report-indicator {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: var(--danger-50);
-        color: var(--danger-600);
+        background: var(--primary-50);
+        color: var(--primary-600);
         padding: 6px 12px;
         border-radius: 30px;
         font-size: 0.85rem;
         font-weight: 600;
     }
 
-    .live-indicator .dot {
-        width: 8px;
-        height: 8px;
-        background: var(--danger-500);
-        border-radius: 50%;
-        animation: pulse 1.5s ease infinite;
-    }
-
-    @@keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.2); }
+    .report-indicator i {
+        font-size: 1rem;
     }
 
     .last-updated {
@@ -218,15 +209,6 @@
         font-size: 0.85rem;
         margin: 0;
     }
-
-    .kpi-change {
-        text-align: right;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .trend-up { color: var(--success-600); }
-    .trend-down { color: var(--danger-600); }
 
     /* Filter Bar */
     .filter-bar {
@@ -336,6 +318,27 @@
     .btn-export:hover {
         background: var(--primary-50);
         border-color: var(--primary-400);
+    }
+
+    .btn-refresh {
+        /* background: var(--bg-primary); */
+        background: #FFDE42;
+        color: var(--primary-600);
+        border: 1px solid var(--gray-300);
+        padding: 10px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        /* transition: all 0.2s ease; */
+    }
+
+    .btn-refresh:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-400);
+        /* transform: rotate(180deg); */
     }
 
     /* Chart Grid */
@@ -518,6 +521,18 @@
         to { transform: rotate(360deg); }
     }
 
+    /* No Auto-refresh indicator */
+    .no-refresh-badge {
+        background: var(--gray-100);
+        color: var(--text-secondary);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
     @@media (max-width: 1200px) {
         .kpi-grid, .chart-grid, .tables-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -568,17 +583,25 @@
                     របាយការណ៍ & វិភាគទិន្នន័យ
                 </h1>
                 <p>
-                    <span class="live-indicator">
-                        <span class="dot"></span>
-                        Live Data
+                    <span class="report-indicator">
+                        <i class="bi bi-database"></i>
+                        Static Report - All Data
                     </span>
                     <span class="last-updated" id="lastUpdated">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        ធ្វើអោយថ្មី: ទើបតែប៉ុន្មានវិនាទីមុន
+                        <i class="bi bi-calendar-check"></i>
+                        ទាញយកទិន្នន័យនៅ: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                    <span class="no-refresh-badge ms-2">
+                        <i class="bi bi-pause-circle"></i>
+                        No Auto-refresh
                     </span>
                 </p>
             </div>
-            <div>
+            <div class="d-flex gap-2">
+                <button class="btn-refresh" onclick="refreshAllData()" title="Refresh Data">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Refresh
+                </button>
                 <button class="btn-export" onclick="exportCurrentReport()">
                     <i class="bi bi-file-earmark-excel"></i>
                     នាំចេញ Excel
@@ -595,7 +618,6 @@
                 <h4 id="totalStudents">0</h4>
                 <p>សិស្សសរុប</p>
             </div>
-            <div class="kpi-change trend-up" id="studentChange">+0%</div>
         </div>
 
         <div class="kpi-card">
@@ -604,7 +626,6 @@
                 <h4 id="totalPayments">$0</h4>
                 <p>បង់ប្រាក់សរុប</p>
             </div>
-            <div class="kpi-change trend-up" id="paymentChange">+0%</div>
         </div>
 
         <div class="kpi-card">
@@ -613,7 +634,6 @@
                 <h4 id="avgAttendance">0%</h4>
                 <p>វត្តមានមធ្យម</p>
             </div>
-            <div class="kpi-change trend-up" id="attendanceChange">+0%</div>
         </div>
 
         <div class="kpi-card">
@@ -622,7 +642,6 @@
                 <h4 id="passRate">0%</h4>
                 <p>អត្រាប្រឡងជាប់</p>
             </div>
-            <div class="kpi-change trend-up" id="passChange">+0%</div>
         </div>
     </div>
 
@@ -655,7 +674,7 @@
 
         <div style="display: flex; gap: 10px;">
             <button class="btn-apply" onclick="applyFilter()">
-                <i class="bi bi-search"></i> អនុវត្ត
+                <i class="bi bi-search"></i> អនុវត្តតម្រង
             </button>
             <button class="btn-export" onclick="resetFilter()">
                 <i class="bi bi-arrow-counterclockwise"></i> កំណត់ឡើងវិញ
@@ -737,68 +756,125 @@
 </div>
 
 <script>
-    let majorChart, yearChart, paymentChart, gradeChart;
-    let refreshInterval;
+    // ==================== SAFE NUMBER FORMATTING ====================
+    function safeToFixed(value, decimals = 2) {
+        if (value === null || value === undefined || isNaN(value)) {
+            return decimals === 0 ? '0' : '0.00';
+        }
+        return Number(value).toFixed(decimals);
+    }
 
+    // ==================== GLOBAL VARIABLES ====================
+    let majorChart, yearChart, paymentChart, gradeChart;
+    let allStudents = [];
+    let allGrades = [];
+    let allPayments = [];
+
+    // ==================== DOCUMENT READY ====================
     $(document).ready(function() {
         loadAllData();
-        startAutoRefresh();
-    });
-
-    function startAutoRefresh() {
-        refreshInterval = setInterval(() => refreshData(), 30000);
-    }
-
-    function loadAllData() {
-        loadKPI();
-        loadAllCharts();
-        loadTopStudents();
-        loadStrugglingStudents();
         updateLastUpdated();
-    }
-
-    function refreshData() {
-        $('#lastUpdated').html('<i class="bi bi-arrow-clockwise"></i> កំពុងធ្វើអោយថ្មី...');
-        loadAllData();
-    }
+    });
 
     function updateLastUpdated() {
         let now = new Date();
-        let timeStr = now.toLocaleTimeString('km-KH');
-        $('#lastUpdated').html(`<i class="bi bi-arrow-clockwise"></i> ធ្វើអោយថ្មី: ${timeStr}`);
+        let dateStr = now.toLocaleDateString('km-KH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        $('#lastUpdated').html(`<i class="bi bi-calendar-check"></i> ទាញយកទិន្នន័យនៅ: ${dateStr}`);
     }
 
-    function loadKPI() {
-        $.ajax({
-            url: '/Report/GetKPI',
-            success: function(res) {
-                if (res.success) {
-                    $('#totalStudents').text(res.data.totalStudents);
-                    $('#totalPayments').text('$' + res.data.totalPayments.toLocaleString());
-                    $('#avgAttendance').text(res.data.avgAttendance + '%');
-                    $('#passRate').text(res.data.passRate + '%');
-                    $('#studentChange').text(res.data.studentChange);
-                    $('#paymentChange').text(res.data.paymentChange);
-                    $('#attendanceChange').text(res.data.attendanceChange);
-                    $('#passChange').text(res.data.passChange);
-                }
+    function refreshAllData() {
+        // Show loading indicator
+        Swal.fire({
+            title: 'កំពុងទាញយកទិន្នន័យ...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        loadAllData(true);
+    }
+
+    function loadAllData(showSuccess = false) {
+        Promise.all([
+            loadKPI(),
+            loadAllCharts(),
+            loadTopStudents(),
+            loadStrugglingStudents()
+        ]).then(() => {
+            updateLastUpdated();
+
+            if (showSuccess) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ទាញយកទិន្នន័យរួចរាល់!',
+                    text: 'របាយការណ៍ត្រូវបានធ្វើអោយថ្មី',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }).catch(error => {
+            console.error('Error loading data:', error);
+            if (showSuccess) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'មានបញ្ហា',
+                    text: 'សូមព្យាយាមម្តងទៀត'
+                });
             }
         });
     }
 
+    function loadKPI() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetKPI',
+                success: function(res) {
+                    if (res.success) {
+                        $('#totalStudents').text(res.data?.totalStudents ?? 0);
+                        $('#totalPayments').text('$' + safeToFixed(res.data?.totalPayments));
+                        $('#avgAttendance').text((res.data?.avgAttendance ?? 0) + '%');
+                        $('#passRate').text((res.data?.passRate ?? 0) + '%');
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading KPI:', error);
+                    resolve();
+                }
+            });
+        });
+    }
+
     function loadAllCharts() {
-        loadMajorChart();
-        loadYearChart();
-        loadPaymentChart();
-        loadGradeChart();
+        return Promise.all([
+            loadMajorChart(),
+            loadYearChart(),
+            loadPaymentChart(),
+            loadGradeChart()
+        ]);
     }
 
     function loadMajorChart() {
-        $.ajax({
-            url: '/Report/GetStudentsByMajor',
-            success: function(res) {
-                if (res.success) renderMajorChart(res.data);
-            }
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetStudentsByMajor',
+                success: function(res) {
+                    if (res.success) renderMajorChart(res.data || []);
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading major chart:', error);
+                    renderMajorChart([]);
+                    resolve();
+                }
+            });
         });
     }
 
@@ -806,12 +882,14 @@
         const ctx = document.getElementById('majorChart').getContext('2d');
         if (majorChart) majorChart.destroy();
 
+        data = Array.isArray(data) ? data : [];
+
         majorChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: data.map(d => d.major),
+                labels: data.map(d => d.major || 'N/A'),
                 datasets: [{
-                    data: data.map(d => d.count),
+                    data: data.map(d => d.count || 0),
                     backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6'],
                     borderWidth: 0,
                     borderRadius: 8
@@ -822,18 +900,31 @@
                 maintainAspectRatio: false,
                 cutout: '65%',
                 plugins: {
-                    legend: { position: 'bottom', labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') } }
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary')
+                        }
+                    }
                 }
             }
         });
     }
 
     function loadYearChart() {
-        $.ajax({
-            url: '/Report/GetStudentsByYear',
-            success: function(res) {
-                if (res.success) renderYearChart(res.data);
-            }
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetStudentsByYear',
+                success: function(res) {
+                    if (res.success) renderYearChart(res.data || []);
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading year chart:', error);
+                    renderYearChart([]);
+                    resolve();
+                }
+            });
         });
     }
 
@@ -841,12 +932,14 @@
         const ctx = document.getElementById('yearChart').getContext('2d');
         if (yearChart) yearChart.destroy();
 
+        data = Array.isArray(data) ? data : [];
+
         yearChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: data.map(d => d.year),
+                labels: data.map(d => d.year || 'N/A'),
                 datasets: [{
-                    data: data.map(d => d.count),
+                    data: data.map(d => d.count || 0),
                     backgroundColor: '#6366f1',
                     borderRadius: 8
                 }]
@@ -861,11 +954,19 @@
     }
 
     function loadPaymentChart() {
-        $.ajax({
-            url: '/Report/GetMonthlyPayments?months=6',
-            success: function(res) {
-                if (res.success) renderPaymentChart(res.data);
-            }
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetMonthlyPayments?months=6',
+                success: function(res) {
+                    if (res.success) renderPaymentChart(res.data || []);
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading payment chart:', error);
+                    renderPaymentChart([]);
+                    resolve();
+                }
+            });
         });
     }
 
@@ -873,12 +974,14 @@
         const ctx = document.getElementById('paymentChart').getContext('2d');
         if (paymentChart) paymentChart.destroy();
 
+        data = Array.isArray(data) ? data : [];
+
         paymentChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.map(d => d.month),
+                labels: data.map(d => d.month || 'N/A'),
                 datasets: [{
-                    data: data.map(d => d.total),
+                    data: data.map(d => d.total || 0),
                     borderColor: '#10b981',
                     backgroundColor: 'rgba(16,185,129,0.1)',
                     tension: 0.4,
@@ -890,7 +993,11 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    tooltip: { callbacks: { label: (ctx) => '$' + ctx.raw.toFixed(2) } }
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => '$' + safeToFixed(ctx.raw)
+                        }
+                    }
                 },
                 scales: { y: { beginAtZero: true } }
             }
@@ -898,11 +1005,19 @@
     }
 
     function loadGradeChart() {
-        $.ajax({
-            url: '/Report/GetGradeDistribution',
-            success: function(res) {
-                if (res.success) renderGradeChart(res.data);
-            }
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetGradeDistribution',
+                success: function(res) {
+                    if (res.success) renderGradeChart(res.data || {});
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading grade chart:', error);
+                    renderGradeChart({});
+                    resolve();
+                }
+            });
         });
     }
 
@@ -910,12 +1025,21 @@
         const ctx = document.getElementById('gradeChart').getContext('2d');
         if (gradeChart) gradeChart.destroy();
 
+        data = data || {};
+
         gradeChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['A', 'B', 'C', 'D', 'E', 'F'],
                 datasets: [{
-                    data: [data.a, data.b, data.c, data.d, data.e, data.f],
+                    data: [
+                        data.a || 0,
+                        data.b || 0,
+                        data.c || 0,
+                        data.d || 0,
+                        data.e || 0,
+                        data.f || 0
+                    ],
                     backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444', '#6b7280'],
                     borderRadius: 8
                 }]
@@ -930,57 +1054,91 @@
     }
 
     function loadTopStudents() {
-        $.ajax({
-            url: '/Report/GetTopStudents',
-            success: function(res) {
-                if (!res.success) return;
-                let tbody = $('#topStudentsBody');
-                tbody.empty();
-                $('#topCount').text(res.data.length + ' នាក់');
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetTopStudents?limit=5',
+                success: function(res) {
+                    if (!res.success) {
+                        resolve();
+                        return;
+                    }
+                    let data = res.data || [];
+                    let tbody = $('#topStudentsBody');
+                    tbody.empty();
+                    $('#topCount').text(data.length + ' នាក់');
 
-                res.data.forEach((s, i) => {
-                    let gradeClass = s.averageGrade >= 90 ? 'grade-a' : s.averageGrade >= 80 ? 'grade-b' : s.averageGrade >= 70 ? 'grade-c' : s.averageGrade >= 60 ? 'grade-d' : 'grade-f';
-                    let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-                    let avatarHtml = s.studentPhoto ? `<img src="${s.studentPhoto}" alt="${s.studentName}">` : (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
+                    data.forEach((s, i) => {
+                        let avgGrade = s.averageGrade || 0;
+                        let gradeClass = avgGrade >= 90 ? 'grade-a' :
+                                        avgGrade >= 80 ? 'grade-b' :
+                                        avgGrade >= 70 ? 'grade-c' :
+                                        avgGrade >= 60 ? 'grade-d' : 'grade-f';
+                        let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
 
-                    tbody.append(`
-                        <tr>
-                            <td><span class="rank-badge ${rankClass}">#${i+1}</span></td>
-                            <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName}</div></td>
-                            <td class="fw-bold">${s.averageGrade.toFixed(1)}</td>
-                            <td><span class="grade-badge-modern ${gradeClass}">${getGradeLetter(s.averageGrade)}</span></td>
-                        </tr>
-                    `);
-                });
-            }
+                        let avatarHtml = s.studentPhoto ?
+                            `<img src="${s.studentPhoto}" alt="${s.studentName}">` :
+                            (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
+
+                        tbody.append(`
+                            <tr>
+                                <td><span class="rank-badge ${rankClass}">#${i+1}</span></td>
+                                <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName || ''}</div></td>
+                                <td class="fw-bold">${safeToFixed(avgGrade, 1)}</td>
+                                <td><span class="grade-badge-modern ${gradeClass}">${getGradeLetter(avgGrade)}</span></td>
+                            </tr>
+                        `);
+                    });
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading top students:', error);
+                    resolve();
+                }
+            });
         });
     }
 
     function loadStrugglingStudents() {
-        $.ajax({
-            url: '/Report/GetStrugglingStudents',
-            success: function(res) {
-                if (!res.success) return;
-                let tbody = $('#strugglingStudentsBody');
-                tbody.empty();
-                $('#strugglingCount').text(res.data.length + ' នាក់');
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '/Report/GetStrugglingStudents?limit=5',
+                success: function(res) {
+                    if (!res.success) {
+                        resolve();
+                        return;
+                    }
+                    let data = res.data || [];
+                    let tbody = $('#strugglingStudentsBody');
+                    tbody.empty();
+                    $('#strugglingCount').text(data.length + ' នាក់');
 
-                res.data.forEach((s, i) => {
-                    let avatarHtml = s.studentPhoto ? `<img src="${s.studentPhoto}" alt="${s.studentName}">` : (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
-                    tbody.append(`
-                        <tr>
-                            <td>${i+1}</td>
-                            <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName}</div></td>
-                            <td class="fw-bold text-danger">${s.averageGrade.toFixed(1)}</td>
-                            <td><span class="grade-badge-modern grade-f">ត្រូវការជំនួយ</span></td>
-                        </tr>
-                    `);
-                });
-            }
+                    data.forEach((s, i) => {
+                        let avgGrade = s.averageGrade || 0;
+                        let avatarHtml = s.studentPhoto ?
+                            `<img src="${s.studentPhoto}" alt="${s.studentName}">` :
+                            (s.studentName ? s.studentName.charAt(0).toUpperCase() : '?');
+
+                        tbody.append(`
+                            <tr>
+                                <td>${i+1}</td>
+                                <td><div class="student-cell"><div class="student-avatar-sm">${avatarHtml}</div>${s.studentName || ''}</div></td>
+                                <td class="fw-bold text-danger">${safeToFixed(avgGrade, 1)}</td>
+                                <td><span class="grade-badge-modern grade-f">ត្រូវការជំនួយ</span></td>
+                            </tr>
+                        `);
+                    });
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading struggling students:', error);
+                    resolve();
+                }
+            });
         });
     }
 
     function getGradeLetter(score) {
+        score = score || 0;
         if (score >= 90) return 'A';
         if (score >= 80) return 'B';
         if (score >= 70) return 'C';
@@ -990,7 +1148,35 @@
     }
 
     function applyFilter() {
-        loadAllCharts();
+        // Show loading
+        Swal.fire({
+            title: 'កំពុងអនុវត្តតម្រង...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Reload all data with filter
+        Promise.all([
+            loadAllCharts(),
+            loadTopStudents(),
+            loadStrugglingStudents()
+        ]).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'អនុវត្តតម្រងរួចរាល់!',
+                timer: 1000,
+                showConfirmButton: false
+            });
+        }).catch(error => {
+            console.error('Error applying filter:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'មានបញ្ហា',
+                text: 'សូមព្យាយាមម្តងទៀត'
+            });
+        });
     }
 
     function resetFilter() {
@@ -1005,11 +1191,13 @@
         let start = $('#startDate').val();
         let end = $('#endDate').val();
 
-        if (type === 'payments') window.location.href = `/Report/ExportPaymentReport?startDate=${start}&endDate=${end}`;
-        else if (type === 'attendance') window.location.href = `/Report/ExportAttendanceReport?startDate=${start}&endDate=${end}`;
-        else if (type === 'grades') window.location.href = '/Report/ExportGradeReport';
-        else window.location.href = '/Report/ExportStudentReport';
+        if (type === 'payments')
+            window.location.href = `/Report/ExportPaymentReport?startDate=${start}&endDate=${end}`;
+        else if (type === 'attendance')
+            window.location.href = `/Report/ExportAttendanceReport?startDate=${start}&endDate=${end}`;
+        else if (type === 'grades')
+            window.location.href = '/Report/ExportGradeReport';
+        else
+            window.location.href = '/Report/ExportStudentReport';
     }
-
-    window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
 </script>

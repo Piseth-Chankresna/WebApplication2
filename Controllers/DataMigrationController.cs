@@ -8,14 +8,9 @@ namespace WebApplication2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DataMigrationController : ControllerBase
+    public class DataMigrationController(ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public DataMigrationController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         [HttpPost("import-all")]
         public async Task<IActionResult> ImportAllData()
@@ -52,7 +47,7 @@ namespace WebApplication2.Controllers
 
             int imported = 0;
 
-            if (data?.Users != null && data.Users.Any())
+            if (data?.Users != null && data.Users.Count != 0)
             {
                 foreach (var user in data.Users)
                 {
@@ -100,7 +95,7 @@ namespace WebApplication2.Controllers
 
             int imported = 0;
 
-            if (classes != null && classes.Any())
+            if (classes != null && classes.Count != 0)
             {
                 foreach (var cls in classes)
                 {
@@ -127,7 +122,7 @@ namespace WebApplication2.Controllers
 
             int imported = 0;
 
-            if (payments != null && payments.Any())
+            if (payments != null && payments.Count != 0)
             {
                 foreach (var payment in payments)
                 {
@@ -146,7 +141,7 @@ namespace WebApplication2.Controllers
         {
             try
             {
-                if (attendances != null && attendances.Any())
+                if (attendances != null && attendances.Count != 0)
                 {
                     await _context.Attendances.AddRangeAsync(attendances);
                     await _context.SaveChangesAsync();
@@ -165,7 +160,7 @@ namespace WebApplication2.Controllers
         {
             try
             {
-                if (grades != null && grades.Any())
+                if (grades != null && grades.Count != 0)
                 {
                     foreach (var grade in grades)
                     {

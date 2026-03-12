@@ -1,0 +1,22 @@
+{
+    "dotnet.defaultSolution": "bin/Debug/net8.0/WebApplication2.sln",
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#1a3478",
+        "activityBar.background": "#1a3478",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#d22d5b",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#1a3478",
+        "statusBar.background": "#11224e",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#1a3478",
+        "statusBarItem.remoteBackground": "#11224e",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#11224e",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#11224e99",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    }
+}

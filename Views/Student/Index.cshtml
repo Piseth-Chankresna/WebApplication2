@@ -1,4 +1,4 @@
-﻿@{
+@{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
     ViewData["Title"] = "បញ្ជីសិស្ស";
@@ -39,7 +39,7 @@
         overflow: hidden;
     }
 
-    [data-theme="dark"] .stat-card {
+    [data-bs-theme="dark"] .stat-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -60,7 +60,7 @@
         margin-bottom: 4px;
     }
 
-    [data-theme="dark"] .stat-value {
+    [data-bs-theme="dark"] .stat-value {
         color: white;
     }
 
@@ -81,7 +81,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .action-bar {
+    [data-bs-theme="dark"] .action-bar {
         background: #1e293b;
         border-color: #334155;
     }
@@ -106,7 +106,7 @@
             color: #1e293b;
         }
 
-    [data-theme="dark"] .search-wrapper input {
+    [data-bs-theme="dark"] .search-wrapper input {
         color: white;
     }
 
@@ -146,7 +146,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .filter-card {
+    [data-bs-theme="dark"] .filter-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -160,7 +160,7 @@
         gap: 8px;
     }
 
-    [data-theme="dark"] .filter-card h5 {
+    [data-bs-theme="dark"] .filter-card h5 {
         color: white;
     }
 
@@ -174,7 +174,7 @@
         margin-bottom: 8px;
     }
 
-    [data-theme="dark"] .filter-card .form-label {
+    [data-bs-theme="dark"] .filter-card .form-label {
         color: #cbd5e1;
     }
 
@@ -186,8 +186,8 @@
         width: 100%;
     }
 
-    [data-theme="dark"] .filter-card .form-select,
-    [data-theme="dark"] .filter-card .form-control {
+    [data-bs-theme="dark"] .filter-card .form-select,
+    [data-bs-theme="dark"] .filter-card .form-control {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -201,7 +201,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .table-container {
+    [data-bs-theme="dark"] .table-container {
         background: #1e293b;
         border-color: #334155;
     }
@@ -221,7 +221,7 @@
             background: #f8fafc;
         }
 
-    [data-theme="dark"] .student-table th {
+    [data-bs-theme="dark"] .student-table th {
         background: #0f172a;
         color: #cbd5e1;
         border-bottom-color: #334155;
@@ -233,7 +233,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .student-table td {
+    [data-bs-theme="dark"] .student-table td {
         color: white;
         border-bottom-color: #334155;
     }
@@ -247,7 +247,7 @@
             background: #f8fafc;
         }
 
-    [data-theme="dark"] .student-table tbody tr:hover {
+    [data-bs-theme="dark"] .student-table tbody tr:hover {
         background: #0f172a;
     }
 
@@ -316,7 +316,7 @@
         text-decoration: none;
     }
 
-    [data-theme="dark"] .btn-icon {
+    [data-bs-theme="dark"] .btn-icon {
         background: #0f172a;
         border-color: #334155;
         color: #cbd5e1;

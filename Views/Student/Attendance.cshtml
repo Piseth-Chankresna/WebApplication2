@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebApplication2.Models.Attendance>
+@model IEnumerable<WebApplication2.Models.Attendance>
 @{
     bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
     Layout = isAjax ? null : "_Layout";
@@ -36,7 +36,7 @@
         overflow: hidden;
     }
 
-    [data-theme="dark"] .stat-card {
+    [data-bs-theme="dark"] .stat-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -57,7 +57,7 @@
         margin-bottom: 4px;
     }
 
-    [data-theme="dark"] .stat-value {
+    [data-bs-theme="dark"] .stat-value {
         color: white;
     }
 
@@ -79,7 +79,7 @@
         gap: 20px;
     }
 
-    [data-theme="dark"] .date-section {
+    [data-bs-theme="dark"] .date-section {
         background: #1e293b;
         border-color: #334155;
     }
@@ -99,7 +99,7 @@
             gap: 8px;
         }
 
-    [data-theme="dark"] .date-picker label {
+    [data-bs-theme="dark"] .date-picker label {
         color: #cbd5e1;
     }
 
@@ -111,7 +111,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .date-picker input {
+    [data-bs-theme="dark"] .date-picker input {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -155,7 +155,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .filter-section {
+    [data-bs-theme="dark"] .filter-section {
         background: #1e293b;
         border-color: #334155;
     }
@@ -178,7 +178,7 @@
             font-size: 0.9rem;
         }
 
-    [data-theme="dark"] .filter-item label {
+    [data-bs-theme="dark"] .filter-item label {
         color: #cbd5e1;
     }
 
@@ -191,8 +191,8 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .filter-item select,
-    [data-theme="dark"] .filter-item input {
+    [data-bs-theme="dark"] .filter-item select,
+    [data-bs-theme="dark"] .filter-item input {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -291,7 +291,7 @@
         overflow-x: auto;
     }
 
-    [data-theme="dark"] .table-container {
+    [data-bs-theme="dark"] .table-container {
         background: #1e293b;
         border-color: #334155;
     }
@@ -312,7 +312,7 @@
             background: #f8fafc;
         }
 
-    [data-theme="dark"] .attendance-table th {
+    [data-bs-theme="dark"] .attendance-table th {
         background: #0f172a;
         color: #cbd5e1;
         border-bottom-color: #334155;
@@ -324,7 +324,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .attendance-table td {
+    [data-bs-theme="dark"] .attendance-table td {
         color: white;
         border-bottom-color: #334155;
     }
@@ -333,7 +333,7 @@
         background: #f8fafc;
     }
 
-    [data-theme="dark"] .attendance-table tbody tr:hover {
+    [data-bs-theme="dark"] .attendance-table tbody tr:hover {
         background: #0f172a;
     }
 
@@ -432,7 +432,7 @@
         font-size: 0.85rem;
     }
 
-    [data-theme="dark"] .note-input {
+    [data-bs-theme="dark"] .note-input {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -457,7 +457,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .section-title {
+    [data-bs-theme="dark"] .section-title {
         color: white;
     }
 
@@ -481,7 +481,7 @@
         cursor: pointer;
     }
 
-    [data-theme="dark"] .history-card {
+    [data-bs-theme="dark"] .history-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -534,7 +534,7 @@
         transition: all 0.3s ease;
     }
 
-    [data-theme="dark"] .btn-view {
+    [data-bs-theme="dark"] .btn-view {
         background: #0f172a;
         color: #cbd5e1;
     }
@@ -573,7 +573,7 @@
         flex-wrap: wrap;
     }
 
-    [data-theme="dark"] .qr-section {
+    [data-bs-theme="dark"] .qr-section {
         background: #1e293b;
         border-color: #334155;
     }

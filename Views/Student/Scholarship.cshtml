@@ -1,7 +1,7 @@
-﻿@{
-    bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-    Layout = isAjax ? null : "_Layout";
-    ViewData["Title"] = "អាហារូបករណ៍";
+@{
+bool isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+Layout = isAjax ? null : "_Layout";
+ViewData["Title"] = "អាហារូបករណ៍";
 }
 
 <style>
@@ -39,7 +39,7 @@
         overflow: hidden;
     }
 
-    [data-theme="dark"] .stat-card {
+    [data-bs-theme="dark"] .stat-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -60,7 +60,7 @@
         margin-bottom: 4px;
     }
 
-    [data-theme="dark"] .stat-value {
+    [data-bs-theme="dark"] .stat-value {
         color: white;
     }
 
@@ -77,7 +77,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .filter-section {
+    [data-bs-theme="dark"] .filter-section {
         background: #1e293b;
         border-color: #334155;
     }
@@ -100,7 +100,7 @@
             font-size: 0.9rem;
         }
 
-    [data-theme="dark"] .filter-item label {
+    [data-bs-theme="dark"] .filter-item label {
         color: #cbd5e1;
     }
 
@@ -113,8 +113,8 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .filter-item select,
-    [data-theme="dark"] .filter-item input {
+    [data-bs-theme="dark"] .filter-item select,
+    [data-bs-theme="dark"] .filter-item input {
         background: #0f172a;
         border-color: #334155;
         color: white;
@@ -138,6 +138,85 @@
             box-shadow: 0 10px 20px rgba(249,115,22,0.3);
         }
 
+    /* ====== REFRESH BUTTON ====== */
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .btn-refresh {
+        background: white;
+        color: #f97316;
+        border: 1px solid #e2e8f0;
+        padding: 10px 24px;
+        border-radius: 40px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    [data-bs-theme="dark"] .btn-refresh {
+        background: #1e293b;
+        color: #f97316;
+        border-color: #334155;
+    }
+
+    .btn-refresh:hover {
+        background: #fff7ed;
+        border-color: #f97316;
+        transform: translateY(-2px);
+    }
+
+    .btn-refresh i {
+        transition: transform 0.5s ease;
+    }
+
+    .btn-refresh:hover i {
+        transform: rotate(180deg);
+    }
+
+    .btn-refresh:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .last-updated {
+        background: #f1f5f9;
+        padding: 6px 14px;
+        border-radius: 40px;
+        color: #475569;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    [data-bs-theme="dark"] .last-updated {
+        background: #1e293b;
+        color: #cbd5e1;
+    }
+
+    .spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        100%
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
     .scholarship-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -156,7 +235,7 @@
         overflow: hidden;
     }
 
-    [data-theme="dark"] .scholarship-card {
+    [data-bs-theme="dark"] .scholarship-card {
         background: #1e293b;
         border-color: #334155;
     }
@@ -210,7 +289,7 @@
         margin-bottom: 4px;
     }
 
-    [data-theme="dark"] .student-info h4 {
+    [data-bs-theme="dark"] .student-info h4 {
         color: white;
     }
 
@@ -261,7 +340,7 @@
         border-bottom: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .info-row {
+    [data-bs-theme="dark"] .info-row {
         border-bottom-color: #334155;
     }
 
@@ -279,7 +358,7 @@
         color: #1e293b;
     }
 
-    [data-theme="dark"] .info-value {
+    [data-bs-theme="dark"] .info-value {
         color: white;
     }
 
@@ -340,7 +419,7 @@
         gap: 8px;
     }
 
-    [data-theme="dark"] .btn-action {
+    [data-bs-theme="dark"] .btn-action {
         background: #0f172a;
         border-color: #334155;
         color: #cbd5e1;
@@ -361,7 +440,7 @@
         border: 1px solid #e2e8f0;
     }
 
-    [data-theme="dark"] .summary-section {
+    [data-bs-theme="dark"] .summary-section {
         background: #1e293b;
         border-color: #334155;
     }
@@ -375,7 +454,7 @@
         gap: 10px;
     }
 
-    [data-theme="dark"] .summary-title {
+    [data-bs-theme="dark"] .summary-title {
         color: white;
     }
 
@@ -397,7 +476,7 @@
         border-radius: 16px;
     }
 
-    [data-theme="dark"] .summary-item {
+    [data-bs-theme="dark"] .summary-item {
         background: #0f172a;
     }
 
@@ -438,7 +517,7 @@
             background: #fff7ed;
         }
 
-    [data-theme="dark"] .scholarship-option:hover {
+    [data-bs-theme="dark"] .scholarship-option:hover {
         background: #1e293b;
     }
 
@@ -447,7 +526,7 @@
         background: #fff7ed;
     }
 
-    [data-theme="dark"] .scholarship-option.selected {
+    [data-bs-theme="dark"] .scholarship-option.selected {
         background: #1e293b;
     }
 
@@ -488,6 +567,16 @@
 
         .summary-stats {
             grid-template-columns: 1fr;
+        }
+
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-refresh, .last-updated {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -582,6 +671,18 @@
     </div>
 </div>
 
+<!-- Action Bar with Refresh -->
+<div class="action-bar">
+    <div class="last-updated" id="lastUpdated">
+        <i class="bi bi-clock-history"></i>
+        <span id="lastUpdatedTime">ទាញយកទិន្នន័យនៅ: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+    <button class="btn-refresh" onclick="refreshScholarshipData()" id="refreshBtn">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+    </button>
+</div>
+
 <!-- Scholarship Cards Grid -->
 <div class="scholarship-grid" id="scholarshipGrid">
     <!-- Cards will be loaded here -->
@@ -660,12 +761,56 @@
 <script>
     let allStudents = [];
     let filteredStudents = [];
+    let isRefreshing = false;
 
     $(document).ready(function() {
+        updateLastUpdatedTime();
         loadStudents();
     });
 
-    function loadStudents() {
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeStr = now.toLocaleDateString('km-KH', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        $('#lastUpdatedTime').text(`ទាញយកទិន្នន័យនៅ: ${timeStr}`);
+    }
+
+    function refreshScholarshipData() {
+        if (isRefreshing) return;
+        isRefreshing = true;
+
+        const refreshBtn = $('#refreshBtn');
+        const originalHtml = refreshBtn.html();
+
+        // Show loading state
+        refreshBtn.html('<i class="bi bi-arrow-clockwise spinning"></i> កំពុងទាញយក...');
+        refreshBtn.prop('disabled', true);
+
+        // Add spinning animation if not exists
+        if (!$('#spinStyle').length) {
+            $('<style id="spinStyle">.spinning { animation: spin 1s linear infinite; } @@keyframes spin { 100% { transform: rotate(360deg); } }</style>').appendTo('head');
+        }
+
+        // Show loading overlay
+        Swal.fire({
+            title: 'កំពុងទាញយកទិន្នន័យ...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Load data
+        loadStudents(true);
+    }
+
+    function loadStudents(isRefresh = false) {
         $.ajax({
             url: '/Student/GetStudents',
             type: 'GET',
@@ -685,10 +830,48 @@
                 displayScholarshipCards();
                 updateStats();
                 generateSummary();
+
+                updateLastUpdatedTime();
+
+                if (isRefresh) {
+                    Swal.close();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ទាញយកទិន្នន័យរួចរាល់!',
+                        text: 'បញ្ជីអាហារូបករណ៍ត្រូវបានធ្វើអោយថ្មី',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+
+                    const refreshBtn = $('#refreshBtn');
+                    refreshBtn.html('<i class="bi bi-arrow-clockwise"></i> ទាញយកថ្មី');
+                    refreshBtn.prop('disabled', false);
+                    isRefreshing = false;
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Error loading students:', error);
                 showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
+
+                if (isRefresh) {
+                    Swal.close();
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'មានបញ្ហា',
+                        text: 'សូមព្យាយាមម្តងទៀត',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    const refreshBtn = $('#refreshBtn');
+                    refreshBtn.html('<i class="bi bi-arrow-clockwise"></i> ទាញយកថ្មី');
+                    refreshBtn.prop('disabled', false);
+                    isRefreshing = false;
+                }
             }
         });
     }
@@ -852,7 +1035,6 @@
             $('#studentInitials').text(initial);
         }
 
-        // Select current scholarship
         $('.scholarship-option').removeClass('selected');
         $(`.scholarship-option:contains('${student.scholarship || '0%'}')`).addClass('selected');
         $('#scholarshipValue').val(student.scholarship || '0%');
@@ -873,8 +1055,13 @@
 
         $('#scholarshipModal').modal('hide');
 
-        // Show loading
-        $('body').append('<div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;"><div style="background:white; padding:20px; border-radius:10px;"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">កំពុងរក្សាទុក...</p></div></div>');
+        Swal.fire({
+            title: 'កំពុងរក្សាទុក...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         $.ajax({
             url: '/Student/UpdateScholarship',
@@ -884,18 +1071,31 @@
                 'RequestVerificationToken': token
             },
             success: function(response) {
-                $('#loading').remove();
-
                 if (response && response.success) {
-                    alert('កែប្រែអាហារូបករណ៍ដោយជោគជ័យ!');
-                    loadStudents(); // Reload data
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ជោគជ័យ!',
+                        text: response.message || 'កែប្រែអាហារូបករណ៍ដោយជោគជ័យ',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    // Refresh data after save
+                    refreshScholarshipData();
                 } else {
-                    alert(response.message || 'មានបញ្ហាក្នុងការរក្សាទុក');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'កំហុស',
+                        text: response.message || 'មានបញ្ហាក្នុងការរក្សាទុក'
+                    });
                 }
             },
             error: function(xhr, status, error) {
-                $('#loading').remove();
-                alert('មានបញ្ហាបច្ចេកទេស: ' + error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'កំហុស',
+                    text: 'មានបញ្ហាបច្ចេកទេស: ' + error
+                });
             }
         });
     }
