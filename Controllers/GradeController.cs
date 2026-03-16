@@ -18,16 +18,23 @@ namespace WebApplication2.Controllers
 
         public IActionResult Index()
         {
+            if (!PermissionService.HasPermission(User, "Grade", "View"))
+                return RedirectToAction("AccessDenied", "Account");
             return View();
         }
 
         public IActionResult Create()
         {
+            if (!PermissionService.HasPermission(User, "Grade", "Create"))
+                return RedirectToAction("AccessDenied", "Account");
             return View();
         }
 
         public async Task<IActionResult> Edit(int id)
         {
+            if (!PermissionService.HasPermission(User, "Grade", "Edit"))
+                return RedirectToAction("AccessDenied", "Account");
+                
             try
             {
                 var grade = await _context.Grades
@@ -50,6 +57,9 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            if (!PermissionService.HasPermission(User, "Grade", "View"))
+                return RedirectToAction("AccessDenied", "Account");
+                
             try
             {
                 var grade = await _context.Grades
@@ -178,6 +188,9 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromBody] Grade grade)
         {
+            if (!PermissionService.HasPermission(User, "Grade", "Create"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិបញ្ចូលពិន្ទុ", 403);
+                
             try
             {
                 if (grade == null)
@@ -240,6 +253,9 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update([FromBody] Grade grade)
         {
+            if (!PermissionService.HasPermission(User, "Grade", "Edit"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិកែប្រែពិន្ទុ", 403);
+                
             try
             {
                 var existing = await _context.Grades.FindAsync(grade.Id);
@@ -284,6 +300,9 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!PermissionService.HasPermission(User, "Grade", "Delete"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិលុបពិន្ទុ", 403);
+                
             try
             {
                 var grade = await _context.Grades
