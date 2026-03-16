@@ -10,8 +10,7 @@ namespace WebApplication2.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string StudentId { get; set; } = string.Empty;
+        public int StudentId { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -38,6 +37,13 @@ namespace WebApplication2.Models
 
         [StringLength(20)]
         public string? Status { get; set; }
+
+        // Legacy properties for backward compatibility
+        [NotMapped]
+        public string? PaymentType => PaymentMethod;
+
+        [NotMapped]
+        public string? Description => Note;
 
         [StringLength(255)]
         public string? Note { get; set; }

@@ -759,8 +759,8 @@ ViewData["Title"] = "អាហារូបករណ៍";
 
 <script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
-    let allStudents = [];
-    let filteredStudents = [];
+    let scholarshipStudentsData = [];
+    let filteredScholarshipStudents = [];
     let isRefreshing = false;
 
     $(document).ready(function() {
@@ -819,14 +819,14 @@ ViewData["Title"] = "អាហារូបករណ៍";
                 console.log("Students response:", response);
 
                 if (response && response.success) {
-                    allStudents = response.data || [];
+                    scholarshipStudentsData = response.data || [];
                 } else if (Array.isArray(response)) {
-                    allStudents = response;
+                    scholarshipStudentsData = response;
                 } else {
-                    allStudents = [];
+                    scholarshipStudentsData = [];
                 }
 
-                filteredStudents = [...allStudents];
+                filteredScholarshipStudents = [...scholarshipStudentsData];
                 displayScholarshipCards();
                 updateStats();
                 generateSummary();
@@ -880,7 +880,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
         var grid = $('#scholarshipGrid');
         grid.empty();
 
-        if (!Array.isArray(filteredStudents) || filteredStudents.length === 0) {
+        if (!Array.isArray(filteredScholarshipStudents) || filteredScholarshipStudents.length === 0) {
             grid.html(`
                 <div class="text-center py-5" style="grid-column: 1 / -1;">
                     <i class="bi bi-gift" style="font-size: 4rem; color: #cbd5e1;"></i>
@@ -890,7 +890,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
             return;
         }
 
-        filteredStudents.forEach(s => {
+        filteredScholarshipStudents.forEach(s => {
             var scholarshipPercent = parseInt(s.scholarship) || 0;
             var badgeClass = scholarshipPercent >= 100 ? 'badge-100' :
                             scholarshipPercent >= 75 ? 'badge-75' :
@@ -958,20 +958,20 @@ ViewData["Title"] = "អាហារូបករណ៍";
     }
 
     function updateStats() {
-        if (!Array.isArray(allStudents)) return;
+        if (!Array.isArray(scholarshipStudentsData)) return;
 
-        var total = allStudents.length;
-        var withScholarship = allStudents.filter(s => {
+        var total = scholarshipStudentsData.length;
+        var withScholarship = scholarshipStudentsData.filter(s => {
             var percent = parseInt(s.scholarship) || 0;
             return percent > 0;
         }).length;
 
         var avgScholarship = withScholarship > 0
-            ? allStudents.filter(s => parseInt(s.scholarship) > 0)
+            ? scholarshipStudentsData.filter(s => parseInt(s.scholarship) > 0)
                 .reduce((sum, s) => sum + (parseInt(s.scholarship) || 0), 0) / withScholarship
             : 0;
 
-        var totalAmount = allStudents.reduce((sum, s) => {
+        var totalAmount = scholarshipStudentsData.reduce((sum, s) => {
             var percent = parseInt(s.scholarship) || 0;
             var amount = (s.amountDue || 0) * percent / 100;
             return sum + amount;
@@ -984,7 +984,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
     }
 
     function generateSummary() {
-        if (!Array.isArray(allStudents)) return;
+        if (!Array.isArray(scholarshipStudentsData)) return;
 
         var levels = {
             '100%': { count: 0, total: 0 },
@@ -994,7 +994,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
             '0%': { count: 0, total: 0 }
         };
 
-        allStudents.forEach(s => {
+        scholarshipStudentsData.forEach(s => {
             var percent = s.scholarship || '0%';
             if (levels[percent]) {
                 levels[percent].count++;
@@ -1021,7 +1021,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
     }
 
     function editScholarship(studentId) {
-        var student = allStudents.find(s => s.id === studentId);
+        var student = scholarshipStudentsData.find(s => s.id === studentId);
         if (!student) return;
 
         $('#studentId').val(student.id);
@@ -1106,7 +1106,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
         var level = $('#filterLevel').val();
         var search = $('#searchInput').val().toLowerCase();
 
-        filteredStudents = allStudents.filter(s => {
+        filteredScholarshipStudents = scholarshipStudentsData.filter(s => {
             var matchMajor = !major || s.major === major;
             var matchYear = !year || s.year === year;
             var matchLevel = !level || s.scholarship === level;
@@ -1125,7 +1125,7 @@ ViewData["Title"] = "អាហារូបករណ៍";
         $('#filterYear').val('');
         $('#filterLevel').val('');
         $('#searchInput').val('');
-        filteredStudents = [...allStudents];
+        filteredScholarshipStudents = [...scholarshipStudentsData];
         displayScholarshipCards();
     }
 

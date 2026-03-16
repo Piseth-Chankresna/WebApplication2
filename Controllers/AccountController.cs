@@ -21,8 +21,53 @@ namespace WebApplication2.Controllers
         [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
         private static partial Regex EmailRegex();
 
+        // Role Selection Page
+        [HttpGet]
+        public IActionResult RoleSelection()
+        {
+            // If already logged in, redirect to appropriate dashboard
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else if (User.IsInRole("User"))
+                {
+                    return RedirectToAction("UserAccount", "User");
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            
+            return View();
+        }
+
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
+        {
+            // If already logged in, redirect to appropriate dashboard
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("User"))
+                {
+                    return RedirectToAction("UserAccount", "User");
+                }
+                return RedirectToAction("Index", "Home");
+            }
+
+            // If there's a returnUrl and it's local, go to login page directly
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                return View();
+            }
+
+            // Otherwise redirect to role selection page
+            return RedirectToAction("RoleSelection");
+        }
+
+        [HttpGet]
+        public IActionResult AdminLogin(string? returnUrl = null)
         {
             // If already logged in, redirect to home page
             if (User.Identity?.IsAuthenticated == true)
@@ -30,8 +75,25 @@ namespace WebApplication2.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Store role in ViewBag for the login page
+            ViewBag.Role = "Admin";
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            return View("Login");
+        }
+
+        [HttpGet]
+        public IActionResult UserLogin(string? returnUrl = null)
+        {
+            // If already logged in, redirect to home page
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Store role in ViewBag for the login page
+            ViewBag.Role = "User";
+            ViewData["ReturnUrl"] = returnUrl;
+            return View("Login");
         }
 
         [HttpPost]
@@ -144,6 +206,10 @@ namespace WebApplication2.Controllers
                 }
 
                 // Otherwise redirect to Home/Index
+                if (user.Role == "User")
+                {
+                    return RedirectToAction("UserAccount", "User");
+                }
                 return RedirectToAction("Index", "Home");
                 // ====================================================================
             }
@@ -163,6 +229,13 @@ namespace WebApplication2.Controllers
             if (User.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction("Index", "Home");
+            }
+
+            // Check if coming from role-specific login
+            var role = HttpContext.Request.Query["role"];
+            if (!string.IsNullOrEmpty(role))
+            {
+                ViewBag.Role = role;
             }
 
             return View();
@@ -215,7 +288,12 @@ namespace WebApplication2.Controllers
                 model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
                 model.IsActive = true;
                 model.CreatedAt = DateTime.Now;
-                model.Role = "User"; // Default role for new registrations
+                
+                // Set role from ViewBag if available (from role-specific login), otherwise use form value
+                if (!string.IsNullOrEmpty(ViewBag.Role as string))
+                {
+                    model.Role = ViewBag.Role as string;
+                }
 
                 // Add user to database
                 _context.UserAccounts.Add(model);

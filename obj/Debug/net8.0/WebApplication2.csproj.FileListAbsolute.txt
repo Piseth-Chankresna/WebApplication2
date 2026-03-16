@@ -304,6 +304,7 @@ C:\Users\phusy\Downloads\Telegram Desktop\WebApplication2\WebApplication2\obj\De
 C:\Users\phusy\Downloads\Telegram Desktop\WebApplication2\WebApplication2\obj\Debug\net8.0\ref\WebApplication2.dll
 C:\Users\phusy\Downloads\Telegram Desktop\WebApplication2\WebApplication2\bin\Debug\net8.0\system_data.json
 C:\Users\phusy\Downloads\Telegram Desktop\WebApplication2\WebApplication2\bin\Debug\net8.0\system_database.json
+D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.sourcelink.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\appsettings.Development.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\appsettings.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\bin\Debug\net8.0\system_data.json
@@ -437,7 +438,6 @@ D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.MvcApplicationPartsAssemblyInfo.cache
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.RazorAssemblyInfo.cache
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.RazorAssemblyInfo.cs
-D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.sourcelink.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\rjimswa.dswa.cache.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -455,4 +455,3 @@ D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.pdb
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\WebApplication2.genruntimeconfig.cache
 D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\ref\WebApplication2.dll
-D:\ASP.NET 3rd year\StudentManagementSystem\WebApplication2\WebApplication2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

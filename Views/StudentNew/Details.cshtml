@@ -1,0 +1,333 @@
+@model WebApplication2.Models.Student
+@{
+    ViewData["Title"] = "ព័ត៌មានលម្អិតសិស្ស";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user me-2"></i>ព័ត៌មានលម្អិតសិស្ស
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Student Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            @if (!string.IsNullOrEmpty(Model.Photo))
+                            {
+                                <img src="@Model.Photo" alt="@Model.FullName" class="img-fluid rounded-circle mb-3" style="max-width: 200px; max-height: 200px;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" style="width: 200px; height: 200px; font-size: 4rem;">
+                                    @Model.FullName?.Substring(0, 1).ToUpper()
+                                </div>
+                            }
+                            <h5>@Model.FullName</h5>
+                            <p class="text-muted">លេខសម្គាល់: STU@Model.Id.ToString("D6")</p>
+                            <span class="badge @(Model.Status == "កំពុងសិក្សា" ? "bg-success" : Model.Status == "ឈប់សម្រាក" ? "bg-warning" : "bg-danger")">
+                                @Model.Status
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>អ៊ីមែល:</strong></td>
+                                            <td>@Model.Email</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ទូរស័ព្ទ:</strong></td>
+                                            <td>@Model.Phone ?? "-"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ភេទ:</strong></td>
+                                            <td>
+                                                @if (Model.Gender == "ប្រុស" || Model.Gender == "Male")
+                                                {
+                                                    <i class="fas fa-mars text-primary me-1"></i>
+                                                }
+                                                else if (Model.Gender == "ស្រី" || Model.Gender == "Female")
+                                                {
+                                                    <i class="fas fa-venus text-pink me-1"></i>
+                                                }
+                                                @Model.Gender
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ថ្ងៃកំណើត:</strong></td>
+                                            <td>@Model.DateOfBirth ?? "-"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ទីកំណើត:</strong></td>
+                                            <td>@Model.PlaceOfBirth ?? "-"</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>ជំនាញ:</strong></td>
+                                            <td>@Model.Major ?? "-"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ឆ្នាំសិក្សា:</strong></td>
+                                            <td>@Model.Year ?? "-"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ថ្នាក់:</strong></td>
+                                            <td>@(Model.Class?.ClassName ?? "-")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>វេន:</strong></td>
+                                            <td>@Model.Shift ?? "-"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>បន្ទប់:</strong></td>
+                                            <td>@Model.Room ?? "-"</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Notes))
+                            {
+                                <div class="mt-3">
+                                    <strong>ចំណាំ:</strong>
+                                    <p class="text-muted">@Model.Notes</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Financial Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5><i class="fas fa-dollar-sign me-2"></i>ព័ត៌មានហិរញ្ញប្រេយ</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card bg-primary text-white">
+                                        <div class="card-body text-center">
+                                            <h6>ថ្លៃជើងសិក្សា</h6>
+                                            <h3>$@Model.TuitionFee.ToString("F2")</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body text-center">
+                                            <h6>ប្រាក់បង់រួច</h6>
+                                            <h3>$@Model.PaidAmount.ToString("F2")</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card @(Model.OutstandingBalance > 0 ? "bg-danger" : "bg-info") text-white">
+                                        <div class="card-body text-center">
+                                            <h6>សមតុលលុយបញ្ចប់</h6>
+                                            <h3>$@Model.OutstandingBalance.ToString("F2")</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>កែប្រែ
+                                </a>
+                                <button class="btn btn-info" onclick="printStudentInfo()">
+                                    <i class="fas fa-print me-2"></i>បោះពុម្ព
+                                </a>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>ត្រឡប់ក្រោយ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs for Additional Information -->
+                    <ul class="nav nav-tabs" id="studentTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="grades-tab" data-bs-toggle="tab" data-bs-target="#grades" type="button" role="tab">
+                                <i class="fas fa-graduation-cap me-2"></i>ការប្រឡង់
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">
+                                <i class="fas fa-calendar-check me-2"></i>វត្តមាន
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">
+                                <i class="fas fa-money-bill-wave me-2"></i>ការបង់ប្រាក់
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="studentTabContent">
+                        <!-- Grades Tab -->
+                        <div class="tab-pane fade show active" id="grades" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>មុខវិជ្ជា</th>
+                                            <th>វត្តមាន</th>
+                                            <th>កិច្ចការ</th>
+                                            <th>ប្រឡង់ពាក់កណ្តាល</th>
+                                            <th>ប្រឡង់បញ្ចប់</th>
+                                            <th>ពិន្ទុ</th>
+                                            <th>មធ្យមភាគ</th>
+                                            <th>ឆ្មាំ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.Grades != null && Model.Grades.Any())
+                                        {
+                                            @foreach (var grade in Model.Grades.OrderByDescending(g => g.RecordedAt))
+                                            {
+                                                <tr>
+                                                    <td>@grade.Subject</td>
+                                                    <td>@grade.Attendance</td>
+                                                    <td>@grade.Assignment</td>
+                                                    <td>@grade.MidTerm</td>
+                                                    <td>@grade.FinalExam</td>
+                                                    <td>@grade.Total</td>
+                                                    <td>@(grade.Total / 4)</td>
+                                                    <td><span class="badge bg-info">@grade.GradeLetter</span></td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted">មិនទាន់មានការប្រឡង់នៅឡើយទេ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Tab -->
+                        <div class="tab-pane fade" id="attendance" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>កាលបរិច្ឆេទ</th>
+                                            <th>ស្ថានភាព</th>
+                                            <th>បន្ទប់</th>
+                                            <th>ចំណាំ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.Attendances != null && Model.Attendances.Any())
+                                        {
+                                            @foreach (var attendance in Model.Attendances.OrderByDescending(a => a.Date))
+                                            {
+                                                <tr>
+                                                    <td>@attendance.Date.ToString("yyyy-MM-dd")</td>
+                                                    <td>
+                                                        <span class="badge @(attendance.Status == "Present" ? "bg-success" : attendance.Status == "Absent" ? "bg-danger" : "bg-warning")">
+                                                            @attendance.Status
+                                                        </span>
+                                                    </td>
+                                                    <td>@attendance.Room ?? "-"</td>
+                                                    <td>@attendance.Note ?? "-"</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">មិនទាន់មានការកត់ត្រាវត្តមាននៅឡើយទេ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payments Tab -->
+                        <div class="tab-pane fade" id="payments" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>កាលបរិច្ឆេទ</th>
+                                            <th>ប្រភេទ</th>
+                                            <th>ចំនួន</th>
+                                            <th>ស្ថានភាព</th>
+                                            <th>ចំណាំ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.Payments != null && Model.Payments.Any())
+                                        {
+                                            @foreach (var payment in Model.Payments.OrderByDescending(p => p.PaymentDate))
+                                            {
+                                                <tr>
+                                                    <td>@payment.PaymentDate.ToString("yyyy-MM-dd")</td>
+                                                    <td>@payment.PaymentType</td>
+                                                    <td>$@payment.Amount.ToString("F2")</td>
+                                                    <td>
+                                                        <span class="badge @(payment.Status == "Paid" ? "bg-success" : payment.Status == "Pending" ? "bg-warning" : "bg-danger")">
+                                                            @payment.Status
+                                                        </span>
+                                                    </td>
+                                                    <td>@payment.Description ?? "-"</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">មិនទាន់មានការបង់ប្រាក់នៅឡើយទេ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function printStudentInfo() {
+            window.print();
+        }
+
+        // Auto-refresh tabs data every 30 seconds
+        setInterval(function() {
+            // You could add AJAX calls here to refresh data if needed
+        }, 30000);
+    </script>
+
+    <style>
+        @@media print {
+            .nav-tabs, .btn, .card-header {
+                display: none !important;
+            }
+            
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+}

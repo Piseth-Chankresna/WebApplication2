@@ -403,7 +403,7 @@
 <div class="action-bar">
     <div class="search-wrapper">
         <i class="bi bi-search"></i>
-        <input type="text" id="searchInput" placeholder="ស្វែងរកតាមឈ្មោះ លេខសម្គាល់...">
+        <input type="text" id="searchInput" name="searchInput" placeholder="ស្វែងរកតាមឈ្មោះ លេខសម្គាល់..." aria-label="ស្វែងរកសិស្ស">
     </div>
     <div class="d-flex gap-2">
         <a href="/Student/ExportStudents" class="btn-excel">
@@ -423,8 +423,8 @@
 
     <div class="row g-3">
         <div class="col-md-3">
-            <label class="form-label fw-bold">ជំនាញ</label>
-            <select id="filterMajor" class="form-select">
+            <label class="form-label fw-bold" for="filterMajor">ជំនាញ</label>
+            <select id="filterMajor" name="filterMajor" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="Information Technology">Information Technology</option>
                 <option value="Business Administration">Business Administration</option>
@@ -435,8 +435,8 @@
         </div>
 
         <div class="col-md-3">
-            <label class="form-label fw-bold">ឆ្នាំសិក្សា</label>
-            <select id="filterYear" class="form-select">
+            <label class="form-label fw-bold" for="filterYear">ឆ្នាំសិក្សា</label>
+            <select id="filterYear" name="filterYear" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="1">ឆ្នាំទី១</option>
                 <option value="2">ឆ្នាំទី២</option>
@@ -446,8 +446,8 @@
         </div>
 
         <div class="col-md-3">
-            <label class="form-label fw-bold">វេនសិក្សា</label>
-            <select id="filterShift" class="form-select">
+            <label class="form-label fw-bold" for="filterShift">វេនសិក្សា</label>
+            <select id="filterShift" name="filterShift" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="ព្រឹក">ព្រឹក</option>
                 <option value="រសៀល">រសៀល</option>
@@ -457,8 +457,8 @@
         </div>
 
         <div class="col-md-3">
-            <label class="form-label fw-bold">ស្ថានភាព</label>
-            <select id="filterStatus" class="form-select">
+            <label class="form-label fw-bold" for="filterStatus">ស្ថានភាព</label>
+            <select id="filterStatus" name="filterStatus" class="form-select">
                 <option value="">ទាំងអស់</option>
                 <option value="កំពុងសិក្សា">កំពុងសិក្សា</option>
                 <option value="ឈប់សម្រាក">ឈប់សម្រាក</option>
@@ -508,19 +508,21 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    let students = [];
-    let isLoading = false;
+    // Use window scope to avoid conflicts
+    window.studentsData = [];
+    window.isLoading = false;
 
     $(document).ready(function() {
         loadStudents();
         loadStats();
+        // ... rest of the code remains the same ...
     });
 
     function loadStudents() {
-        if (isLoading) return;
-        isLoading = true;
+        if (window.isLoading) return;
+        window.isLoading = true;
 
         $('#studentTableBody').html(`
             <tr>
@@ -536,21 +538,21 @@
             type: 'GET',
             cache: false,
             success: function(response) {
-                isLoading = false;
+                window.isLoading = false;
 
                 if (response && response.success) {
-                    students = response.data || [];
+                    window.studentsData = response.data || [];
                 } else if (Array.isArray(response)) {
-                    students = response;
+                    window.studentsData = response;
                 } else {
-                    students = [];
+                    window.studentsData = [];
                 }
 
-                displayStudents(students);
-                updateFilteredCount(students.length);
+                displayStudents(window.studentsData);
+                updateFilteredCount(window.studentsData.length);
             },
             error: function(xhr, status, error) {
-                isLoading = false;
+                window.isLoading = false;
                 console.error("Error loading students:", error);
                 showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
             }
@@ -654,7 +656,7 @@
         var shift = $('#filterShift').val();
         var status = $('#filterStatus').val();
 
-        var filtered = students.filter(s => {
+        var filtered = window.studentsData.filter(s => {
             var matchSearch = !searchText ||
                 (s.name && s.name.toLowerCase().includes(searchText)) ||
                 (s.id && s.id.toLowerCase().includes(searchText));
@@ -676,12 +678,12 @@
         $('#filterYear').val('');
         $('#filterShift').val('');
         $('#filterStatus').val('');
-        displayStudents(students);
-        updateFilteredCount(students.length);
+        displayStudents(window.studentsData);
+        updateFilteredCount(window.studentsData.length);
     }
 
     function updateFilteredCount(count) {
-        $('#filteredCount').text(count + ' / ' + students.length);
+        $('#filteredCount').text(count + ' / ' + window.studentsData.length);
     }
 
     function viewStudent(id) {

@@ -224,7 +224,6 @@
 
         <form asp-action="Register" method="post">
             @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="Role" value="User" />
             <div class="mb-3">
                 <label class="form-label" asp-for="FullName">ឈ្មោះពេញ</label>
                 <div class="input-wrap">
@@ -241,6 +240,23 @@
                     <input asp-for="Email" class="form-control" type="email" placeholder="example@hru.edu.kh" autocomplete="email" style="padding-right: 16px;" />
                 </div>
                 <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" asp-for="Role">តួនាទី</label>
+                <div class="input-wrap">
+                    <i class="bi bi-shield input-icon"></i>
+                    <select asp-for="Role" class="form-control" style="padding-right: 16px;">
+                        <option value="">ជ្រើសរើសតួនាទី</option>
+                        <option value="User">អ្នកប្រើប្រាស់-User</option>
+                        <option value="Admin">អ្នកគ្រប់គ្រងប្រព័ន្ធ-Admin</option>
+                    </select>
+                </div>
+                <span asp-validation-for="Role" class="field-error"></span>
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <span id="roleDescription">សូមជ្រើសរើសតួនាទីដើម្បីកំណត់សិទ្ធិរបស់អ្នក</span>
+                </small>
             </div>
 
             <div class="mb-3">
@@ -294,6 +310,22 @@
                 icon.classList.add('bi-eye');
             }
         }
+
+        // Role description updates
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.querySelector('select[name="Role"]');
+            const roleDescription = document.getElementById('roleDescription');
+            
+            const roleDescriptions = {
+                '': 'សូមជ្រើសរើសតួនាទីដើម្បីកំណត់សិទ្ធិរបស់អ្នក',
+                'User': 'អ្នកប្រើប្រាស់ - អាចមើលនិងគ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួន និងមើលទិន្នន័យសិស្ស',
+                'Admin': 'អ្នកគ្រប់គ្រងប្រព័ន្ធ - មានសិទ្ធិគ្រប់គ្រងទាំងអស់នៅក្នុងប្រព័ន្ធ'
+            };
+            
+            roleSelect.addEventListener('change', function() {
+                roleDescription.textContent = roleDescriptions[this.value] || roleDescriptions[''];
+            });
+        });
     </script>
 </body>
 </html>

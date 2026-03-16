@@ -9,7 +9,7 @@ namespace WebApplication2.Models
         public int Id { get; set; }
 
         [Required]
-        public string? StudentId { get; set; }
+        public int StudentId { get; set; }
 
         [Required]
         public string? Subject { get; set; }

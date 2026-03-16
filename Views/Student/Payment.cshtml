@@ -1650,7 +1650,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
     }
 
     // ==================== GLOBAL VARIABLES ====================
-    let students = [];
+    let paymentStudentsData = [];
     let payments = [];
     let selectedStudent = null;
     let currentPaymentMethod = 'cash';
@@ -1859,11 +1859,11 @@ ViewData["Title"] = "ការបង់ប្រាក់";
                     console.log("Students loaded:", response);
 
                     if (response && response.success) {
-                        students = response.data || [];
+                        paymentStudentsData = response.data || [];
                     } else if (Array.isArray(response)) {
-                        students = response;
+                        paymentStudentsData = response;
                     } else {
-                        students = [];
+                        paymentStudentsData = [];
                     }
 
                     renderStudentList();
@@ -1887,7 +1887,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
         let container = $('#studentList');
         container.empty();
 
-        if (!students || students.length === 0) {
+        if (!paymentStudentsData || paymentStudentsData.length === 0) {
             container.html(`
                 <div class="text-center p-4 text-muted">
                     <i class="bi bi-people fs-1"></i>
@@ -1897,7 +1897,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
             return;
         }
 
-        students.forEach(s => {
+        paymentStudentsData.forEach(s => {
             let avatarHtml = s.photo ?
                 `<img src="${s.photo}" alt="${s.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.name || 'User')}&background=10b981&color=fff'">` :
                 (s.name ? s.name.charAt(0).toUpperCase() : '?');
@@ -1940,7 +1940,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
     }
 
     function selectStudent(studentId) {
-        let student = students.find(s => s.id === studentId);
+        let student = paymentStudentsData.find(s => s.id === studentId);
         if (!student) return;
 
         selectedStudent = student;
@@ -2047,7 +2047,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
         let search = $('#searchInput').val().toLowerCase();
 
         let filtered = payments.filter(p => {
-            let student = students.find(s => s.id === p.studentId);
+            let student = paymentStudentsData.find(s => s.id === p.studentId);
             if (!student) return false;
 
             let matchMajor = !major || student.major === major;
@@ -2073,7 +2073,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
         }
 
         filtered.forEach(p => {
-            let student = students.find(s => s.id === p.studentId) || {};
+            let student = paymentStudentsData.find(s => s.id === p.studentId) || {};
             let avatarHtml = student.photo ?
                 `<img src="${student.photo}" alt="${student.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(student.name || 'User')}&background=10b981&color=fff'">` :
                 (student.name ? student.name.charAt(0).toUpperCase() : '?');
@@ -2129,17 +2129,17 @@ ViewData["Title"] = "ការបង់ប្រាក់";
 
         let totalCollected = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
         let totalPaid = payments.length;
-        let totalPending = students.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
+        let totalPending = paymentStudentsData.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
 
         $('#totalCollected').text('$' + safeToFixed(totalCollected));
         $('#totalPending').text('$' + safeToFixed(Math.max(0, totalPending)));
         $('#totalPaid').text(totalPaid);
-        $('#totalStudents').text(students.length || 0);
+        $('#totalStudents').text(paymentStudentsData.length || 0);
     }
 
     // ==================== MODAL FUNCTIONS ====================
     function openAddPaymentModal() {
-        if (!students || students.length === 0) {
+        if (!paymentStudentsData || paymentStudentsData.length === 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'គ្មានទិន្នន័យសិស្ស',

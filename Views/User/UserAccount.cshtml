@@ -1,0 +1,542 @@
+@{
+    ViewData["Title"] = "User Account Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- User Welcome Section -->
+        <div class="col-12 mb-4">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="bi bi-person-circle me-2"></i>
+                                សួស្តី, @(User.Identity?.Name ?? "User")!
+                            </h2>
+                            <p class="mb-0">ប្រព័ន្ធគ្រប់គ្រងសិស្ស HR University - User Account</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge bg-light text-primary fs-6">
+                                <i class="bi bi-shield-check me-1"></i>User Account
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section - View Only -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-mortarboard-fill me-2"></i>
+                        ទិន្នន័យសិស្ស
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-light" onclick="refreshStudentData()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>ធ្វើបច្ចុប្បន្នភាព
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Student List -->
+                    <div id="studentListContainer">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="studentTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>លេខសម្គាល់</th>
+                                        <th>ឈ្មោះពេញ</th>
+                                        <th>អ៊ីមែល</th>
+                                        <th>លេខទូរស័ព្ទ</th>
+                                        <th>ថ្នាប</th>
+                                        <th>ស្ថានភាព</th>
+                                        <th>សកម្មភាព</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">កំពុងផ្ទុក...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classes Section - View Only -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building me-2"></i>
+                        ថ្នាបទាំងអស់
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="classListContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-warning" role="status">
+                                <span class="visually-hidden">កំពុងផ្ទុក...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grades Section - View Only -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        ពិន្ទុសិស្ស
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="gradeListContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-info" role="status">
+                                <span class="visually-hidden">កំពុងផ្ទុក...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Section - View Only -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-check-fill me-2"></i>
+                        វត្តមានសិស្ស
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="attendanceListContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-secondary" role="status">
+                                <span class="visually-hidden">កំពុងផ្ទុក...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Accessible Modules -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-wallet2-fill me-2"></i>
+                        Payments
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-success border-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>អ្នកប្រើប្រាស់អាចប្រើប្រាស់ម៉ូឌុលនេះ</strong>
+                    </div>
+                    <button class="btn btn-primary" onclick="showModuleAlert('Payments')">
+                        <i class="bi bi-wallet2 me-1"></i>បើកម៉ូឌុល
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-award-fill me-2"></i>
+                        Scholarships
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-success border-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>អ្នកប្រើប្រាស់អាចប្រើប្រាស់ម៉ូឌុលនេះ</strong>
+                    </div>
+                    <button class="btn btn-success" onclick="showModuleAlert('Scholarships')">
+                        <i class="bi bi-award me-1"></i>បើកម៉ូឌុល
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text-fill me-2"></i>
+                        Reports
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-success border-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>អ្នកប្រើប្រាស់អាចប្រើប្រាស់ម៉ូឌុលនេះ</strong>
+                    </div>
+                    <button class="btn btn-dark" onclick="showModuleAlert('Reports')">
+                        <i class="bi bi-file-earmark-text me-1"></i>បើកម៉ូឌុល
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-badge-fill me-2"></i>
+                        Student Center
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-success border-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>អ្នកប្រើប្រាស់អាចប្រើប្រាស់ម៉ូឌុលនេះ</strong>
+                    </div>
+                    <button class="btn btn-info" onclick="showModuleAlert('Student Center')">
+                        <i class="bi bi-person-badge me-1"></i>បើកម៉ូឌុល
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Permission Alert Modal -->
+<div class="modal fade" id="permissionModal" tabindex="-1" aria-labelledby="permissionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="permissionModalLabel">
+                    <i class="bi bi-shield-exclamation-triangle me-2"></i>គ្មានសិទ្ធិ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="bi bi-lock-fill text-danger" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">អ្នកមិនមានសិទ្ធិធ្វើសកម្មភាពនេះទេ!</h4>
+                    <p class="text-muted">សូមទាក់ទងអ្នកគ្រប់គ្រងប្រព័ន្ធដើម្បីទទួលបានសិទ្ធិក្នុងការធ្វើសកម្មភាពនេះ។</p>
+                    <div id="permissionAction"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .card .card-body {
+        padding: 1.5rem;
+    }
+    .card .card-header {
+        font-weight: 600;
+        border-bottom: none;
+    }
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+    }
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.65rem;
+    }
+    .text-muted {
+        line-height: 1.4;
+    }
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    .spinner-border {
+        width: 1rem;
+        height: 1rem;
+    }
+    .alert {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+</style>
+
+<script>
+    // Global variables
+    let permissionModal;
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        permissionModal = new bootstrap.Modal(document.getElementById('permissionModal'));
+        loadAllData();
+    });
+
+    // Load all data without page refresh
+    async function loadAllData() {
+        await Promise.all([
+            loadStudentData(),
+            loadClassData(),
+            loadGradeData(),
+            loadAttendanceData()
+        ]);
+    }
+
+    // Load student data
+    async function loadStudentData() {
+        try {
+            const response = await fetch('/api/User/GetStudents');
+            const students = await response.json();
+            
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            
+            if (students && students.length > 0) {
+                students.forEach(student => {
+                    const row = createStudentRow(student);
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">មិនមានទិន្នន័យសិស្សទេ</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error loading student data:', error);
+            document.getElementById('studentTableBody').innerHTML = 
+                '<tr><td colspan="7" class="text-center text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</td></tr>';
+        }
+    }
+
+    // Create student row
+    function createStudentRow(student) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${student.id || ''}</td>
+            <td>${student.fullName || ''}</td>
+            <td>${student.email || ''}</td>
+            <td>${student.phone || ''}</td>
+            <td>${student.className || ''}</td>
+            <td>
+                <span class="badge bg-${student.status === 'Active' ? 'success' : 'danger'}">
+                    ${student.status || 'Active'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewStudent(${student.id})">
+                    <i class="bi bi-eye me-1"></i>មើល
+                </button>
+                <button class="btn btn-sm btn-outline-warning" onclick="showPermissionAlert('edit', 'student')">
+                    <i class="bi bi-pencil me-1"></i>កែ
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="showPermissionAlert('delete', 'student')">
+                    <i class="bi bi-trash me-1"></i>លុប
+                </button>
+            </td>
+        `;
+        return row;
+    }
+
+    // Load class data
+    async function loadClassData() {
+        try {
+            const response = await fetch('/api/User/GetClasses');
+            const classes = await response.json();
+            
+            const container = document.getElementById('classListContainer');
+            container.innerHTML = '';
+            
+            if (classes && classes.length > 0) {
+                const classList = document.createElement('div');
+                classList.className = 'list-group';
+                
+                classes.forEach(cls => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    item.innerHTML = `
+                        <div>
+                            <i class="bi bi-building text-warning me-2"></i>
+                            <strong>${cls.name}</strong>
+                            <span class="text-muted ms-2">${cls.major || ''}</span>
+                            <span class="text-muted ms-2">ឆ្នាំ: ${cls.year || ''}</span>
+                            <span class="text-muted ms-2">សិស្ស: ${cls.studentCount || 0}/${cls.maxStudents || 0}</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-warning" onclick="showPermissionAlert('view', 'class')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    `;
+                    classList.appendChild(item);
+                });
+                
+                container.appendChild(classList);
+            } else {
+                container.innerHTML = '<div class="text-center text-muted">មិនមានទិន្នន័យថ្នាបទេ</div>';
+            }
+        } catch (error) {
+            console.error('Error loading class data:', error);
+            document.getElementById('classListContainer').innerHTML = 
+                '<div class="text-center text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</div>';
+        }
+    }
+
+    // Load grade data
+    async function loadGradeData() {
+        try {
+            const response = await fetch('/api/User/GetGrades');
+            const grades = await response.json();
+            
+            const container = document.getElementById('gradeListContainer');
+            container.innerHTML = '';
+            
+            if (grades && grades.length > 0) {
+                const gradeList = document.createElement('div');
+                gradeList.className = 'list-group';
+                
+                grades.forEach(grade => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    item.innerHTML = `
+                        <div>
+                            <i class="bi bi-graph-up text-info me-2"></i>
+                            <strong>${grade.studentName}</strong>
+                            <span class="text-muted ms-2">ថ្នាប: ${grade.className}</span>
+                            <span class="text-muted ms-2">មុខវិទ្យា: ${grade.subject}</span>
+                            <span class="text-muted ms-2">ពិន្ទុ: ${grade.total || 0}</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-info" onclick="showPermissionAlert('view', 'grade')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    `;
+                    gradeList.appendChild(item);
+                });
+                
+                container.appendChild(gradeList);
+            } else {
+                container.innerHTML = '<div class="text-center text-muted">មិនមានទិន្នន័យពិន្ទុទេ</div>';
+            }
+        } catch (error) {
+            console.error('Error loading grade data:', error);
+            document.getElementById('gradeListContainer').innerHTML = 
+                '<div class="text-center text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</div>';
+        }
+    }
+
+    // Load attendance data
+    async function loadAttendanceData() {
+        try {
+            const response = await fetch('/api/User/GetAttendance');
+            const attendance = await response.json();
+            
+            const container = document.getElementById('attendanceListContainer');
+            container.innerHTML = '';
+            
+            if (attendance && attendance.length > 0) {
+                const attendanceList = document.createElement('div');
+                attendanceList.className = 'list-group';
+                
+                attendance.forEach(att => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    item.innerHTML = `
+                        <div>
+                            <i class="bi bi-calendar-check text-secondary me-2"></i>
+                            <strong>${att.studentName}</strong>
+                            <span class="text-muted ms-2">ថ្នាប: ${att.className}</span>
+                            <span class="text-muted ms-2">កាលបរិច្ឆេទ: ${att.date}</span>
+                            <span class="text-muted ms-2">បន្ទប់: ${att.room || 'N/A'}</span>
+                            <span class="badge bg-${att.status === 'P' ? 'success' : att.status === 'L' ? 'warning' : 'danger'} ms-2">
+                                ${att.status === 'P' ? 'Present' : att.status === 'L' ? 'Late' : 'Absent'}
+                            </span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="showPermissionAlert('view', 'attendance')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    `;
+                    attendanceList.appendChild(item);
+                });
+                
+                container.appendChild(attendanceList);
+            } else {
+                container.innerHTML = '<div class="text-center text-muted">មិនមានទិន្នន័យវត្តមានទេ</div>';
+            }
+        } catch (error) {
+            console.error('Error loading attendance data:', error);
+            document.getElementById('attendanceListContainer').innerHTML = 
+                '<div class="text-center text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</div>';
+        }
+    }
+
+    // View student details
+    function viewStudent(studentId) {
+        // This would show student details in a modal
+        showPermissionAlert('view', 'student');
+    }
+
+    // Show permission alert
+    function showPermissionAlert(action, module) {
+        const actionText = {
+            'edit': 'កែប្រែ',
+            'delete': 'លុប',
+            'create': 'បង្កើត',
+            'view': 'មើល'
+        };
+        
+        const moduleText = {
+            'student': 'ទិន្នន័យសិស្ស',
+            'class': 'ថ្នាប',
+            'grade': 'ពិន្ទុ',
+            'attendance': 'វត្តមាន'
+        };
+        
+        document.getElementById('permissionAction').innerHTML = 
+            `<p class="text-muted"><strong>សកម្មភាព:</strong> ${actionText[action]} ${moduleText[module]}</p>`;
+        
+        permissionModal.show();
+    }
+
+    // Show module alert
+    function showModuleAlert(moduleName) {
+        document.getElementById('permissionAction').innerHTML = 
+            `<p class="text-muted"><strong>ម៉ូឌុល:</strong> ${moduleName}</p>
+             <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                ម៉ូឌុលនេះនឹងមកដល់ឆាប់ៗ
+             </div>`;
+        
+        permissionModal.show();
+    }
+
+    // Refresh student data
+    async function refreshStudentData() {
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">កំពុងផ្ទុក...</span></div></td></tr>';
+        await loadStudentData();
+    }
+
+    // Auto-refresh data every 30 seconds
+    setInterval(loadAllData, 30000);
+</script>

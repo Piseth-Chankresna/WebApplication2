@@ -1,0 +1,326 @@
+@model IEnumerable<WebApplication2.Models.Student>
+@{
+    ViewData["Title"] = "បញ្ជីសិស្ស";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users me-2"></i>បញ្ជីសិស្ស
+                    </h4>
+                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>បន្ថែមសិស្សថ្មី
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">សរុប</h5>
+                                    <h2 id="totalStudents">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">ប្រុស</h5>
+                                    <h2 id="maleStudents">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-pink text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">ស្រី</h5>
+                                    <h2 id="femaleStudents">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">សកម្ម</h5>
+                                    <h2 id="activeStudents">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="ស្វែងរកតាមឈ្មោះ អ៊ីមែល...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterStatus" class="form-select">
+                                <option value="">ស្ថានភាពទាំងអស់</option>
+                                <option value="កំពុងសិក្សា">កំពុងសិក្សា</option>
+                                <option value="ឈប់សម្រាក">ឈប់សម្រាក</option>
+                                <option value="បញ្ចប់ការសិក្សា">បញ្ចប់ការសិក្សា</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filterClass" class="form-select">
+                                <option value="">ថ្នាក់ទាំងអស់</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Students Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>លេខសម្គាល់</th>
+                                    <th>ឈ្មោះ</th>
+                                    <th>អ៊ីមែល</th>
+                                    <th>ទូរស័ព្ទ</th>
+                                    <th>ភេទ</th>
+                                    <th>ថ្នាក់</th>
+                                    <th>ស្ថានភាព</th>
+                                    <th class="text-center">សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            loadStudents();
+            loadStats();
+            loadClasses();
+
+            // Search functionality
+            $('#searchInput').on('input', function() {
+                filterStudents();
+            });
+
+            // Filter functionality
+            $('#filterStatus, #filterClass').on('change', function() {
+                filterStudents();
+            });
+        });
+
+        let allStudents = [];
+
+        function loadStudents() {
+            $.ajax({
+                url: '@Url.Action("GetStudents")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        allStudents = response.data;
+                        displayStudents(allStudents);
+                    } else {
+                        showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showError('មានបញ្ហាក្នុងការតភ្ជាប់: ' + error);
+                }
+            });
+        }
+
+        function loadStats() {
+            $.ajax({
+                url: '@Url.Action("GetStudentStats")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        $('#totalStudents').text(response.total);
+                        $('#maleStudents').text(response.male);
+                        $('#femaleStudents').text(response.female);
+                        $('#activeStudents').text(response.active);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading stats:', error);
+                }
+            });
+        }
+
+        function loadClasses() {
+            $.ajax({
+                url: '@Url.Action("GetClasses", "StudentNew")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        var select = $('#filterClass');
+                        select.empty().append('<option value="">ថ្នាក់ទាំងអស់</option>');
+                        response.data.forEach(function(cls) {
+                            select.append('<option value="' + cls.id + '">' + cls.className + '</option>');
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading classes:', error);
+                }
+            });
+        }
+
+        function displayStudents(students) {
+            var tbody = $('#studentTableBody');
+            tbody.empty();
+
+            if (students.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">មិនទាន់មានទិន្នន័យសិស្សនៅឡើយទេ</p>
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>បន្ថែមសិស្សដំបូង
+                            </a>
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            students.forEach(function(student) {
+                var statusBadge = getStatusBadge(student.status);
+                var genderIcon = getGenderIcon(student.gender);
+                var photoHtml = student.photo ? 
+                    '<img src="' + student.photo + '" alt="' + student.fullName + '" class="rounded-circle me-2" width="40" height="40">' : 
+                    '<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">' + student.fullName.charAt(0).toUpperCase() + '</div>';
+
+                var row = `
+                    <tr>
+                        <td>${student.studentId}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${photoHtml}
+                                <div>
+                                    <div class="fw-bold">${student.fullName}</div>
+                                    <small class="text-muted">${student.email}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${student.email}</td>
+                        <td>${student.phone || '-'}</td>
+                        <td>${genderIcon} ${student.gender}</td>
+                        <td>${student.className || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Details")/${student.id}" class="btn btn-sm btn-info" title="មើលលម្អិត">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="@Url.Action("Edit")/${student.id}" class="btn btn-sm btn-warning" title="កែប្រែ">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id}, '${student.fullName}')" title="លុប">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        function filterStudents() {
+            var searchTerm = $('#searchInput').val().toLowerCase();
+            var statusFilter = $('#filterStatus').val();
+            var classFilter = $('#filterClass').val();
+
+            var filtered = allStudents.filter(function(student) {
+                var matchesSearch = !searchTerm || 
+                    student.fullName.toLowerCase().includes(searchTerm) ||
+                    student.email.toLowerCase().includes(searchTerm) ||
+                    student.phone.toLowerCase().includes(searchTerm);
+
+                var matchesStatus = !statusFilter || student.status === statusFilter;
+                var matchesClass = !classFilter || student.classId == classFilter;
+
+                return matchesSearch && matchesStatus && matchesClass;
+            });
+
+            displayStudents(filtered);
+        }
+
+        function getStatusBadge(status) {
+            var badges = {
+                'កំពុងសិក្សា': '<span class="badge bg-success">កំពុងសិក្សា</span>',
+                'ឈប់សម្រាក': '<span class="badge bg-warning">ឈប់សម្រាក</span>',
+                'បញ្ចប់ការសិក្សា': '<span class="badge bg-danger">បញ្ចប់ការសិក្សា</span>'
+            };
+            return badges[status] || '<span class="badge bg-secondary">' + status + '</span>';
+        }
+
+        function getGenderIcon(gender) {
+            var icons = {
+                'ប្រុស': '<i class="fas fa-mars text-primary"></i>',
+                'Male': '<i class="fas fa-mars text-primary"></i>',
+                'ស្រី': '<i class="fas fa-venus text-pink"></i>',
+                'Female': '<i class="fas fa-venus text-pink"></i>'
+            };
+            return icons[gender] || '';
+        }
+
+        function deleteStudent(id, name) {
+            if (confirm('តើអ្នកពិតជាចង់លុបសិស្ស "' + name + '" មែនទេ?')) {
+                $.ajax({
+                    url: '@Url.Action("Delete")',
+                    type: 'POST',
+                    data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function(response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('មានបញ្ហាក្នុងការលុបសិស្ស: ' + error);
+                    }
+                });
+            }
+        }
+
+        function showError(message) {
+            $('#studentTableBody').html(`
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <p class="text-danger">${message}</p>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            <i class="fas fa-redo me-2"></i>ព្យាយាមម្តងទៀត
+                        </button>
+                    </td>
+                </tr>
+            `);
+        }
+    </script>
+}
+
+@Html.AntiForgeryToken()

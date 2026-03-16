@@ -19,16 +19,23 @@ namespace WebApplication2.Controllers
 
         public IActionResult Index()
         {
+            if (!PermissionService.HasPermission(User, "Student", "View"))
+                return RedirectToAction("AccessDenied", "Account");
             return View();
         }
 
         public IActionResult Create()
         {
+            if (!PermissionService.HasPermission(User, "Student", "Create"))
+                return RedirectToAction("AccessDenied", "Account");
             return View();
         }
 
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(int id)
         {
+            if (!PermissionService.HasPermission(User, "Student", "Edit"))
+                return RedirectToAction("AccessDenied", "Account");
+                
             try
             {
                 var student = await _context.Students.FindAsync(id);
@@ -46,8 +53,10 @@ namespace WebApplication2.Controllers
             }
         }
 
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(int id)
         {
+            if (!PermissionService.HasPermission(User, "Student", "View"))
+                return RedirectToAction("AccessDenied", "Account");
             try
             {
                 var student = await _context.Students.FindAsync(id);
@@ -76,15 +85,15 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CheckAttendance(string? studentId = null)
+        public async Task<IActionResult> CheckAttendance(int? studentId = null)
         {
             try
             {
                 ViewBag.SelectedDate = DateTime.Today.ToString("yyyy-MM-dd");
 
-                if (!string.IsNullOrEmpty(studentId))
+                if (studentId.HasValue)
                 {
-                    var student = await _context.Students.FindAsync(studentId);
+                    var student = await _context.Students.FindAsync(studentId.Value);
                     ViewBag.SelectedStudent = student;
                 }
 
@@ -147,12 +156,12 @@ namespace WebApplication2.Controllers
                     .OrderByDescending(s => s.CreatedAt)
                     .Select(s => new {
                         s.Id,
-                        s.Name,
+                        Name = s.FullName,
                         s.Gender,
-                        s.Dob,
-                        s.Pob,
+                        Dob = s.DateOfBirth,
+                        Pob = s.PlaceOfBirth,
                         s.Phone,
-                        s.Degree,
+                        Degree = s.Major,
                         s.Major,
                         s.Year,
                         s.Room,
@@ -161,7 +170,7 @@ namespace WebApplication2.Controllers
                         s.Photo,
                         s.Batch,
                         s.AcademicYear,
-                        s.AmountDue,
+                        AmountDue = s.TuitionFee - s.PaidAmount,
                         s.Status,
                         s.CreatedAt
                     })
@@ -199,10 +208,13 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] Student student, IFormFile? Photo)
         {
+            if (!PermissionService.HasPermission(User, "Student", "Create"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិបង្កើតសិស្ស", 403);
+                
             try
             {
                 // Validation
-                if (string.IsNullOrEmpty(student.Name))
+                if (string.IsNullOrEmpty(student.FullName))
                 {
                     return ErrorResponse("សូមបញ្ចូលឈ្មោះសិស្ស");
                 }
@@ -212,7 +224,7 @@ namespace WebApplication2.Controllers
                     return ErrorResponse("សូមជ្រើសរើសភេទ");
                 }
 
-                if (string.IsNullOrEmpty(student.Dob))
+                if (string.IsNullOrEmpty(student.DateOfBirth))
                 {
                     return ErrorResponse("សូមបញ្ចូលថ្ងៃខែឆ្នាំកំណើត");
                 }
@@ -222,8 +234,7 @@ namespace WebApplication2.Controllers
                     return ErrorResponse("សូមបញ្ចូលលេខទូរស័ព្ទ");
                 }
 
-                // Generate Student ID
-                student.Id = "STU" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                // Generate Student ID is handled by database auto-increment
                 student.CreatedAt = DateTime.Now;
                 student.Status = "កំពុងសិក្សា";
 
@@ -255,7 +266,7 @@ namespace WebApplication2.Controllers
                     0,
                     "System",
                     "បង្កើតសិស្សថ្មី",
-                    $"បង្កើតសិស្ស: {student.Name} (ID: {student.Id})"
+                    $"បង្កើតសិស្ស: {student.FullName} (ID: {student.Id})"
                 );
 
                 return Json(new
@@ -276,6 +287,9 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update([FromForm] Student updatedStudent, IFormFile? NewPhoto)
         {
+            if (!PermissionService.HasPermission(User, "Student", "Edit"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិកែប្រែព័ត៌មានសិស្ស", 403);
+                
             try
             {
                 var student = await _context.Students.FindAsync(updatedStudent.Id);
@@ -285,12 +299,11 @@ namespace WebApplication2.Controllers
                 }
 
                 // Update fields
-                student.Name = updatedStudent.Name;
+                student.FullName = updatedStudent.FullName;
                 student.Gender = updatedStudent.Gender;
-                student.Dob = updatedStudent.Dob;
-                student.Pob = updatedStudent.Pob;
+                student.DateOfBirth = updatedStudent.DateOfBirth;
+                student.PlaceOfBirth = updatedStudent.PlaceOfBirth;
                 student.Phone = updatedStudent.Phone;
-                student.Degree = updatedStudent.Degree;
                 student.Major = updatedStudent.Major;
                 student.Year = updatedStudent.Year;
                 student.Room = updatedStudent.Room;
@@ -299,7 +312,8 @@ namespace WebApplication2.Controllers
                 student.Status = updatedStudent.Status;
                 student.Batch = updatedStudent.Batch;
                 student.AcademicYear = updatedStudent.AcademicYear;
-                student.AmountDue = updatedStudent.AmountDue;
+                student.TuitionFee = updatedStudent.TuitionFee;
+                student.PaidAmount = updatedStudent.PaidAmount;
 
                 // Handle new photo
                 if (NewPhoto != null && NewPhoto.Length > 0)
@@ -339,7 +353,7 @@ namespace WebApplication2.Controllers
                     0,
                     "System",
                     "កែប្រែព័ត៌មានសិស្ស",
-                    $"កែប្រែសិស្ស: {student.Name} (ID: {student.Id})"
+                    $"កែប្រែសិស្ស: {student.FullName} (ID: {student.Id})"
                 );
 
                 return Json(new { success = true, message = "កែប្រែព័ត៌មានសិស្សដោយជោគជ័យ!", redirectUrl = "/Student/Index" });
@@ -352,8 +366,11 @@ namespace WebApplication2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
+            if (!PermissionService.HasPermission(User, "Student", "Delete"))
+                return ErrorResponse("អ្នកគ្មានសិទ្ធិលុបសិស្ស", 403);
+                
             try
             {
                 var student = await _context.Students.FindAsync(id);
@@ -372,7 +389,7 @@ namespace WebApplication2.Controllers
                     }
                 }
 
-                var studentName = student.Name;
+                var studentName = student.FullName;
                 _context.Students.Remove(student);
                 await _context.SaveChangesAsync();
 
@@ -400,9 +417,7 @@ namespace WebApplication2.Controllers
         {
             try
             {
-                var classes = await _context.StudentClasses
-                    .OrderBy(c => c.ClassCode)
-                    .ToListAsync();
+                var classes = await _context.StudentClasses.ToListAsync();
                 return SuccessResponse("ទាញយកទិន្នន័យបានជោគជ័យ", classes);
             }
             catch (Exception ex)
@@ -533,7 +548,10 @@ namespace WebApplication2.Controllers
 
                 if (!string.IsNullOrEmpty(studentId))
                 {
-                    query = query.Where(a => a.StudentId == studentId);
+                    if (int.TryParse(studentId, out int studentIdInt))
+                    {
+                        query = query.Where(a => a.StudentId == studentIdInt);
+                    }
                 }
 
                 var records = await query
@@ -713,7 +731,10 @@ namespace WebApplication2.Controllers
 
                 if (!string.IsNullOrEmpty(studentId))
                 {
-                    query = query.Where(g => g.StudentId == studentId);
+                    if (int.TryParse(studentId, out int studentIdInt))
+                    {
+                        query = query.Where(g => g.StudentId == studentIdInt);
+                    }
                 }
 
                 var grades = await query
@@ -791,20 +812,20 @@ namespace WebApplication2.Controllers
                 return ErrorResponse(ex.Message, 500);
             }
         }
-
-        // ==================== PAYMENTS API ====================
         [HttpGet]
         public async Task<IActionResult> GetPayments(string? studentId = null)
         {
-            try
-            {
+            try {
                 var query = _context.Payments
                     .Include(p => p.Student)
                     .AsQueryable();
 
                 if (!string.IsNullOrEmpty(studentId))
                 {
-                    query = query.Where(p => p.StudentId == studentId);
+                    if (int.TryParse(studentId, out int studentIdInt))
+                    {
+                        query = query.Where(p => p.StudentId == studentIdInt);
+                    }
                 }
 
                 var payments = await query
@@ -891,7 +912,7 @@ namespace WebApplication2.Controllers
                 }
 
                 // Validate required fields
-                if (string.IsNullOrEmpty(payment.StudentId))
+                if (payment.StudentId == 0)
                 {
                     Console.WriteLine("ERROR: StudentId is empty");
                     return Json(new { success = false, message = "សូមជ្រើសរើសសិស្ស" });
@@ -1261,6 +1282,121 @@ namespace WebApplication2.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting payments");
+                return ErrorResponse(ex.Message, 500);
+            }
+        }
+
+        // Grades CRUD Methods
+        [HttpGet]
+        public async Task<IActionResult> GetGrades()
+        {
+            try
+            {
+                var students = await _context.Students
+                    .Where(s => s.Status == "កំពុងសិក្សា")
+                    .Select(s => new {
+                        id = s.Id,
+                        name = s.FullName,
+                        major = s.Major,
+                        year = s.Year,
+                        photo = s.Photo
+                    })
+                    .ToListAsync();
+
+                var grades = await _context.Grades
+                    .Include(g => g.Student)
+                    .ToListAsync();
+
+                return SuccessResponse("Data retrieved successfully", new { students, data = grades });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting grades");
+                return ErrorResponse(ex.Message, 500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateGrade([FromBody] Grade grade)
+        {
+            try
+            {
+                if (grade == null)
+                {
+                    return ErrorResponse("Invalid grade data", 400);
+                }
+
+                grade.RecordedAt = DateTime.Now;
+                grade.Semester = "1";
+                grade.AcademicYear = "2024-2025";
+
+                _context.Grades.Add(grade);
+                await _context.SaveChangesAsync();
+
+                return SuccessResponse("Grade created successfully", grade);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating grade");
+                return ErrorResponse(ex.Message, 500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateGrade([FromBody] Grade grade)
+        {
+            try
+            {
+                if (grade == null || grade.Id <= 0)
+                {
+                    return ErrorResponse("Invalid grade data", 400);
+                }
+
+                var existingGrade = await _context.Grades.FindAsync(grade.Id);
+                if (existingGrade == null)
+                {
+                    return ErrorResponse("Grade not found", 404);
+                }
+
+                existingGrade.Attendance = grade.Attendance;
+                existingGrade.Assignment = grade.Assignment;
+                existingGrade.MidTerm = grade.MidTerm;
+                existingGrade.FinalExam = grade.FinalExam;
+                existingGrade.Total = grade.Total;
+                existingGrade.GradeLetter = grade.GradeLetter;
+                existingGrade.Subject = grade.Subject;
+                existingGrade.RecordedAt = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return SuccessResponse("Grade updated successfully", existingGrade);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating grade");
+                return ErrorResponse(ex.Message, 500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteGrade(int id)
+        {
+            try
+            {
+                var grade = await _context.Grades.FindAsync(id);
+                if (grade == null)
+                {
+                    return ErrorResponse("Grade not found", 404);
+                }
+
+                _context.Grades.Remove(grade);
+                await _context.SaveChangesAsync();
+
+                return SuccessResponse("Grade deleted successfully", null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting grade");
                 return ErrorResponse(ex.Message, 500);
             }
         }

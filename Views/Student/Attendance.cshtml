@@ -829,7 +829,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    let students = [];
+    let attendanceStudentsData = [];
     let attendanceRecords = [];
     let currentAttendance = {};
     let monthlyChart = null;
@@ -847,7 +847,7 @@
             type: 'GET',
             cache: true,
             success: function(data) {
-                students = data;
+                attendanceStudentsData = data;
                 displayAttendance();
             },
             error: function(xhr, status, error) {
@@ -886,7 +886,7 @@
         var tbody = $('#attendanceTableBody');
         tbody.empty();
 
-        if (students.length === 0) {
+        if (attendanceStudentsData.length === 0) {
             tbody.html(`
                 <tr>
                     <td colspan="6" class="text-center py-5">
@@ -903,7 +903,7 @@
         var shift = $('#filterShift').val();
         var search = $('#searchInput').val().toLowerCase();
 
-        var filteredStudents = students.filter(s => {
+        var filteredStudents = attendanceStudentsData.filter(s => {
             var matchMajor = !major || s.major === major;
             var matchYear = !year || s.year === year;
             var matchShift = !shift || s.shift === shift;

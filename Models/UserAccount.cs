@@ -36,11 +36,29 @@ namespace WebApplication2.Models
         [Display(Name = "រូបភាពប្រវត្តិរូប")]
         public string? ProfileImage { get; set; }
 
+        [Display(Name = "លេខទូរស័ព្ទ")]
+        public string? Phone { get; set; }
+
+        [Display(Name = "ថ្នាប")]
+        public string? ClassName { get; set; }
+
+        [Display(Name = "ជំនាញ")]
+        public string? Major { get; set; }
+
+        [Display(Name = "ឆ្នាំ")]
+        public string? Year { get; set; }
+
+        [Display(Name = "ភេទ")]
+        public string? Gender { get; set; }
+
         [NotMapped]
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "លេខសម្ងាត់មិនត្រូវគ្នា")]
         [Display(Name = "បញ្ជាក់លេខសម្ងាត់")]
         public string? ConfirmPassword { get; set; }
+
+        // Navigation properties
+        public virtual ICollection<StudentClass>? CreatedClasses { get; set; }
     }
 
     public class RolePermission

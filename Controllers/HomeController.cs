@@ -67,7 +67,7 @@ namespace WebApplication2.Controllers
                 var topStudents = await _context.Grades
                     .Include(g => g.Student)
                     .Where(g => g.Student != null)
-                    .GroupBy(g => g.StudentId ?? "")
+                    .GroupBy(g => g.StudentId)
                     .Select(g => new
                     {
                         StudentId = g.Key,
@@ -86,7 +86,7 @@ namespace WebApplication2.Controllers
                 var strugglingStudents = await _context.Grades
                     .Include(g => g.Student)
                     .Where(g => g.Student != null)
-                    .GroupBy(g => g.StudentId ?? "")
+                    .GroupBy(g => g.StudentId)
                     .Select(g => new
                     {
                         StudentId = g.Key,
@@ -190,7 +190,7 @@ namespace WebApplication2.Controllers
                     RecentActivities = recentActivities,
                     TopStudents = [.. topStudents.Select(s => new TopStudentViewModel
                     {
-                        Id = s.StudentId,
+                        Id = s.StudentId.ToString(),
                         Name = s.StudentName ?? "",
                         Photo = s.StudentPhoto,
                         Major = s.StudentMajor ?? "",
@@ -198,7 +198,7 @@ namespace WebApplication2.Controllers
                     })],
                     StrugglingStudents = [.. strugglingStudents.Select(s => new StrugglingStudentViewModel
                     {
-                        Id = s.StudentId,
+                        Id = s.StudentId.ToString(),
                         Name = s.StudentName ?? "",
                         Photo = s.StudentPhoto,
                         Major = s.StudentMajor ?? "",
@@ -335,7 +335,7 @@ namespace WebApplication2.Controllers
             var topStudents = await _context.Grades
                 .Include(g => g.Student)
                 .Where(g => g.Student != null)
-                .GroupBy(g => g.StudentId ?? "")
+                .GroupBy(g => g.StudentId)
                 .Select(g => new
                 {
                     StudentId = g.Key,

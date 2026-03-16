@@ -679,16 +679,17 @@
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-bs-dismiss="modal">បោះបង់</button>
                 <button type="button" class="btn-delete" onclick="confirmDelete()">បាទ/ចាស លុប</button>
-            </div>
-        </div>
     </div>
 </div>
 
 <script src="https://unpkg.com/sweetalert2@11"></script>
 <script>
-    let allRecords = [];
-    let currentPage = 1;
-    let itemsPerPage = 25;
+    // Prevent duplicate variable declarations
+    if (typeof allRecords === 'undefined') {
+        var allRecords = [];
+        var currentPage = 1;
+        var itemsPerPage = 25;
+    }
 
     $(document).ready(function() {
         loadAttendanceRecords();

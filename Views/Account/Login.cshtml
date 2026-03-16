@@ -51,6 +51,23 @@
             color: #1e293b;
             margin-bottom: 4px;
         }
+        .auth-header .role-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .auth-header .role-badge.user {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        }
+        .auth-header h1 {
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
         .auth-header p {
             font-size: 0.9rem;
             color: #475569;
@@ -199,7 +216,17 @@
     <div class="auth-card">
         <div class="auth-header">
             <img src="/images/log.jpg.png" alt="HRU Logo" onerror="this.style.display='none'">
-            <h1>ចូលប្រើប្រាស់ប្រព័ន្ធ</h1>
+            <h1>
+                ចូលប្រើប្រាស់ប្រព័ន្ធ
+                @if (ViewBag.Role == "Admin")
+                {
+                    <span class="role-badge">អ្នកគ្រប់គ្រងប្រព័ន្ធ</span>
+                }
+                else if (ViewBag.Role == "User")
+                {
+                    <span class="role-badge user">អ្នកប្រើប្រាស់</span>
+                }
+            </h1>
             <p>HR University Management System</p>
         </div>
 

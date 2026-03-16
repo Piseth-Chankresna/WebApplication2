@@ -227,7 +227,10 @@
         <!-- Profile Info -->
         <div class="profile-info">
             <h3>@Model.FullName</h3>
-            <span class="badge"><i class="bi bi-shield me-1"></i>@Model.Role</span>
+            <span class="badge">
+                <i class="bi bi-shield me-1"></i>
+                @(Model.Role == "Admin" ? "អ្នកគ្រប់គ្រងប្រព័ន្ធ" : "អ្នកប្រើប្រាស់")
+            </span>
         </div>
 
         <!-- Info Grid -->

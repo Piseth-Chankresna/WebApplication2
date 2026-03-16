@@ -1,0 +1,301 @@
+@model WebApplication2.Models.Student
+@{
+    ViewData["Title"] = "កែប្រែព័ត៌មានសិស្ស";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>កែប្រែព័ត៌មានសិស្ស
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label">ឈ្មោះសិស្ស *</label>
+                                    <input asp-for="FullName" class="form-control" required />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">អ៊ីមែល *</label>
+                                    <input asp-for="Email" type="email" class="form-control" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Phone" class="form-label">លេខទូរស័ព្ទ</label>
+                                    <input asp-for="Phone" class="form-control" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Gender" class="form-label">ភេទ *</label>
+                                    <select asp-for="Gender" class="form-select" required>
+                                        <option value="">ជ្រើសរើសភេទ</option>
+                                        <option value="ប្រុស">ប្រុស</option>
+                                        <option value="ស្រី">ស្រី</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="DateOfBirth" class="form-label">ថ្ងៃកំណើត</label>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="PlaceOfBirth" class="form-label">ទីកំណើត</label>
+                                    <input asp-for="PlaceOfBirth" class="form-control" />
+                                    <span asp-validation-for="PlaceOfBirth" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Major" class="form-label">ជំនាញ</label>
+                                    <input asp-for="Major" class="form-control" />
+                                    <span asp-validation-for="Major" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Year" class="form-label">ឆ្នាំសិក្សា</label>
+                                    <select asp-for="Year" class="form-select">
+                                        <option value="">ជ្រើសរើសឆ្នាំ</option>
+                                        <option value="1">ឆ្នាំទី 1</option>
+                                        <option value="2">ឆ្នាំទី 2</option>
+                                        <option value="3">ឆ្នាំទី 3</option>
+                                        <option value="4">ឆ្នាំទី 4</option>
+                                    </select>
+                                    <span asp-validation-for="Year" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ClassId" class="form-label">ថ្នាក់</label>
+                                    <select asp-for="ClassId" class="form-select" asp-items="ViewBag.Classes">
+                                        <option value="">ជ្រើសរើសថ្នាក់</option>
+                                    </select>
+                                    <span asp-validation-for="ClassId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Shift" class="form-label">វេន</label>
+                                    <select asp-for="Shift" class="form-select">
+                                        <option value="">ជ្រើសរើសវេន</option>
+                                        <option value="ព្រឹក">ព្រឹក</option>
+                                        <option value="រសៀល">រសៀល</option>
+                                        <option value="យប់">យប់</option>
+                                    </select>
+                                    <span asp-validation-for="Shift" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Room" class="form-label">បន្ទប់</label>
+                                    <input asp-for="Room" class="form-control" />
+                                    <span asp-validation-for="Room" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Status" class="form-label">ស្ថានភាព</label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="កំពុងសិក្សា">កំពុងសិក្សា</option>
+                                        <option value="ឈប់សម្រាក">ឈប់សម្រាក</option>
+                                        <option value="បញ្ចប់ការសិក្សា">បញ្ចប់ការសិក្សា</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TuitionFee" class="form-label">ថ្លៃជើងសិក្សា ($)</label>
+                                    <input asp-for="TuitionFee" type="number" step="0.01" class="form-control" />
+                                    <span asp-validation-for="TuitionFee" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PaidAmount" class="form-label">ប្រាក់បង់រួច ($)</label>
+                                    <input asp-for="PaidAmount" type="number" step="0.01" class="form-control" />
+                                    <span asp-validation-for="PaidAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Photo Upload -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Photo" class="form-label">រូបភាពថ្មី</label>
+                                    <input type="file" id="Photo" name="Photo" class="form-control" accept="image/*" />
+                                    <div class="form-text">ទុករូបភាពថ្មី ឬទុកទទេដើម្បីរក្សាទុករូបភាពចាស់</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Notes" class="form-label">ចំណាំ</label>
+                                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="Notes" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Photo Display -->
+                        @if (!string.IsNullOrEmpty(Model.Photo))
+                        {
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">រូបភាពបច្ចុប្បន្ន</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="@Model.Photo" alt="Current Photo" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+                                        <div>
+                                            <small class="text-muted">រូបភាពបច្ចុប្បន្ន</small><br>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmRemovePhoto()">លុបរូបភាពបច្ចុប្បន្ន</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Photo Preview -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div id="photoPreview" class="text-center" style="display: none;">
+                                    <label class="form-label">មើលរូបភាពថ្មី</label>
+                                    <br />
+                                    <img id="previewImage" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                                    <br />
+                                    <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeNewPhoto()">លុបរូបភាពថ្មី</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outstanding Balance Display -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>សមតុលលុយបញ្ចប់:</strong> 
+                                    <span id="outstandingBalance">$@((Model.TuitionFee - Model.PaidAmount).ToString("F2"))</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-info">
+                                            <i class="fas fa-eye me-2"></i>មើលលម្អិត
+                                        </a>
+                                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left me-2"></i>ត្រឡប់ក្រោយ
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>រក្សាទុកការកែប្រែ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Photo preview
+            $('#Photo').on('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('ទំហំរូបភាពត្រូវតែតិចជាង 5MB');
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Check file type
+                    var validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('ប្រភេទរូបភាពត្រូវតែជា JPG, PNG ឬ GIF');
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Show preview
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewImage').attr('src', e.target.result);
+                        $('#photoPreview').show();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Auto-calculate outstanding balance
+            $('#TuitionFee, #PaidAmount').on('input', function() {
+                var tuitionFee = parseFloat($('#TuitionFee').val()) || 0;
+                var paidAmount = parseFloat($('#PaidAmount').val()) || 0;
+                var balance = tuitionFee - paidAmount;
+                
+                $('#outstandingBalance').text('$' + balance.toFixed(2));
+                
+                // Change color based on balance
+                var balanceElement = $('#outstandingBalance');
+                balanceElement.removeClass('text-success text-danger text-warning');
+                
+                if (balance > 0) {
+                    balanceElement.addClass('text-danger');
+                } else if (balance < 0) {
+                    balanceElement.addClass('text-warning');
+                } else {
+                    balanceElement.addClass('text-success');
+                }
+            });
+        });
+
+        function removeNewPhoto() {
+            $('#Photo').val('');
+            $('#photoPreview').hide();
+            $('#previewImage').attr('src', '');
+        }
+
+        function confirmRemovePhoto() {
+            if (confirm('តើអ្នកពិតជាចង់លុបរូបភាពបច្ចុប្បន្នមែនទេ?')) {
+                // Add a hidden field to indicate photo removal
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'removeCurrentPhoto',
+                    value: 'true'
+                }).appendTo('form');
+                
+                // Hide current photo display
+                $('img[alt="Current Photo"]').parent().parent().hide();
+            }
+        }
+    </script>
+}

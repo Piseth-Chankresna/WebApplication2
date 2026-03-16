@@ -12,7 +12,7 @@ namespace WebApplication2.Models
         public string? AttendanceCode { get; set; }
 
         [Required]
-        public string? StudentId { get; set; }  // Make nullable
+        public int StudentId { get; set; }  // Changed from string to int to match Student.Id
 
         [Required]
         public string? StudentName { get; set; }  // Make nullable

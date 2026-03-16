@@ -867,7 +867,7 @@
 <script>
     // ==================== GLOBAL VARIABLES ====================
     let refreshInterval;
-    let students = [];
+    let centerStudentsData = [];
     let classes = [];
     let payments = [];
     let grades = [];
@@ -922,11 +922,11 @@
             cache: false,
             success: function(response) {
                 if (response && response.success) {
-                    students = response.data || [];
+                    centerStudentsData = response.data || [];
                 } else if (Array.isArray(response)) {
-                    students = response;
+                    centerStudentsData = response;
                 } else {
-                    students = [];
+                    centerStudentsData = [];
                 }
                 updateStats();
             },
@@ -1002,11 +1002,11 @@
     // ==================== UPDATE STATISTICS ====================
     function updateStats() {
         // Student stats
-        let totalStudents = students.length;
-        let maleStudents = students.filter(s => s.gender === 'ប្រុស' || s.gender === 'Male').length;
-        let femaleStudents = students.filter(s => s.gender === 'ស្រី' || s.gender === 'Female').length;
-        let activeStudents = students.filter(s => s.status === 'កំពុងសិក្សា').length;
-        let scholarshipCount = students.filter(s => s.scholarship && s.scholarship !== '0%').length;
+        let totalStudents = centerStudentsData.length;
+        let maleStudents = centerStudentsData.filter(s => s.gender === 'ប្រុស' || s.gender === 'Male').length;
+        let femaleStudents = centerStudentsData.filter(s => s.gender === 'ស្រី' || s.gender === 'Female').length;
+        let activeStudents = centerStudentsData.filter(s => s.status === 'កំពុងសិក្សា').length;
+        let scholarshipCount = centerStudentsData.filter(s => s.scholarship && s.scholarship !== '0%').length;
 
         $('#totalStudents').text(totalStudents);
         $('#maleStudents').text(maleStudents);

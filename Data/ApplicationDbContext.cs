@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
 
 namespace WebApplication2.Data
@@ -12,14 +12,33 @@ namespace WebApplication2.Data
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
-        public DbSet<ActivityLog> ActivityLogs { get; set; } // បន្ថែមនេះ
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Student configuration
             modelBuilder.Entity<Student>()
-                .Property(s => s.AmountDue)
+                .Property(s => s.TuitionFee)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Student>()
+                .Property(s => s.PaidAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Class)
+                .WithMany(sc => sc.Students)
+                .HasForeignKey(s => s.ClassId);
+
+            // StudentClass configuration
+            modelBuilder.Entity<StudentClass>()
+                .HasIndex(sc => sc.ClassCode)
+                .IsUnique();
+
+            modelBuilder.Entity<StudentClass>()
+                .HasOne<UserAccount>()
+                .WithMany(ua => ua.CreatedClasses)
+                .HasForeignKey(sc => sc.CreatedBy);
 
             // Payment configuration
             modelBuilder.Entity<Payment>()
@@ -78,10 +97,15 @@ namespace WebApplication2.Data
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
-            // StudentClass configuration
-            modelBuilder.Entity<StudentClass>()
-                .HasIndex(sc => sc.ClassCode)
-                .IsUnique();
+            // ActivityLog configuration
+            modelBuilder.Entity<ActivityLog>()
+                .Property(al => al.Timestamp)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<ActivityLog>()
+                .HasOne<UserAccount>()
+                .WithMany()
+                .HasForeignKey(al => al.UserId);
         }
     }
 }
