@@ -38,13 +38,6 @@ namespace WebApplication2.Models
         [StringLength(20)]
         public string? Status { get; set; }
 
-        // Legacy properties for backward compatibility
-        [NotMapped]
-        public string? PaymentType => PaymentMethod;
-
-        [NotMapped]
-        public string? Description => Note;
-
         [StringLength(255)]
         public string? Note { get; set; }
 

@@ -436,7 +436,7 @@
                     <label class="form-label"><i class="bi bi-person"></i> ឈ្មោះពេញ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-person"></i>
-                        <input asp-for="Name" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" required>
+                        <input asp-for="FullName" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" required>
                     </div>
                 </div>
 
@@ -459,7 +459,7 @@
                     <label class="form-label"><i class="bi bi-calendar"></i> ថ្ងៃខែឆ្នាំកំណើត</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar"></i>
-                        <input asp-for="Dob" type="date" class="form-control" required>
+                        <input asp-for="DateOfBirth" class="form-control" required>
                     </div>
                 </div>
 
@@ -467,7 +467,7 @@
                     <label class="form-label"><i class="bi bi-geo-alt"></i> ទីកន្លែងកំណើត</label>
                     <div class="input-wrapper">
                         <i class="bi bi-geo-alt"></i>
-                        <input asp-for="Pob" class="form-control" placeholder="ឧ. ភ្នំពេញ" required>
+                        <input asp-for="PlaceOfBirth" class="form-control" placeholder="ឧ. ភ្នំពេញ" required>
                     </div>
                 </div>
             </div>
@@ -604,10 +604,28 @@
                     <label class="form-label"><i class="bi bi-currency-dollar"></i> ថ្លៃសិក្សាត្រូវបង់ ($)</label>
                     <div class="input-wrapper">
                         <i class="bi bi-currency-dollar"></i>
-                        <input asp-for="AmountDue" class="form-control" step="0.01">
+                        <input asp-for="TuitionFee" class="form-control" step="0.01">
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label"><i class="bi bi-cash-check"></i> ប្រាក់បង់រួច ($)</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-cash-check"></i>
+                        <input asp-for="PaidAmount" class="form-control" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-journal-text"></i> ចំណាំ</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-journal-text"></i>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="ចំណាំអំពីសិស្ស..."></textarea>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-flag"></i> ស្ថានភាព</label>
                     <div class="input-wrapper">
@@ -657,7 +675,7 @@
             var token = $('input[name="__RequestVerificationToken"]').val();
 
             // Validate required fields
-            if (!$('#Name').val()) {
+            if (!$('#FullName').val()) {
                 Swal.fire('កំហុស', 'សូមបញ្ចូលឈ្មោះសិស្ស', 'error');
                 return;
             }

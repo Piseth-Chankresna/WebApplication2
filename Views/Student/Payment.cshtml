@@ -1675,6 +1675,13 @@ ViewData["Title"] = "ការបង់ប្រាក់";
             filterStudentList();
         });
 
+        // Student selection using event delegation
+        $(document).on('click', '.student-item', function() {
+            let studentId = $(this).attr('id').replace('student_', '');
+            console.log("Student clicked:", studentId);
+            selectStudent(studentId);
+        });
+
         // Quick amount buttons
         $('.quick-amount-btn').click(function() {
             let amount = $(this).data('amount');
@@ -1851,33 +1858,35 @@ ViewData["Title"] = "ការបង់ប្រាក់";
     // ==================== STUDENT FUNCTIONS ====================
     function loadStudents(updateTimestamp = true) {
         return new Promise((resolve, reject) => {
+            console.log("Loading students for payment page...");
             $.ajax({
                 url: '/Student/GetStudents',
                 type: 'GET',
                 cache: false,
                 success: function(response) {
-                    console.log("Students loaded:", response);
+                    console.log("Students loaded response:", response);
 
                     if (response && response.success) {
                         paymentStudentsData = response.data || [];
+                        console.log("Payment students data loaded:", paymentStudentsData.length, "students");
                     } else if (Array.isArray(response)) {
                         paymentStudentsData = response;
+                        console.log("Payment students data loaded (direct array):", paymentStudentsData.length, "students");
                     } else {
                         paymentStudentsData = [];
+                        console.log("No students data found");
                     }
 
                     renderStudentList();
-                    updateStats();
-
                     if (updateTimestamp) {
                         updateLastUpdatedTime();
                     }
                     resolve();
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error loading students:', error);
-                    showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យសិស្ស');
-                    resolve();
+                    console.error("Error loading students:", error);
+                    renderStudentError('មិនអាចទាញយកទិន្នន័យសិស្សបាន: ' + error);
+                    reject(error);
                 }
             });
         });
@@ -1940,9 +1949,18 @@ ViewData["Title"] = "ការបង់ប្រាក់";
     }
 
     function selectStudent(studentId) {
-        let student = paymentStudentsData.find(s => s.id === studentId);
-        if (!student) return;
+        console.log("selectStudent called with ID:", studentId);
+        console.log("Available students:", paymentStudentsData);
+        
+        let student = paymentStudentsData.find(s => s.id == studentId);
+        console.log("Found student:", student);
+        
+        if (!student) {
+            console.log("Student not found with ID:", studentId);
+            return;
+        }
 
+        console.log("Selecting student:", student.name);
         selectedStudent = student;
 
         $('.student-item').removeClass('selected');
@@ -1958,6 +1976,7 @@ ViewData["Title"] = "ការបង់ប្រាក់";
         $('#selectedAmount').text(`ជំពាក់: $${safeToFixed(student.amountDue || 0)}`);
 
         $('#selectedStudentCard').fadeIn(300);
+        console.log("Student selected successfully");
 
         let currentAmount = parseFloat($('#amountInput').val()) || 0;
         if (currentAmount > 0) {
@@ -2125,16 +2144,19 @@ ViewData["Title"] = "ការបង់ប្រាក់";
     }
 
     function updateStats() {
-        if (!students || !payments) return;
+        let students = paymentStudentsData; // declare students variable here
+        let paymentsList = payments; // declare paymentsList variable here
 
-        let totalCollected = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-        let totalPaid = payments.length;
-        let totalPending = paymentStudentsData.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
+        if (!students || !paymentsList) return;
+
+        let totalCollected = paymentsList.reduce((sum, p) => sum + (p.amount || 0), 0);
+        let totalPaid = paymentsList.length;
+        let totalPending = students.reduce((sum, s) => sum + (s.amountDue || 0), 0) - totalCollected;
 
         $('#totalCollected').text('$' + safeToFixed(totalCollected));
         $('#totalPending').text('$' + safeToFixed(Math.max(0, totalPending)));
         $('#totalPaid').text(totalPaid);
-        $('#totalStudents').text(paymentStudentsData.length || 0);
+        $('#totalStudents').text(students.length || 0);
     }
 
     // ==================== MODAL FUNCTIONS ====================
@@ -2260,9 +2282,6 @@ ViewData["Title"] = "ការបង់ប្រាក់";
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(paymentData),
-            headers: {
-                'RequestVerificationToken': token
-            },
             success: function(response) {
                 isSaving = false;
                 console.log("Save response:", response);
@@ -2336,9 +2355,6 @@ ViewData["Title"] = "ការបង់ប្រាក់";
                     url: '/Student/DeletePayment',
                     type: 'POST',
                     data: { id: id },
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
                     success: function(response) {
                         if (response && response.success) {
                             Swal.fire({

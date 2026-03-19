@@ -18,31 +18,31 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --primary-light: #6366f1;
-            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
-            --primary-gradient-subtle: linear-gradient(135deg, rgba(79,70,229,0.1) 0%, rgba(124,58,237,0.06) 100%);
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
-            --body-bg: #f8fafc;
+            --primary: #6b7280;
+            --primary-dark: #4a5568;
+            --primary-light: #9ca3af;
+            --primary-gradient: linear-gradient(135deg, #6b7280 0%, #9ca3af 50%, #6b7280 100%);
+            --primary-gradient-subtle: linear-gradient(135deg, rgba(107,114,128,0.1) 0%, rgba(156,163,175,0.06) 100%);
+            --accent-color: #9ca3af;
+            --accent-hover: #6b7280;
+            --body-bg: #f5f5f4;
             --sidebar-bg: #ffffff;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-secondary: #334155;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --nav-hover: rgba(99,102,241,0.1);
+            --text-main: #374151;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --nav-hover: rgba(107,114,128,0.08);
             --input-bg: #ffffff;
-            --input-border: #cbd5e1;
-            --input-text: #0f172a;
+            --input-border: #d1d5db;
+            --input-text: #374151;
             --btn-primary-text: #ffffff;
-            --btn-secondary-bg: #f1f5f9;
-            --btn-secondary-text: #334155;
+            --btn-secondary-bg: #f8fafc;
+            --btn-secondary-text: #6b7280;
             --table-header-bg: #f8fafc;
             --table-row-hover: #f1f5f9;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
-            --card-shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --card-shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.07);
         }
 
         [data-bs-theme="dark"] {
@@ -551,6 +551,21 @@
         <div class="sidebar-scroll-area">
 
             <nav class="nav flex-column">
+                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#studentMenu">
+                    <i class="bi bi-people-fill me-3"></i> Students
+                    <i class="bi bi-chevron-right arrow-icon"></i>
+                </a>
+                <div class="collapse show" id="studentMenu">
+                    <ul class="submenu nav flex-column">
+                        <li><a class="nav-link ajax-link" data-url="/Student/Create">&#128221; Add Student</a></li>
+                        <li><a class="nav-link ajax-link" data-url="/Student/Index">&#128196; Student List</a></li>
+                        <li><a class="nav-link ajax-link" data-url="/Student/Classes">&#127968; Classes</a></li>
+                        <li><a class="nav-link ajax-link" data-url="/Student/Grades">&#128202; Grades</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <nav class="nav flex-column">
                 <a class="nav-link collapsed" data-bs-toggle="collapse" href="#userMenu">
                     <i class="bi bi-shield-lock-fill me-3"></i> User Management
                     <i class="bi bi-chevron-right arrow-icon"></i>
@@ -565,20 +580,6 @@
                 </div>
             </nav>
 
-            <nav class="nav flex-column">
-                <a class="nav-link collapsed" data-bs-toggle="collapse" href="#studentMenu">
-                    <i class="bi bi-people-fill me-3"></i> Students
-                    <i class="bi bi-chevron-right arrow-icon"></i>
-                </a>
-                <div class="collapse show" id="studentMenu">
-                    <ul class="submenu nav flex-column">
-                        <li><a class="nav-link ajax-link" data-url="/Student/Create">📝 Add Student</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/Index">📋 Student List</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/Classes">🏫 Classes</a></li>
-                        <li><a class="nav-link ajax-link" data-url="/Student/Grades">📊 Grades</a></li>
-                    </ul>
-                </div>
-            </nav>
 
             <nav class="nav flex-column">
                 <a class="nav-link collapsed" data-bs-toggle="collapse" href="#attendantMenu">
@@ -596,8 +597,8 @@
             <nav class="nav flex-column">
                 <a class="nav-link ajax-link" data-url="/Student/Payment"><i class="bi bi-credit-card-fill me-3"></i> Payments</a>
                 <a class="nav-link ajax-link" data-url="/Student/Scholarship"><i class="bi bi-gift-fill me-3"></i> Scholarships</a>
-                <a class="nav-link ajax-link" data-url="/Report/Index"><i class="bi bi-file-earmark-text-fill me-3"></i> Reports</a>
                 <a class="nav-link ajax-link" data-url="/Student/StudentCenter"><i class="bi bi-layout-text-window me-3"></i> Student Center</a>
+                <a class="nav-link ajax-link" data-url="/Report/Index"><i class="bi bi-file-earmark-text-fill me-3"></i> Reports</a>
             </nav>
 
         </div>

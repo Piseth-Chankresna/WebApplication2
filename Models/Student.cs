@@ -64,13 +64,10 @@ namespace WebApplication2.Models
         [Column("PlaceOfBirth")]
         public string? PlaceOfBirth { get; set; }
 
-        // Legacy property for backward compatibility
-        [NotMapped]
-        public string? Degree 
-        { 
-            get => Major; 
-            set => Major = value; 
-        }
+        [StringLength(100)]
+        [Display(Name = "កម្រិតសិក្សា")]
+        [Column("Degree")]
+        public string? Degree { get; set; }
 
         [StringLength(100)]
         [Display(Name = "ជំនាញ")]
@@ -92,27 +89,20 @@ namespace WebApplication2.Models
         [Display(Name = "បន្ទប់")]
         public string? Room { get; set; }
 
-        // Legacy properties for backward compatibility
-        [NotMapped]
-        public string? Batch 
-        { 
-            get => ""; 
-            set { /* Not stored in database */ } 
-        }
+        [StringLength(50)]
+        [Display(Name = "ឈុត")]
+        [Column("Batch")]
+        public string? Batch { get; set; }
 
-        [NotMapped]
-        public string? AcademicYear 
-        { 
-            get => ""; 
-            set { /* Not stored in database */ } 
-        }
+        [StringLength(50)]
+        [Display(Name = "ឆ្នាំសិក្សា")]
+        [Column("AcademicYear")]
+        public string? AcademicYear { get; set; }
 
-        [NotMapped]
-        public string? Scholarship 
-        { 
-            get => ""; 
-            set { /* Not stored in database */ } 
-        }
+        [StringLength(50)]
+        [Display(Name = "អាហារូបករណ៍")]
+        [Column("Scholarship")]
+        public string? Scholarship { get; set; }
 
         [StringLength(20)]
         [Display(Name = "ស្ថានភាព")]
@@ -176,6 +166,6 @@ namespace WebApplication2.Models
 
         [NotMapped]
         [Display(Name = "ឈ្មោះពេញ")]
-        public string DisplayName => string.IsNullOrEmpty(FullName) ? "មិនមានឈ្មោះ" : FullName;
+        public string? FullNameKhmer => string.IsNullOrEmpty(FullName) ? "មិនមានឈ្មោះ" : FullName;
     }
 }

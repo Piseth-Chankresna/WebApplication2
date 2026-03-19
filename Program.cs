@@ -80,6 +80,9 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await DataSeeder.SeedData(context);
+    
+    // Test grade storage
+    await TestGradeStorage.TestGradeOperations(context);
 }
 
 // Configure the HTTP request pipeline.

@@ -278,14 +278,14 @@
                                             {
                                                 <tr>
                                                     <td>@payment.PaymentDate.ToString("yyyy-MM-dd")</td>
-                                                    <td>@payment.PaymentType</td>
+                                                    <td>@payment.PaymentMethod</td>
                                                     <td>$@payment.Amount.ToString("F2")</td>
                                                     <td>
                                                         <span class="badge @(payment.Status == "Paid" ? "bg-success" : payment.Status == "Pending" ? "bg-warning" : "bg-danger")">
                                                             @payment.Status
                                                         </span>
                                                     </td>
-                                                    <td>@payment.Description ?? "-"</td>
+                                                    <td>@payment.Note ?? "-"</td>
                                                 </tr>
                                             }
                                         }

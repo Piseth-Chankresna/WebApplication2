@@ -344,18 +344,28 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-person"></i> ឈ្មោះពេញ</label>
+                    <label for="studentName" class="form-label"><i class="bi bi-person"></i> ឈ្មោះពេញ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-person"></i>
-                        <input type="text" name="Name" id="studentName" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" required>
+                        <input type="text" name="FullName" id="studentName" class="form-control" placeholder="ឧ. សុខ សុភ័ក្រ" autocomplete="name" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-gender-ambiguous"></i> ភេទ</label>
+                    <label for="studentEmail" class="form-label"><i class="bi bi-envelope"></i> អ៊ីមែល</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-envelope"></i>
+                        <input type="email" name="Email" id="studentEmail" class="form-control" placeholder="ឧ. student@example.com" autocomplete="email" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="studentGender" class="form-label"><i class="bi bi-gender-ambiguous"></i> ភេទ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-gender-ambiguous"></i>
-                        <select name="Gender" id="studentGender" class="form-control" required>
+                        <select name="Gender" id="studentGender" class="form-control" autocomplete="sex" required>
                             <option value="">ជ្រើសរើសភេទ</option>
                             <option value="ប្រុស">ប្រុស</option>
                             <option value="ស្រី">ស្រី</option>
@@ -363,31 +373,31 @@
                         <i class="bi bi-chevron-down select-arrow"></i>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="studentDob" class="form-label"><i class="bi bi-calendar"></i> ថ្ងៃខែឆ្នាំកំណើត</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-calendar"></i>
+                        <input type="date" name="DateOfBirth" id="studentDob" class="form-control" autocomplete="bday" required>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-calendar"></i> ថ្ងៃខែឆ្នាំកំណើត</label>
+                    <label for="studentPob" class="form-label"><i class="bi bi-geo-alt"></i> ទីកន្លែងកំណើត</label>
                     <div class="input-wrapper">
-                        <i class="bi bi-calendar"></i>
-                        <input type="date" name="Dob" id="studentDob" class="form-control" required>
+                        <i class="bi bi-geo-alt"></i>
+                        <input type="text" name="PlaceOfBirth" id="studentPob" class="form-control" placeholder="ឧ. ភ្នំពេញ" autocomplete="home" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-geo-alt"></i> ទីកន្លែងកំណើត</label>
+                    <label for="studentPhone" class="form-label"><i class="bi bi-phone"></i> លេខទូរស័ព្ទ</label>
                     <div class="input-wrapper">
-                        <i class="bi bi-geo-alt"></i>
-                        <input type="text" name="Pob" id="studentPob" class="form-control" placeholder="ឧ. ភ្នំពេញ" required>
+                        <i class="bi bi-phone"></i>
+                        <input type="tel" name="Phone" id="studentPhone" class="form-control" placeholder="ឧ. 012 345 678" autocomplete="tel" required>
                     </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label"><i class="bi bi-phone"></i> លេខទូរស័ព្ទ</label>
-                <div class="input-wrapper">
-                    <i class="bi bi-phone"></i>
-                    <input type="tel" name="Phone" id="studentPhone" class="form-control" placeholder="ឧ. 012 345 678" required>
                 </div>
             </div>
 
@@ -399,10 +409,10 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-book"></i> កម្រិតសិក្សា</label>
+                    <label for="studentDegree" class="form-label"><i class="bi bi-book"></i> កម្រិតសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-book"></i>
-                        <select name="Degree" id="studentDegree" class="form-control" required>
+                        <select name="Degree" id="studentDegree" class="form-control" autocomplete="education" required>
                             <option value="">ជ្រើសរើសកម្រិត</option>
                             <option value="បរិញ្ញាបត្ររង">បរិញ្ញាបត្ររង</option>
                             <option value="បរិញ្ញាបត្រ">បរិញ្ញាបត្រ</option>
@@ -413,10 +423,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-star"></i> ជំនាញ</label>
+                    <label for="studentMajor" class="form-label"><i class="bi bi-star"></i> ជំនាញ</label>
                     <div class="input-wrapper">
                         <i class="bi bi-star"></i>
-                        <select name="Major" id="studentMajor" class="form-control" required>
+                        <select name="Major" id="studentMajor" class="form-control" autocomplete="organization" required>
                             <option value="">ជ្រើសរើសជំនាញ</option>
                             <option value="Information Technology">Information Technology</option>
                             <option value="Business Administration">Business Administration</option>
@@ -431,10 +441,10 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-calendar3"></i> ឆ្នាំសិក្សា</label>
+                    <label for="studentYear" class="form-label"><i class="bi bi-calendar3"></i> ឆ្នាំសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar3"></i>
-                        <select name="Year" id="studentYear" class="form-control" required>
+                        <select name="Year" id="studentYear" class="form-control" autocomplete="organization-title" required>
                             <option value="">ជ្រើសរើសឆ្នាំ</option>
                             <option value="1">ឆ្នាំទី១</option>
                             <option value="2">ឆ្នាំទី២</option>
@@ -446,20 +456,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-door-open"></i> បន្ទប់</label>
+                    <label for="studentRoom" class="form-label"><i class="bi bi-door-open"></i> បន្ទប់</label>
                     <div class="input-wrapper">
                         <i class="bi bi-door-open"></i>
-                        <input type="text" name="Room" id="studentRoom" class="form-control" placeholder="ឧ. A101" required>
+                        <input type="text" name="Room" id="studentRoom" class="form-control" placeholder="ឧ. A101" autocomplete="address-line1" required>
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-clock"></i> វេនសិក្សា</label>
+                    <label for="studentShift" class="form-label"><i class="bi bi-clock"></i> វេនសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-clock"></i>
-                        <select name="Shift" id="studentShift" class="form-control" required>
+                        <select name="Shift" id="studentShift" class="form-control" autocomplete="off" required>
                             <option value="">ជ្រើសរើសវេន</option>
                             <option value="ព្រឹក">ព្រឹក (៧:០០-១១:០០)</option>
                             <option value="រសៀល">រសៀល (១:០០-៥:០០)</option>
@@ -471,10 +481,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-gift"></i> អាហារូបករណ៍</label>
+                    <label for="studentScholarship" class="form-label"><i class="bi bi-gift"></i> អាហារូបករណ៍</label>
                     <div class="input-wrapper">
                         <i class="bi bi-gift"></i>
-                        <select name="Scholarship" id="studentScholarship" class="form-control">
+                        <select name="Scholarship" id="studentScholarship" class="form-control" autocomplete="off">
                             <option value="0%">0% (បង់ថ្លៃពេញ)</option>
                             <option value="25%">25%</option>
                             <option value="50%">50%</option>
@@ -494,27 +504,45 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-tag"></i> លេខសម្គាល់ (បើមាន)</label>
+                    <label for="studentBatch" class="form-label"><i class="bi bi-tag"></i> លេខសម្គាល់ (បើមាន)</label>
                     <div class="input-wrapper">
                         <i class="bi bi-tag"></i>
-                        <input type="text" name="Batch" id="studentBatch" class="form-control" placeholder="ឧ. BATCH-2025">
+                        <input type="text" name="Batch" id="studentBatch" class="form-control" placeholder="ឧ. BATCH-2025" autocomplete="off">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-calendar-week"></i> ឆ្នាំសិក្សា</label>
+                    <label for="studentAcademicYear" class="form-label"><i class="bi bi-calendar-week"></i> ឆ្នាំសិក្សា</label>
                     <div class="input-wrapper">
                         <i class="bi bi-calendar-week"></i>
-                        <input type="text" name="AcademicYear" id="studentAcademicYear" class="form-control" value="2025-2026">
+                        <input type="text" name="AcademicYear" id="studentAcademicYear" class="form-control" value="2025-2026" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="studentAmountDue" class="form-label"><i class="bi bi-currency-dollar"></i> ថ្លៃសិក្សាត្រូវបង់ ($)</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-currency-dollar"></i>
+                        <input type="number" name="TuitionFee" id="studentAmountDue" class="form-control" value="1000" step="0.01" autocomplete="transaction-amount">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="studentPaidAmount" class="form-label"><i class="bi bi-cash-check"></i> ប្រាក់បង់រួច ($)</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-cash-check"></i>
+                        <input type="number" name="PaidAmount" id="studentPaidAmount" class="form-control" value="0" step="0.01" autocomplete="transaction-amount">
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label"><i class="bi bi-currency-dollar"></i> ថ្លៃសិក្សាត្រូវបង់ ($)</label>
+                <label for="studentNotes" class="form-label"><i class="bi bi-journal-text"></i> ចំណាំ</label>
                 <div class="input-wrapper">
-                    <i class="bi bi-currency-dollar"></i>
-                    <input type="number" name="AmountDue" id="studentAmountDue" class="form-control" value="0" step="0.01">
+                    <i class="bi bi-journal-text"></i>
+                    <textarea name="Notes" id="studentNotes" class="form-control" rows="3" placeholder="ចំណាំអំពីសិស្ស..." autocomplete="off"></textarea>
                 </div>
             </div>
 

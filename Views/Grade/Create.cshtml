@@ -1,0 +1,136 @@
+@model WebApplication2.Models.Grade
+@{
+    ViewData["Title"] = "បង្កើតពិន្ទុថ្មី";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">បង្កើតពិន្ទុថ្មី</h3>
+                    <div class="card-tools">
+                        <a href="/Grade/Index" class="btn btn-default btn-sm">
+                            <i class="fas fa-arrow-left"></i> ត្រឡប់ក្រោយ
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="StudentId" class="control-label">សិស្ស</label>
+                                    <select asp-for="StudentId" class="form-control" asp-items="ViewBag.StudentId">
+                                        <option value="">ជ្រើសរើសសិស្ស...</option>
+                                    </select>
+                                    <span asp-validation-for="StudentId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Subject" class="control-label">មុខវិជ្ជា</label>
+                                    <input asp-for="Subject" class="form-control" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="Attendance" class="control-label">វត្តមាន (១០%)</label>
+                                    <input asp-for="Attendance" class="form-control" type="number" min="0" max="10" step="0.1" />
+                                    <span asp-validation-for="Attendance" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="Assignment" class="control-label">កិច្ចការ (២០%)</label>
+                                    <input asp-for="Assignment" class="form-control" type="number" min="0" max="20" step="0.1" />
+                                    <span asp-validation-for="Assignment" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="MidTerm" class="control-label">ពាក់កណ្តាលឆ្នាំ (៣០%)</label>
+                                    <input asp-for="MidTerm" class="form-control" type="number" min="0" max="30" step="0.1" />
+                                    <span asp-validation-for="MidTerm" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="FinalExam" class="control-label">ប្រឡងចុងឆ្នាំ (៤០%)</label>
+                                    <input asp-for="FinalExam" class="form-control" type="number" min="0" max="40" step="0.1" />
+                                    <span asp-validation-for="FinalExam" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Semester" class="control-label">ឆមាស</label>
+                                    <input asp-for="Semester" class="form-control" />
+                                    <span asp-validation-for="Semester" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="AcademicYear" class="control-label">ឆ្នាំសិក្សា</label>
+                                    <input asp-for="AcademicYear" class="form-control" />
+                                    <span asp-validation-for="AcademicYear" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> រក្សាទុក
+                            </button>
+                            <a href="/Grade/Index" class="btn btn-default">
+                                <i class="fas fa-times"></i> បោះបង់
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+    
+    <script>
+        $(document).ready(function() {
+            // Calculate total and grade letter on input change
+            $('input[type="number"]').on('input', function() {
+            });
+
+            function calculateGrade() {
+                var attendance = parseFloat($('#Attendance').val()) || 0;
+                var assignment = parseFloat($('#Assignment').val()) || 0;
+                var midTerm = parseFloat($('#MidTerm').val()) || 0;
+                var finalExam = parseFloat($('#FinalExam').val()) || 0;
+                
+                var total = attendance + assignment + midTerm + finalExam;
+                
+                var gradeLetter = 'F';
+                if (total >= 90) gradeLetter = 'A';
+                else if (total >= 80) gradeLetter = 'B';
+                else if (total >= 70) gradeLetter = 'C';
+                else if (total >= 60) gradeLetter = 'D';
+                else if (total >= 50) gradeLetter = 'E';
+                
+                // You can display the calculated values if needed
+                console.log('Total:', total, 'Grade:', gradeLetter);
+            }
+        });
+    </script>
+}

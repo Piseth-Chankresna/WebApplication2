@@ -156,21 +156,24 @@ namespace WebApplication2.Controllers
                     .OrderByDescending(s => s.CreatedAt)
                     .Select(s => new {
                         s.Id,
-                        Name = s.FullName,
+                        name = s.FullName,
+                        s.Email,
                         s.Gender,
-                        Dob = s.DateOfBirth,
-                        Pob = s.PlaceOfBirth,
+                        dob = s.DateOfBirth,
+                        pob = s.PlaceOfBirth,
                         s.Phone,
-                        Degree = s.Major,
-                        s.Major,
-                        s.Year,
-                        s.Room,
-                        s.Scholarship,
-                        s.Shift,
-                        s.Photo,
-                        s.Batch,
-                        s.AcademicYear,
-                        AmountDue = s.TuitionFee - s.PaidAmount,
+                        degree = s.Degree,
+                        major = s.Major,
+                        year = s.Year,
+                        room = s.Room,
+                        scholarship = s.Scholarship,
+                        shift = s.Shift,
+                        photo = s.Photo,
+                        batch = s.Batch,
+                        academicYear = s.AcademicYear,
+                        amountDue = s.TuitionFee - s.PaidAmount,
+                        tuitionFee = s.TuitionFee,
+                        paidAmount = s.PaidAmount,
                         s.Status,
                         s.CreatedAt
                     })
@@ -219,6 +222,11 @@ namespace WebApplication2.Controllers
                     return ErrorResponse("សូមបញ្ចូលឈ្មោះសិស្ស");
                 }
 
+                if (string.IsNullOrEmpty(student.Email))
+                {
+                    return ErrorResponse("សូមបញ្ចូលអ៊ីមែល");
+                }
+
                 if (string.IsNullOrEmpty(student.Gender))
                 {
                     return ErrorResponse("សូមជ្រើសរើសភេទ");
@@ -227,6 +235,11 @@ namespace WebApplication2.Controllers
                 if (string.IsNullOrEmpty(student.DateOfBirth))
                 {
                     return ErrorResponse("សូមបញ្ចូលថ្ងៃខែឆ្នាំកំណើត");
+                }
+
+                if (string.IsNullOrEmpty(student.PlaceOfBirth))
+                {
+                    return ErrorResponse("សូមបញ្ចូលទីកន្លែងកំណើត");
                 }
 
                 if (string.IsNullOrEmpty(student.Phone))
@@ -256,6 +269,17 @@ namespace WebApplication2.Controllers
                     }
 
                     student.Photo = "/uploads/students/" + fileName;
+                }
+
+                // Ensure payment-related fields are properly set
+                if (student.TuitionFee <= 0)
+                {
+                    student.TuitionFee = 1000; // Default tuition fee
+                }
+                
+                if (student.PaidAmount < 0)
+                {
+                    student.PaidAmount = 0;
                 }
 
                 _context.Students.Add(student);
@@ -292,18 +316,29 @@ namespace WebApplication2.Controllers
                 
             try
             {
+                Console.WriteLine("========== UPDATE STUDENT START ==========");
+                Console.WriteLine($"Student ID: {updatedStudent?.Id}");
+                Console.WriteLine($"FullName: {updatedStudent?.FullName}");
+                Console.WriteLine($"TuitionFee: {updatedStudent?.TuitionFee}");
+                Console.WriteLine($"PaidAmount: {updatedStudent?.PaidAmount}");
+                Console.WriteLine($"Scholarship: {updatedStudent?.Scholarship}");
+                Console.WriteLine($"Notes: {updatedStudent?.Notes}");
+
                 var student = await _context.Students.FindAsync(updatedStudent.Id);
                 if (student == null)
                 {
+                    Console.WriteLine("ERROR: Student not found");
                     return Json(new { success = false, message = "រកមិនឃើញសិស្ស" });
                 }
 
                 // Update fields
                 student.FullName = updatedStudent.FullName;
+                student.Email = updatedStudent.Email;
                 student.Gender = updatedStudent.Gender;
                 student.DateOfBirth = updatedStudent.DateOfBirth;
                 student.PlaceOfBirth = updatedStudent.PlaceOfBirth;
                 student.Phone = updatedStudent.Phone;
+                student.Degree = updatedStudent.Degree;
                 student.Major = updatedStudent.Major;
                 student.Year = updatedStudent.Year;
                 student.Room = updatedStudent.Room;
@@ -314,6 +349,8 @@ namespace WebApplication2.Controllers
                 student.AcademicYear = updatedStudent.AcademicYear;
                 student.TuitionFee = updatedStudent.TuitionFee;
                 student.PaidAmount = updatedStudent.PaidAmount;
+                student.Notes = updatedStudent.Notes;
+                student.ClassId = updatedStudent.ClassId;
 
                 // Handle new photo
                 if (NewPhoto != null && NewPhoto.Length > 0)
@@ -347,6 +384,12 @@ namespace WebApplication2.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+                
+                Console.WriteLine("Student updated successfully!");
+                Console.WriteLine($"Updated TuitionFee: {student.TuitionFee}");
+                Console.WriteLine($"Updated PaidAmount: {student.PaidAmount}");
+                Console.WriteLine($"Updated Scholarship: {student.Scholarship}");
+                Console.WriteLine($"Updated Notes: {student.Notes}");
 
                 // Log activity
                 await _activityLogService.LogAsync(
@@ -428,7 +471,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateClass([FromBody] StudentClass classObj)
         {
             try
@@ -475,7 +517,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateClass([FromBody] StudentClass classObj)
         {
             try
@@ -503,7 +544,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteClass(int id)
         {
             try
@@ -611,7 +651,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveAttendance([FromBody] List<Attendance> attendances)
         {
             try
@@ -665,7 +704,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAttendance(int id, DateTime date, string status, string note)
         {
             try
@@ -696,7 +734,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAttendance(int id)
         {
             try
@@ -765,7 +802,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveGrade([FromBody] Grade grade)
         {
             try
@@ -890,7 +926,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SavePayment([FromBody] Payment payment)
         {
             try
@@ -924,10 +959,29 @@ namespace WebApplication2.Controllers
                     return Json(new { success = false, message = "សូមបញ្ចូលចំនួនទឹកប្រាក់អោយបានត្រឹមត្រូវ" });
                 }
 
-                // Generate receipt number
+                if (string.IsNullOrEmpty(payment.StudentName))
+                {
+                    Console.WriteLine("ERROR: StudentName is empty");
+                    return Json(new { success = false, message = "ឈ្មោះសិស្សត្រូវតែមាន" });
+                }
+
+                // Get student first to ensure they exist
+                var student = await _context.Students.FindAsync(payment.StudentId);
+                if (student == null)
+                {
+                    Console.WriteLine($"ERROR: Student with ID {payment.StudentId} not found");
+                    return Json(new { success = false, message = "រកមិនឃើញសិស្សដែលបានជ្រើសរើស" });
+                }
+
+                Console.WriteLine($"Student found: {student.FullName}, TuitionFee: {student.TuitionFee}, Scholarship: {student.Scholarship}");
+
+                // Generate receipt number and set defaults
                 payment.ReceiptNumber = "RCT" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 payment.PaymentDate = DateTime.Now;
                 payment.Status = "បង់រួច";
+
+                // Set additional payment details from student (only for logging, not stored in DB)
+                payment.AcademicYear = student.AcademicYear ?? "2025-2026";
 
                 Console.WriteLine($"Generated Receipt: {payment.ReceiptNumber}");
 
@@ -938,28 +992,20 @@ namespace WebApplication2.Controllers
                 int saveResult = await _context.SaveChangesAsync();
                 Console.WriteLine($"SaveChangesAsync result: {saveResult} records saved");
 
-                // Update student amount due
-                var student = await _context.Students.FindAsync(payment.StudentId);
-                if (student != null)
-                {
-                    Console.WriteLine($"Student found: {student.Name}, Current AmountDue: {student.AmountDue}");
+                // Update student paid amount
+                Console.WriteLine($"Student found: {student.FullName}, Current PaidAmount: {student.PaidAmount}");
 
-                    student.AmountDue -= payment.Amount;
-                    Console.WriteLine($"New AmountDue: {student.AmountDue}");
+                student.PaidAmount += payment.Amount;
+                Console.WriteLine($"New PaidAmount: {student.PaidAmount}");
 
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine("Student amount due updated");
-                }
-                else
-                {
-                    Console.WriteLine($"WARNING: Student with ID {payment.StudentId} not found");
-                }
+                await _context.SaveChangesAsync();
+                Console.WriteLine("Student paid amount updated");
 
                 // Log activity
                 if (_activityLogService != null)
                 {
                     await _activityLogService.LogAsync(0, "System", "កត់ត្រាការបង់ប្រាក់",
-                        $"កត់ត្រាការបង់ប្រាក់: ${payment.Amount} សម្រាប់សិស្ស ID: {payment.StudentId}");
+                        $"កត់ត្រាការបង់ប្រាក់: ${payment.Amount} សម្រាប់សិស្ស {student.FullName} (ID: {payment.StudentId})");
                 }
 
                 Console.WriteLine("========== SAVE PAYMENT SUCCESS ==========");
@@ -993,7 +1039,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePayment(int id)
         {
             try
@@ -1075,7 +1120,6 @@ namespace WebApplication2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateScholarship(string id, string scholarship)
         {
             try

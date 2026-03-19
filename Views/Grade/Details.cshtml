@@ -1,0 +1,255 @@
+@model WebApplication2.Models.Grade
+@{
+    ViewData["Title"] = "ពិន្ទុលម្អិត";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">ពិន្ទុលម្អិត</h3>
+                    <div class="card-tools">
+                        <a href="/Grade/Index" class="btn btn-default btn-sm">
+                            <i class="fas fa-arrow-left"></i> ត្រឡប់ក្រោយ
+                        </a>
+                        <a href="/Grade/Edit/@Model.Id" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> កែប្រែ
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>ព័ត៌មានសិស្ស</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>ឈ្មោះ:</strong></td>
+                                    <td>@Model.Student?.FullNameKhmer ?? Model.Student?.FullName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>លេខសម្គាល់:</strong></td>
+                                    <td>STU@(Model.StudentId.ToString("D6"))</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ជំនាញ:</strong></td>
+                                    <td>@Model.Student?.Major</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ឆ្នាំសិក្សា:</strong></td>
+                                    <td>@Model.Student?.Year</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>ព័ត៌មានពិន្ទុ</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>មុខវិជ្ជា:</strong></td>
+                                    <td>@Model.Subject</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ឆមាស:</strong></td>
+                                    <td>@Model.Semester</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ឆ្នាំសិក្សា:</strong></td>
+                                    <td>@Model.AcademicYear</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>កាលបរិច្ឆេទកត់ត្រា:</strong></td>
+                                    <td>@Model.RecordedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>ពិន្ទុលម្អិត</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>ប្រភេទពិន្ទុ</th>
+                                            <th>ពិន្ទុអតិបរមា</th>
+                                            <th>ពិន្ទុទទួលបាន</th>
+                                            <th>ភាគរយ</th>
+                                            <th>ស្ថានភាព</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>វត្តមាន</td>
+                                            <td>10</td>
+                                            <td>@Model.Attendance</td>
+                                            <td>@((Model.Attendance / 10 * 100).ToString("F1"))%</td>
+                                            <td>
+                                                @if (Model.Attendance >= 8)
+                                                {
+                                                    <span class="badge badge-success">ល្អ</span>
+                                                }
+                                                else if (Model.Attendance >= 6)
+                                                {
+                                                    <span class="badge badge-warning">មធ្យម</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">ខ្សោយ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>កិច្ចការ</td>
+                                            <td>20</td>
+                                            <td>@Model.Assignment</td>
+                                            <td>@((Model.Assignment / 20 * 100).ToString("F1"))%</td>
+                                            <td>
+                                                @if (Model.Assignment >= 16)
+                                                {
+                                                    <span class="badge badge-success">ល្អ</span>
+                                                }
+                                                else if (Model.Assignment >= 12)
+                                                {
+                                                    <span class="badge badge-warning">មធ្យម</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">ខ្សោយ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ពាក់កណ្តាលឆ្នាំ</td>
+                                            <td>30</td>
+                                            <td>@Model.MidTerm</td>
+                                            <td>@((Model.MidTerm / 30 * 100).ToString("F1"))%</td>
+                                            <td>
+                                                @if (Model.MidTerm >= 24)
+                                                {
+                                                    <span class="badge badge-success">ល្អ</span>
+                                                }
+                                                else if (Model.MidTerm >= 18)
+                                                {
+                                                    <span class="badge badge-warning">មធ្យម</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">ខ្សោយ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ប្រឡងចុងឆ្នាំ</td>
+                                            <td>40</td>
+                                            <td>@Model.FinalExam</td>
+                                            <td>@((Model.FinalExam / 40 * 100).ToString("F1"))%</td>
+                                            <td>
+                                                @if (Model.FinalExam >= 32)
+                                                {
+                                                    <span class="badge badge-success">ល្អ</span>
+                                                }
+                                                else if (Model.FinalExam >= 24)
+                                                {
+                                                    <span class="badge badge-warning">មធ្យម</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">ខ្សោយ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr class="font-weight-bold">
+                                            <td><strong>ពិន្ទុសរុប</strong></td>
+                                            <td><strong>100</strong></td>
+                                            <td><strong>@Model.Total</strong></td>
+                                            <td><strong>@((Model.Total / 100 * 100).ToString("F1"))%</strong></td>
+                                            <td>
+                                                <span class="badge badge-@GetGradeBadgeClass(Model.GradeLetter)">
+                                                    @Model.GradeLetter - @GetGradeDescription(Model.GradeLetter)
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>ការវិនិច្ឆ័យ</h5>
+                            <div class="alert alert-@GetResultAlertClass(Model.Total)">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-@GetResultIcon(Model.Total)"></i> 
+                                    @GetResultText(Model.Total)
+                                </h6>
+                                <p class="mb-0">
+                                    សិស្សបានទទួលពិន្ទុសរុប <strong>@Model.Total</strong> និងនិទ្ទេស <strong>@Model.GradeLetter</strong>។
+                                    @GetResultDescription(Model.Total)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetGradeBadgeClass(string grade)
+    {
+        return grade switch
+        {
+            "A" => "success",
+            "B" => "primary",
+            "C" => "warning",
+            "D" => "info",
+            "E" => "secondary",
+            "F" => "danger",
+            _ => "secondary"
+        };
+    }
+
+    private string GetGradeDescription(string grade)
+    {
+        return grade switch
+        {
+            "A" => "ល្អប្រសើរ",
+            "B" => "ល្អ",
+            "C" => "មធ្យម",
+            "D" => "ខ្សោយ",
+            "E" => "ខ្សោយណាស់",
+            "F" => "ធ្លាក់",
+            _ => "មិនកំណត់"
+        };
+    }
+
+    private string GetResultAlertClass(decimal total)
+    {
+        return total >= 60 ? "success" : "danger";
+    }
+
+    private string GetResultIcon(decimal total)
+    {
+        return total >= 60 ? "check-circle" : "times-circle";
+    }
+
+    private string GetResultText(decimal total)
+    {
+        return total >= 60 ? "ប្រលងជាប់" : "ធ្លាក់";
+    }
+
+    private string GetResultDescription(decimal total)
+    {
+        return total >= 60 
+            ? "សិស្សបានឆ្លងកាត់ការប្រឡងដោយជោគជ័យ។" 
+            : "សិស្សត្រូវបានកំណត់ថាធ្លាក់ហើយត្រូវការការប្រឹងប្រែងបន្ថែម។";
+    }
+}

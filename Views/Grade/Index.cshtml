@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "គ្រប់គ្រងពិន្ទុ";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">គ្រប់គ្រងពិន្ទុ</h3>
+                    <div class="card-tools">
+                        <a href="/Grade/Create" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> បង្កើតពិន្ទុថ្មី
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="gradesContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            loadGrades();
+        });
+
+        function loadGrades() {
+            $.ajax({
+                url: '/Grade/GetGrades',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        displayGrades(response.data);
+                    } else {
+                        showError('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ');
+                    }
+                },
+                error: function() {
+                    showError('មានបញ្ហាបច្ចេកទេស');
+                }
+            });
+        }
+
+        function displayGrades(grades) {
+            var container = $('#gradesContainer');
+            
+            if (!grades || grades.length === 0) {
+                container.html('<div class="text-center text-muted py-5">មិនទាន់មានទិន្នន័យពិន្ទុនៅឡើយទេ</div>');
+                return;
+            }
+
+            var html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr>';
+            html += '<th>សិស្ស</th><th>មុខវិជ្ជា</th><th>វត្តមាន</th><th>កិច្ចការ</th><th>ពាក់កណ្តាលឆ្នាំ</th><th>ប្រឡងចុងឆ្នាំ</th><th>ពិន្ទុសរុប</th><th>និទ្ទេស</th><th>សកម្មភាព</th>';
+            html += '</tr></thead><tbody>';
+
+            grades.forEach(function(grade) {
+                html += '<tr>';
+                html += '<td>' + grade.studentName + '</td>';
+                html += '<td>' + grade.subject + '</td>';
+                html += '<td>' + grade.attendance + '</td>';
+                html += '<td>' + grade.assignment + '</td>';
+                html += '<td>' + grade.midTerm + '</td>';
+                html += '<td>' + grade.finalExam + '</td>';
+                html += '<td><strong>' + grade.total + '</strong></td>';
+                html += '<td><span class="badge badge-' + getGradeBadgeClass(grade.gradeLetter) + '">' + grade.gradeLetter + '</span></td>';
+                html += '<td>';
+                html += '<a href="/Grade/Details/' + grade.id + '" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a> ';
+                html += '<a href="/Grade/Edit/' + grade.id + '" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a> ';
+                html += '<button class="btn btn-sm btn-danger" onclick="deleteGrade(' + grade.id + ')"><i class="fas fa-trash"></i></button>';
+                html += '</td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.html(html);
+        }
+
+        function getGradeBadgeClass(grade) {
+            switch(grade) {
+                case 'A': return 'success';
+                case 'B': return 'primary';
+                case 'C': return 'warning';
+                case 'D': return 'info';
+                case 'E': return 'secondary';
+                case 'F': return 'danger';
+                default: return 'secondary';
+            }
+        }
+
+        function deleteGrade(id) {
+            if (confirm('តើអ្នកពិតជាចង់លុបពិន្ទុនេះមែនទេ?')) {
+                $.ajax({
+                    url: '/Grade/Delete/' + id,
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showSuccess('លុបពិន្ទុដោយជោគជ័យ');
+                            loadGrades();
+                        } else {
+                            showError(response.message || 'មានបញ្ហាក្នុងការលុប');
+                        }
+                    },
+                    error: function() {
+                        showError('មានបញ្ហាបច្ចេកទេស');
+                    }
+                });
+            }
+        }
+
+        function showSuccess(message) {
+            // Implement success notification
+            alert(message);
+        }
+
+        function showError(message) {
+            // Implement error notification
+            alert(message);
+        }
+    </script>
+}

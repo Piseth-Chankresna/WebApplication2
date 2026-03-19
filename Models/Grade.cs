@@ -34,6 +34,7 @@ namespace WebApplication2.Models
         public string? Semester { get; set; }
         public string? AcademicYear { get; set; }
         public DateTime RecordedAt { get; set; } = DateTime.Now;
+        public int? CreatedBy { get; set; }
 
         [ForeignKey("StudentId")]
         public virtual Student? Student { get; set; }

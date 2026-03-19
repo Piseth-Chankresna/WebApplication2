@@ -273,6 +273,11 @@
         color: #f43f5e;
     }
 
+    .grade-e {
+        background: #e5e7eb;
+        color: #6b7280;
+    }
+
     .grade-f {
         background: #fee2e2;
         color: #ef4444;
@@ -628,8 +633,6 @@
         <div class="summary-label">និទ្ទេស C (៧០-៧៩)</div>
     </div>
 </div>
-
-<!-- Grade Distribution -->
 <div class="grade-distribution">
     <h6 class="fw-bold mb-3">ការចែកចាយនិទ្ទេស</h6>
     <div class="distribution-bar" id="distributionBar"></div>
@@ -638,6 +641,7 @@
         <div class="col">B</div>
         <div class="col">C</div>
         <div class="col">D</div>
+        <div class="col">E</div>
         <div class="col">F</div>
     </div>
 </div>
@@ -693,7 +697,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.7/sweetalert2.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     let gradesStudentsData = [];
     let grades = [];
@@ -731,7 +735,7 @@
 
     function loadGrades() {
         $.ajax({
-            url: '/Student/GetGrades',
+            url: '/Grade/GetGrades',
             type: 'GET',
             cache: false,
             success: function(response) {
@@ -787,7 +791,7 @@
             grade = grade || { attendance: 0, assignment: 0, midTerm: 0, finalExam: 0, total: 0, gradeLetter: 'F' };
 
             var total = (grade.attendance || 0) + (grade.assignment || 0) + (grade.midTerm || 0) + (grade.finalExam || 0);
-            var gradeClass = total >= 90 ? 'grade-a' : total >= 80 ? 'grade-b' : total >= 70 ? 'grade-c' : total >= 60 ? 'grade-d' : 'grade-f';
+            var gradeClass = total >= 90 ? 'grade-a' : total >= 80 ? 'grade-b' : total >= 70 ? 'grade-c' : total >= 60 ? 'grade-d' : total >= 50 ? 'grade-e' : 'grade-f';
 
             var avatarHtml = s.photo ? "<img src=\"" + s.photo + "\" style=\"width:100%; height:100%; object-fit:cover;\" onerror=\"this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(s.name || 'User') + '&background=f97316&color=fff'\">" : (s.name ? s.name.charAt(0).toUpperCase() : '?');
 
@@ -804,7 +808,7 @@
                 + '    <td><input type="number" class="grade-input" id="mid_' + s.id + '" name="mid_' + s.id + '" value="' + (grade.midTerm || 0).toString() + '" min="0" max="30" step="0.1" onchange="updateGrade(\'' + s.id + '\')" aria-label="ពាក់កណ្តាលឆ្នាំ ' + (s.name || '') + '"></td>'
                 + '    <td><input type="number" class="grade-input" id="final_' + s.id + '" name="final_' + s.id + '" value="' + (grade.finalExam || 0).toString() + '" min="0" max="40" step="0.1" onchange="updateGrade(\'' + s.id + '\')" aria-label="ប្រឡងចុងឆ្នាំ ' + (s.name || '') + '"></td>'
                 + '    <td class="total-cell" id="total_' + s.id + '">' + total.toFixed(1) + '</td>'
-                + '    <td><span class="grade-badge ' + gradeClass + '" id="grade_' + s.id + '">' + (total >= 90 ? 'A' : total >= 80 ? 'B' : total >= 70 ? 'C' : total >= 60 ? 'D' : 'F') + '</span></td>'
+                + '    <td><span class="grade-badge ' + gradeClass + '" id="grade_' + s.id + '">' + (total >= 90 ? 'A' : total >= 80 ? 'B' : total >= 70 ? 'C' : total >= 60 ? 'D' : total >= 50 ? 'E' : 'F') + '</span></td>'
                 + '    <td class="text-center"><button class="btn-edit-grade" onclick="openEditModal(\'' + s.id + '\', \'' + s.name + '\')"><i class="bi bi-pencil"></i> កែប្រែ</button></td>'
                 + '</tr>';
             
@@ -819,20 +823,26 @@
         var finalExam = parseFloat($(`#final_${studentId}`).val()) || 0;
 
         var total = attendance + assignment + midTerm + finalExam;
-        $(`#total_${studentId}`).text(total.toFixed(1));
-
         var gradeSpan = $(`#grade_${studentId}`);
-        gradeSpan.removeClass('grade-a grade-b grade-c grade-d grade-f');
+        gradeSpan.removeClass('grade-a grade-b grade-c grade-d grade-e grade-f');
 
         var gradeLetter = 'F';
         if (total >= 90) { gradeLetter = 'A'; gradeSpan.addClass('grade-a'); }
         else if (total >= 80) { gradeLetter = 'B'; gradeSpan.addClass('grade-b'); }
         else if (total >= 70) { gradeLetter = 'C'; gradeSpan.addClass('grade-c'); }
         else if (total >= 60) { gradeLetter = 'D'; gradeSpan.addClass('grade-d'); }
+        else if (total >= 50) { gradeLetter = 'E'; gradeSpan.addClass('grade-e'); }
         else { gradeSpan.addClass('grade-f'); }
         gradeSpan.text(gradeLetter);
 
+        // Check if grade exists for this student
+        var existingGrade = null;
+        if (Array.isArray(grades)) {
+            existingGrade = grades.find(g => g.studentId == studentId);
+        }
+
         var gradeData = {
+            id: existingGrade ? existingGrade.id : 0,
             studentId: studentId,
             subject: 'ទូទៅ',
             attendance: attendance,
@@ -843,12 +853,14 @@
             academicYear: '2025-2026'
         };
 
+        // Use Update endpoint if grade exists, otherwise Create
+        var apiUrl = existingGrade ? '/Grade/Update' : '/Grade/Create';
+
         $.ajax({
-            url: '/Student/SaveGrade',
+            url: apiUrl,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(gradeData),
-            headers: { 'RequestVerificationToken': token },
             success: function(response) {
                 console.log("Save grade response:", response);
                 if (response && response.success) {
@@ -963,7 +975,6 @@
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(gradeData),
-            headers: { 'RequestVerificationToken': token },
             success: function(response) {
                 console.log("Save grade response:", response);
 
@@ -1013,7 +1024,7 @@
         if (!Array.isArray(currentFilteredData)) currentFilteredData = [];
         var total = currentFilteredData.length;
         var passed = 0, totalScore = 0;
-        var gradeCounts = {A:0, B:0, C:0, D:0, F:0};
+        var gradeCounts = {A:0, B:0, C:0, D:0, E:0, F:0};
         var gradesArray = Array.isArray(grades) ? grades : [];
 
         currentFilteredData.forEach(s => {
@@ -1026,6 +1037,7 @@
                 else if (t >= 80) gradeCounts.B++;
                 else if (t >= 70) gradeCounts.C++;
                 else if (t >= 60) gradeCounts.D++;
+                else if (t >= 50) gradeCounts.E++;
                 else gradeCounts.F++;
             }
         });
@@ -1044,7 +1056,7 @@
         var total = currentFilteredData.length;
         if (total === 0) return;
 
-        var counts = {A:0, B:0, C:0, D:0, F:0};
+        var counts = {A:0, B:0, C:0, D:0, E:0, F:0};
         var gradesArray = Array.isArray(grades) ? grades : [];
 
         currentFilteredData.forEach(s => {
@@ -1055,13 +1067,14 @@
                 else if (t >= 80) counts.B++;
                 else if (t >= 70) counts.C++;
                 else if (t >= 60) counts.D++;
+                else if (t >= 50) counts.E++;
                 else counts.F++;
             }
         });
 
         var bar = $('#distributionBar').empty();
-        var colors = ['#10b981', '#3b82f6', '#f59e0b', '#f43f5e', '#ef4444'];
-        var grades = ['A', 'B', 'C', 'D', 'F'];
+        var colors = ['#10b981', '#3b82f6', '#f59e0b', '#f43f5e', '#6b7280', '#ef4444'];
+        var grades = ['A', 'B', 'C', 'D', 'E', 'F'];
 
         grades.forEach((g, i) => {
             var percentage = total > 0 ? (counts[g] / total * 100).toFixed(1) : 0;

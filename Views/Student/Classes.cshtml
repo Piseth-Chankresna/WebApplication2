@@ -325,7 +325,6 @@
 
         .btn-create {
             width: 100%;
-            justify-content: center;
         }
     }
 </style>
@@ -461,247 +460,264 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    let classesData = [];
-    let token = '';
+    // Use IIFE to avoid global scope pollution
+    (function() {
+        // Check if already initialized to prevent re-execution
+        if (window.classesPageInitialized) {
+            return;
+        }
+        window.classesPageInitialized = true;
+        
+        let classesData = [];
+        let token = '';
 
-    $(document).ready(function() {
-        token = $('input[name="__RequestVerificationToken"]').val();
-        loadClasses();
-    });
+        function initClassesPage() {
+            token = $('input[name="__RequestVerificationToken"]').val();
+            loadClasses();
+        }
 
-    function loadClasses() {
-        $('#classTableBody').html(`
-            <tr>
-                <td colspan="7" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
-                </td>
-            </tr>
-        `);
+        function loadClasses() {
+            $('#classTableBody').html(`
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">កំពុងផ្ទុកទិន្នន័យ...</p>
+                    </td>
+                </tr>
+            `);
 
-        $.ajax({
-            url: '/Student/GetClasses',
-            type: 'GET',
-            cache: false,
-            success: function(response) {
-                if (response && response.success) {
-                    classesData = response.data || [];
-                } else if (Array.isArray(response)) {
-                    classesData = response;
-                } else {
-                    classesData = [];
+            $.ajax({
+                url: '/Student/GetClasses',
+                type: 'GET',
+                cache: false,
+                success: function(response) {
+                    if (response && response.success) {
+                        classesData = response.data || [];
+                    } else if (Array.isArray(response)) {
+                        classesData = response;
+                    } else {
+                        classesData = [];
+                    }
+                    displayClasses(classesData);
+                    updateStats(classesData);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading classes:', error);
+                    $('#classTableBody').html(`
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                                <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
+                                <button class="btn btn-primary mt-3" onclick="loadClasses()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាម្តងទៀត
+                                </button>
+                            </td>
+                        </tr>
+                    `);
                 }
-                displayClasses(classesData);
-                updateStats(classesData);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading classes:', error);
-                $('#classTableBody').html(`
+            });
+        }
+
+        function displayClasses(data) {
+            var tbody = $('#classTableBody');
+            tbody.empty();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.html(`
                     <tr>
                         <td colspan="7" class="text-center py-5">
-                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
-                            <h5 class="mt-3 text-danger">មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</h5>
-                            <button class="btn btn-primary mt-3" onclick="loadClasses()">
-                                <i class="bi bi-arrow-clockwise me-2"></i>ព្យាយាម្តងទៀត
+                            <i class="bi bi-door-open" style="font-size: 4rem; color: #cbd5e1;"></i>
+                            <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យថ្នាក់នៅឡើយទេ</h5>
+                            <button class="btn btn-primary mt-3" onclick="openCreateModal()">
+                                <i class="bi bi-plus-lg me-2"></i>បន្ថែមថ្នាក់ដំបូង
                             </button>
                         </td>
                     </tr>
                 `);
+                return;
             }
-        });
-    }
 
-    function displayClasses(data) {
-        var tbody = $('#classTableBody');
-        tbody.empty();
-
-        if (!Array.isArray(data) || data.length === 0) {
-            tbody.html(`
-                <tr>
-                    <td colspan="7" class="text-center py-5">
-                        <i class="bi bi-door-open" style="font-size: 4rem; color: #cbd5e1;"></i>
-                        <h5 class="mt-3 text-muted">មិនទាន់មានទិន្នន័យថ្នាក់នៅឡើយទេ</h5>
-                        <button class="btn btn-primary mt-3" onclick="openCreateModal()">
-                            <i class="bi bi-plus-lg me-2"></i>បន្ថែមថ្នាក់ដំបូង
-                        </button>
-                    </td>
-                </tr>
-            `);
-            return;
+            data.forEach(cls => {
+                var row = `
+                    <tr>
+                        <td><span class="fw-bold text-primary">${cls.classCode || 'N/A'}</span></td>
+                        <td>${cls.className || 'N/A'}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="teacher-avatar">
+                                    ${cls.teacherName ? cls.teacherName.charAt(0).toUpperCase() : '?'}
+                                </div>
+                                <span>${cls.teacherName || 'មិនមាន'}</span>
+                            </div>
+                        </td>
+                        <td><span class="room-badge"><i class="bi bi-door-open me-1"></i>${cls.room || 'N/A'}</span></td>
+                        <td><span class="time-badge"><i class="bi bi-clock me-1"></i>${cls.time || 'N/A'}</span></td>
+                        <td><span class="badge bg-secondary">${cls.studentCount || 0} នាក់</span></td>
+                        <td class="text-end">
+                            <div class="action-group">
+                                <button class="btn-icon" onclick="openEditModal(${cls.id})" title="កែប្រែ">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-icon" onclick="deleteClass(${cls.id}, '${cls.className}')" title="លុប">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
         }
 
-        data.forEach(cls => {
-            var row = `
-                <tr>
-                    <td><span class="fw-bold text-primary">${cls.classCode || 'N/A'}</span></td>
-                    <td>${cls.className || 'N/A'}</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="teacher-avatar">
-                                ${cls.teacherName ? cls.teacherName.charAt(0).toUpperCase() : '?'}
-                            </div>
-                            <span>${cls.teacherName || 'មិនមាន'}</span>
-                        </div>
-                    </td>
-                    <td><span class="room-badge"><i class="bi bi-door-open me-1"></i>${cls.room || 'N/A'}</span></td>
-                    <td><span class="time-badge"><i class="bi bi-clock me-1"></i>${cls.time || 'N/A'}</span></td>
-                    <td><span class="badge bg-secondary">${cls.studentCount || 0} នាក់</span></td>
-                    <td class="text-end">
-                        <div class="action-group">
-                            <button class="btn-icon" onclick="openEditModal(${cls.id})" title="កែប្រែ">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn-icon" onclick="deleteClass(${cls.id}, '${cls.className}')" title="លុប">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            tbody.append(row);
+        function updateStats(data) {
+            if (!Array.isArray(data)) data = [];
+
+            $('#totalClasses').text(data.length);
+
+            var teachers = [...new Set(data.map(c => c.teacherName))].filter(t => t).length;
+            $('#totalTeachers').text(teachers);
+
+            var rooms = [...new Set(data.map(c => c.room))].filter(r => r).length;
+            $('#totalRooms').text(rooms);
+
+            var totalStudents = data.reduce((sum, c) => sum + (c.studentCount || 0), 0);
+            $('#totalStudents').text(totalStudents);
+        }
+
+        // Search functionality
+        $('#searchInput').on('keyup', function() {
+            var searchText = $(this).val().toLowerCase();
+
+            if (!Array.isArray(classesData)) classesData = [];
+
+            var filtered = classesData.filter(c =>
+                (c.className && c.className.toLowerCase().includes(searchText)) ||
+                (c.classCode && c.classCode.toLowerCase().includes(searchText)) ||
+                (c.teacherName && c.teacherName.toLowerCase().includes(searchText)) ||
+                (c.room && c.room.toLowerCase().includes(searchText))
+            );
+            displayClasses(filtered);
         });
-    }
 
-    function updateStats(data) {
-        if (!Array.isArray(data)) data = [];
-
-        $('#totalClasses').text(data.length);
-
-        var teachers = [...new Set(data.map(c => c.teacherName))].filter(t => t).length;
-        $('#totalTeachers').text(teachers);
-
-        var rooms = [...new Set(data.map(c => c.room))].filter(r => r).length;
-        $('#totalRooms').text(rooms);
-
-        var totalStudents = data.reduce((sum, c) => sum + (c.studentCount || 0), 0);
-        $('#totalStudents').text(totalStudents);
-    }
-
-    // Search functionality
-    $('#searchInput').on('keyup', function() {
-        var searchText = $(this).val().toLowerCase();
-
-        if (!Array.isArray(classesData)) classesData = [];
-
-        var filtered = classesData.filter(c =>
-            (c.className && c.className.toLowerCase().includes(searchText)) ||
-            (c.classCode && c.classCode.toLowerCase().includes(searchText)) ||
-            (c.teacherName && c.teacherName.toLowerCase().includes(searchText)) ||
-            (c.room && c.room.toLowerCase().includes(searchText))
-        );
-        displayClasses(filtered);
-    });
-
-    function openCreateModal() {
-        $('#modalTitleText').text('បន្ថែមថ្នាក់ថ្មី');
-        $('#classId').val('0');
-        $('#classCode').val('');
-        $('#className').val('');
-        $('#teacherName').val('');
-        $('#room').val('');
-        $('#time').val('');
-        $('#classModal').modal('show');
-    }
-
-    function openEditModal(id) {
-        var classObj = classesData.find(c => c.id === id);
-        if (classObj) {
-            $('#modalTitleText').text('កែប្រែព័ត៌មានថ្នាក់');
-            $('#classId').val(classObj.id);
-            $('#classCode').val(classObj.classCode);
-            $('#className').val(classObj.className);
-            $('#teacherName').val(classObj.teacherName);
-            $('#room').val(classObj.room);
-            $('#time').val(classObj.time);
+        function openCreateModal() {
+            $('#modalTitleText').text('បន្ថែមថ្នាក់ថ្មី');
+            $('#classId').val('0');
+            $('#classCode').val('');
+            $('#className').val('');
+            $('#teacherName').val('');
+            $('#room').val('');
+            $('#time').val('');
             $('#classModal').modal('show');
         }
-    }
 
-    function saveClass() {
-        var id = $('#classId').val();
-        var classData = {
-            id: id == '0' ? 0 : parseInt(id),
-            classCode: $('#classCode').val(),
-            className: $('#className').val(),
-            teacherName: $('#teacherName').val(),
-            room: $('#room').val(),
-            time: $('#time').val(),
-            studentCount: 0
-        };
-
-        // Validate
-        if (!classData.classCode) {
-            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលលេខកូដថ្នាក់' }); return;
-        }
-        if (!classData.className) {
-            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះថ្នាក់' }); return;
-        }
-        if (!classData.teacherName) {
-            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះគ្រូ' }); return;
-        }
-        if (!classData.room) {
-            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលបន្ទប់' }); return;
-        }
-        if (!classData.time) {
-            Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលម៉ោងសិក្សា' }); return;
-        }
-
-        var url = id == '0' ? '/Student/CreateClass' : '/Student/UpdateClass';
-
-        Swal.fire({ title: 'កំពុងរក្សាទុក...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(classData),
-            headers: { 'RequestVerificationToken': token },
-            success: function(response) {
-                if (response && response.success) {
-                    $('#classModal').modal('hide');
-                    Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
-                    loadClasses();
-                } else {
-                    Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
-                }
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស: ' + error });
+        function openEditModal(id) {
+            var classObj = classesData.find(c => c.id === id);
+            if (classObj) {
+                $('#modalTitleText').text('កែប្រែព័ត៌មានថ្នាក់');
+                $('#classId').val(classObj.id);
+                $('#classCode').val(classObj.classCode);
+                $('#className').val(classObj.className);
+                $('#teacherName').val(classObj.teacherName);
+                $('#room').val(classObj.room);
+                $('#time').val(classObj.time);
+                $('#classModal').modal('show');
             }
-        });
-    }
+        }
 
-    function deleteClass(id, name) {
-        Swal.fire({
-            title: 'លុបថ្នាក់?',
-            text: `តើអ្នកពិតជាចង់លុបថ្នាក់ "${name}" មែនទេ?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'បាទ/ចាស លុប',
-            cancelButtonText: 'បោះបង់'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/Student/DeleteClass',
-                    type: 'POST',
-                    data: { id: id },
-                    headers: { 'RequestVerificationToken': token },
-                    success: function(response) {
-                        if (response && response.success) {
-                            Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
-                            loadClasses();
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស' });
+        function saveClass() {
+            var id = $('#classId').val();
+            var classData = {
+                id: id == '0' ? 0 : parseInt(id),
+                classCode: $('#classCode').val(),
+                className: $('#className').val(),
+                teacherName: $('#teacherName').val(),
+                room: $('#room').val(),
+                time: $('#time').val(),
+                academicYear: '2025-2026', // Add required AcademicYear
+                studentCount: 0
+            };
+
+            // Validate
+            if (!classData.classCode) {
+                Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលលេខកូដថ្នាក់' }); return;
+            }
+            if (!classData.className) {
+                Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះថ្នាក់' }); return;
+            }
+            if (!classData.teacherName) {
+                Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលឈ្មោះគ្រូ' }); return;
+            }
+            if (!classData.room) {
+                Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលបន្ទប់' }); return;
+            }
+            if (!classData.time) {
+                Swal.fire({ icon: 'warning', title: 'សូមបញ្ចូលម៉ោងសិក្សា' }); return;
+            }
+
+            var url = id == '0' ? '/Student/CreateClass' : '/Student/UpdateClass';
+
+            Swal.fire({ title: 'កំពុងរក្សាទុក...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(classData),
+                success: function(response) {
+                    if (response && response.success) {
+                        $('#classModal').modal('hide');
+                        Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
+                        loadClasses();
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
                     }
-                });
-            }
-        });
-    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស: ' + error });
+                }
+            });
+        }
+
+        function deleteClass(id, name) {
+            Swal.fire({
+                title: 'លុបថ្នាក់?',
+                text: `តើអ្នកពិតជាចង់លុបថ្នាក់ "${name}" មែនទេ?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'បាទ/ចាស លុប',
+                cancelButtonText: 'បោះបង់'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Student/DeleteClass',
+                        type: 'POST',
+                        data: { id: id },
+                        headers: { 'RequestVerificationToken': token },
+                        success: function(response) {
+                            if (response && response.success) {
+                                Swal.fire({ icon: 'success', title: 'ជោគជ័យ!', text: response.message, timer: 2000, showConfirmButton: false });
+                                loadClasses();
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'កំហុស', text: response.message });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាបច្ចេកទេស' });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Expose functions globally for onclick handlers
+        window.openCreateModal = openCreateModal;
+        window.openEditModal = openEditModal;
+        window.saveClass = saveClass;
+        window.deleteClass = deleteClass;
+
+        // Initialize when document is ready
+        $(document).ready(initClassesPage);
+    })();
 </script>
